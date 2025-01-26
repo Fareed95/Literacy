@@ -20,7 +20,7 @@ except ImportError:
 BASE_API_URL = "https://api.langflow.astra.datastax.com"
 LANGFLOW_ID = "563677ee-c1d6-43e4-8442-c4d7fde992f0"
 FLOW_ID = "529e7fe9-97f4-4d33-aeee-84e55d731d4a"
-APPLICATION_TOKEN = os.getenv("GROQ_API_KEY")
+APPLICATION_TOKEN = os.getenv("APPLICATION_TOKEN")
 ENDPOINT = "" 
 def roadmap_generator(input_value):
     TWEAKS = {

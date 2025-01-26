@@ -39,7 +39,7 @@
                 "placeholder": "",
                 "show": true,
                 "name": "template",
-                "value": "Create a learning roadmap in JSON format based on the **key subject** extracted from the user's input. The roadmap should contain multiple **blocks**, with each block describing a specific skill, topic, or concept.\n\nEach block must include:\n- **name**: Name of the skill/topic (e.g., Python, OOP, Django).\n- **description**: A brief description of the skill/topic, its importance, and what to focus on.\n- **document**: Reliable official documentation or references to study.\n\nYour user input is - {input}\n\n### Guidelines:\n1. Extract the key subject from the input (e.g., \"I want to learn Django\" → Key Subject: \"Django\").\n2. Progress from beginner to advanced levels. For example, if the subject is Django:\n    - Python Basics\n    - Object-Oriented Programming (OOP) in Python\n    - Web Development Basics\n    - Django Introduction\n    - Building a Simple Django Application\n3. **Output Format**: Strictly use the JSON syntax as shown below. Ensure no explanations, additional text, or nested serializers:\n   ```\n   (\n   (\"name\": \"name\", \"description\": \"description\", \"document\": \"document\"),\n\n   (\"name\": \"name\", \"description\": \"description\", \"document\": \"document\")\n   )\n   \n",
+                "value": "Create a learning roadmap in JSON format based on the **key subject** extracted from the user's input. The roadmap should contain multiple **blocks**, with each block describing a specific skill, topic, or concept.\n\nEach block must include:\n- **name**: Name of the skill/topic (e.g., Python, OOP, Django).\n- **description**: A brief description of the skill/topic, its importance, and what to focus on.\n- **document**: Reliable official documentation or references to study.\n-**test_series**: provide the 20 questions with options and answer of that topic of that particular block\n\nYour user input is - {input}\n\n### Guidelines:\n1. Extract the key subject from the input (e.g., \"I want to learn Django\" → Key Subject: \"Django\").\n2. Progress from beginner to advanced levels. For example, if the subject is Django:\n    - Python Basics\n    - Object-Oriented Programming (OOP) in Python\n    - Web Development Basics\n    - Django Introduction\n    - Building a Simple Django Application\n3. **Output Format**: Strictly use the JSON syntax as shown below. Ensure no explanations, additional text, or nested serializers(NESTED SERIALIZER SHOULD BE MUST TIN test_series in each block).:\n   ```\n   (\n   (\"name\": \"name\", \"description\": \"description\", \"document\": \"document\"),\n\n   (\"name\": \"name\", \"description\": \"description\", \"document\": \"document\")\n   )\n   \n",
                 "display_name": "Template",
                 "advanced": false,
                 "dynamic": false,
@@ -116,8 +116,7 @@
             "error": null,
             "edited": false,
             "metadata": {},
-            "tool_mode": false,
-            "lf_version": "1.1.1"
+            "tool_mode": false
           },
           "type": "Prompt",
           "id": "Prompt-D4Qpb"
@@ -135,7 +134,7 @@
         "id": "GroqModel-LFxpd",
         "type": "genericNode",
         "position": {
-          "x": 839.7545848519719,
+          "x": 840.733965914105,
           "y": 628.3429496374677
         },
         "data": {
@@ -430,7 +429,7 @@
         "width": 320,
         "height": 669,
         "positionAbsolute": {
-          "x": 839.7545848519719,
+          "x": 840.733965914105,
           "y": 628.3429496374677
         },
         "dragging": false
@@ -899,14 +898,14 @@
       }
     ],
     "viewport": {
-      "x": -512.4586092416064,
-      "y": -506.63773375342635,
+      "x": -560.4586092416064,
+      "y": -460.63773375342623,
       "zoom": 1.021053028962951
     }
   },
   "description": "Bridging Prompts for Brilliance.",
   "name": "Roadmap_generator",
   "last_tested_version": "1.1.1",
-  "endpoint_name": null,
+  "endpoint_name": "roadmap",
   "is_component": false
 }
