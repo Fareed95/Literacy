@@ -31,14 +31,15 @@ def youtube_search(query, max_results=5):
 
     return results
 
+if __name__ == "__main__":
 # Usage example
-search_results = youtube_search("sex education in one shot", max_results=5)
+    search_results = youtube_search("sex education in one shot", max_results=5)
 
-# Display only the first video link
-if search_results:
-    first_video = search_results[0]
-    print(f"First video : {first_video['url']}")
-    print(f"First video link: {first_video['url']}")
-    print(f"Embed URL for frontend: {first_video['embed_url']}")  # Print embed URL for frontend
-else:
-    print("No videos found.")
+    # Display only the first video link
+    if search_results:
+        first_video = search_results[0]
+        print(f"First video : {first_video['url']}")
+        print(f"First video link: {first_video['url']}")
+        print(f"Embed URL for frontend: {first_video['embed_url']}")  # Print embed URL for frontend
+    else:
+        print("No videos found.")

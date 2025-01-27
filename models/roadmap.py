@@ -55,5 +55,10 @@ def roadmap(input_value):
     # print(cleaned_message)
 
 
-result = roadmap(input_value="mern")
-print(result)
+
+
+if __name__ == "__main__":
+
+    result = roadmap(input_value="mern")
+    result_json = json.loads(result)
+    print(result_json[1]['name'])

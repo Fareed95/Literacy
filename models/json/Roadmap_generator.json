@@ -6,8 +6,8 @@
         "id": "Prompt-D4Qpb",
         "type": "genericNode",
         "position": {
-          "x": 465.030655319095,
-          "y": 488.4975243891155
+          "x": 462.4552741724151,
+          "y": 420.249924002099
         },
         "data": {
           "node": {
@@ -116,7 +116,8 @@
             "error": null,
             "edited": false,
             "metadata": {},
-            "tool_mode": false
+            "tool_mode": false,
+            "lf_version": "1.1.1"
           },
           "type": "Prompt",
           "id": "Prompt-D4Qpb"
@@ -125,8 +126,8 @@
         "width": 320,
         "height": 345,
         "positionAbsolute": {
-          "x": 465.030655319095,
-          "y": 488.4975243891155
+          "x": 462.4552741724151,
+          "y": 420.249924002099
         },
         "dragging": false
       },
@@ -134,7 +135,7 @@
         "id": "GroqModel-LFxpd",
         "type": "genericNode",
         "position": {
-          "x": 840.733965914105,
+          "x": 842.021656487445,
           "y": 628.3429496374677
         },
         "data": {
@@ -429,7 +430,7 @@
         "width": 320,
         "height": 669,
         "positionAbsolute": {
-          "x": 840.733965914105,
+          "x": 842.021656487445,
           "y": 628.3429496374677
         },
         "dragging": false
@@ -525,7 +526,7 @@
           "type": "TextOutput",
           "id": "TextOutput-vqJjc"
         },
-        "selected": true,
+        "selected": false,
         "width": 320,
         "height": 233,
         "dragging": false,
@@ -783,37 +784,137 @@
           "y": 944.1668811634438
         },
         "dragging": false
+      },
+      {
+        "id": "Prompt-BUQC5",
+        "type": "genericNode",
+        "position": {
+          "x": 481.5507004122567,
+          "y": 913.1338890045741
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from langflow.base.prompts.api_utils import process_prompt_template\nfrom langflow.custom import Component\nfrom langflow.inputs.inputs import DefaultPromptField\nfrom langflow.io import Output, PromptInput\nfrom langflow.schema.message import Message\nfrom langflow.template.utils import update_template_values\n\n\nclass PromptComponent(Component):\n    display_name: str = \"Prompt\"\n    description: str = \"Create a prompt template with dynamic variables.\"\n    icon = \"prompts\"\n    trace_type = \"prompt\"\n    name = \"Prompt\"\n\n    inputs = [\n        PromptInput(name=\"template\", display_name=\"Template\"),\n    ]\n\n    outputs = [\n        Output(display_name=\"Prompt Message\", name=\"prompt\", method=\"build_prompt\"),\n    ]\n\n    async def build_prompt(self) -> Message:\n        prompt = Message.from_template(**self._attributes)\n        self.status = prompt.text\n        return prompt\n\n    def _update_template(self, frontend_node: dict):\n        prompt_template = frontend_node[\"template\"][\"template\"][\"value\"]\n        custom_fields = frontend_node[\"custom_fields\"]\n        frontend_node_template = frontend_node[\"template\"]\n        _ = process_prompt_template(\n            template=prompt_template,\n            name=\"template\",\n            custom_fields=custom_fields,\n            frontend_node_template=frontend_node_template,\n        )\n        return frontend_node\n\n    def post_code_processing(self, new_frontend_node: dict, current_frontend_node: dict):\n        \"\"\"This function is called after the code validation is done.\"\"\"\n        frontend_node = super().post_code_processing(new_frontend_node, current_frontend_node)\n        template = frontend_node[\"template\"][\"template\"][\"value\"]\n        # Kept it duplicated for backwards compatibility\n        _ = process_prompt_template(\n            template=template,\n            name=\"template\",\n            custom_fields=frontend_node[\"custom_fields\"],\n            frontend_node_template=frontend_node[\"template\"],\n        )\n        # Now that template is updated, we need to grab any values that were set in the current_frontend_node\n        # and update the frontend_node with those values\n        update_template_values(new_template=frontend_node, previous_template=current_frontend_node[\"template\"])\n        return frontend_node\n\n    def _get_fallback_input(self, **kwargs):\n        return DefaultPromptField(**kwargs)\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "template": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "list": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "template",
+                "value": "Create a learning roadmap in JSON format based on the **key subject** extracted from the user's input. The roadmap should contain multiple **blocks**, with each block describing a specific skill, topic, or concept.\n\nEach block must include:\n- **name**: Name of the skill/topic (e.g., Python, OOP, Django).\n- **description**: A brief description of the skill/topic, its importance, and what to focus on.\n- **document**: Reliable official documentation or references to study.\n\nYour user input is - {input}\n\n### Guidelines:\n1. Extract the key subject from the input (e.g., \"I want to learn Django\" → Key Subject: \"Django\").\n2. Progress from beginner to advanced levels. For example, if the subject is Django:\n    - Python Basics\n    - Object-Oriented Programming (OOP) in Python\n    - Web Development Basics\n    - Django Introduction\n    - Building a Simple Django Application\n3. **Output Format**: Strictly use the JSON syntax as shown below. Ensure no explanations, additional text, or nested serializers.:\n   ```\n   (\n   (\"name\": \"name\", \"description\": \"description\", \"document\": \"document\"),\n\n   (\"name\": \"name\", \"description\": \"description\", \"document\": \"document\")\n   )\n   \n",
+                "display_name": "Template",
+                "advanced": false,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "prompt",
+                "_input_type": "PromptInput"
+              },
+              "input": {
+                "field_type": "str",
+                "required": false,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "",
+                "fileTypes": [],
+                "file_path": "",
+                "name": "input",
+                "display_name": "input",
+                "advanced": false,
+                "input_types": [
+                  "Message",
+                  "Text"
+                ],
+                "dynamic": false,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false,
+                "type": "str"
+              }
+            },
+            "description": "Create a prompt template with dynamic variables.",
+            "icon": "prompts",
+            "is_input": null,
+            "is_output": null,
+            "is_composition": null,
+            "base_classes": [
+              "Message"
+            ],
+            "name": "",
+            "display_name": "Prompt",
+            "documentation": "",
+            "custom_fields": {
+              "template": [
+                "input"
+              ]
+            },
+            "output_types": [],
+            "full_path": null,
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "prompt",
+                "hidden": null,
+                "display_name": "Prompt Message",
+                "method": "build_prompt",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null
+              }
+            ],
+            "field_order": [
+              "template"
+            ],
+            "beta": false,
+            "legacy": false,
+            "error": null,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false
+          },
+          "type": "Prompt",
+          "id": "Prompt-BUQC5"
+        },
+        "selected": false,
+        "width": 320,
+        "height": 345,
+        "positionAbsolute": {
+          "x": 481.5507004122567,
+          "y": 913.1338890045741
+        },
+        "dragging": false
       }
     ],
     "edges": [
-      {
-        "source": "Prompt-D4Qpb",
-        "sourceHandle": "{œdataTypeœ:œPromptœ,œidœ:œPrompt-D4Qpbœ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "GroqModel-LFxpd",
-        "targetHandle": "{œfieldNameœ:œsystem_messageœ,œidœ:œGroqModel-LFxpdœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
-        "data": {
-          "targetHandle": {
-            "fieldName": "system_message",
-            "id": "GroqModel-LFxpd",
-            "inputTypes": [
-              "Message"
-            ],
-            "type": "str"
-          },
-          "sourceHandle": {
-            "dataType": "Prompt",
-            "id": "Prompt-D4Qpb",
-            "name": "prompt",
-            "output_types": [
-              "Message"
-            ]
-          }
-        },
-        "id": "reactflow__edge-Prompt-D4Qpb{œdataTypeœ:œPromptœ,œidœ:œPrompt-D4Qpbœ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}-GroqModel-LFxpd{œfieldNameœ:œsystem_messageœ,œidœ:œGroqModel-LFxpdœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
-        "animated": false,
-        "className": "",
-        "selected": false
-      },
       {
         "source": "GroqModel-LFxpd",
         "sourceHandle": "{œdataTypeœ:œGroqModelœ,œidœ:œGroqModel-LFxpdœ,œnameœ:œtext_outputœ,œoutput_typesœ:[œMessageœ]}",
@@ -871,12 +972,12 @@
       {
         "source": "TextInput-PDOUC",
         "sourceHandle": "{œdataTypeœ:œTextInputœ,œidœ:œTextInput-PDOUCœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "Prompt-D4Qpb",
-        "targetHandle": "{œfieldNameœ:œinputœ,œidœ:œPrompt-D4Qpbœ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}",
+        "target": "Prompt-BUQC5",
+        "targetHandle": "{œfieldNameœ:œinputœ,œidœ:œPrompt-BUQC5œ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}",
         "data": {
           "targetHandle": {
             "fieldName": "input",
-            "id": "Prompt-D4Qpb",
+            "id": "Prompt-BUQC5",
             "inputTypes": [
               "Message",
               "Text"
@@ -892,15 +993,38 @@
             ]
           }
         },
-        "id": "reactflow__edge-TextInput-PDOUC{œdataTypeœ:œTextInputœ,œidœ:œTextInput-PDOUCœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-Prompt-D4Qpb{œfieldNameœ:œinputœ,œidœ:œPrompt-D4Qpbœ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}",
-        "animated": false,
-        "className": ""
+        "id": "reactflow__edge-TextInput-PDOUC{œdataTypeœ:œTextInputœ,œidœ:œTextInput-PDOUCœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-Prompt-BUQC5{œfieldNameœ:œinputœ,œidœ:œPrompt-BUQC5œ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}"
+      },
+      {
+        "source": "Prompt-BUQC5",
+        "sourceHandle": "{œdataTypeœ:œPromptœ,œidœ:œPrompt-BUQC5œ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}",
+        "target": "GroqModel-LFxpd",
+        "targetHandle": "{œfieldNameœ:œsystem_messageœ,œidœ:œGroqModel-LFxpdœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "data": {
+          "targetHandle": {
+            "fieldName": "system_message",
+            "id": "GroqModel-LFxpd",
+            "inputTypes": [
+              "Message"
+            ],
+            "type": "str"
+          },
+          "sourceHandle": {
+            "dataType": "Prompt",
+            "id": "Prompt-BUQC5",
+            "name": "prompt",
+            "output_types": [
+              "Message"
+            ]
+          }
+        },
+        "id": "reactflow__edge-Prompt-BUQC5{œdataTypeœ:œPromptœ,œidœ:œPrompt-BUQC5œ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}-GroqModel-LFxpd{œfieldNameœ:œsystem_messageœ,œidœ:œGroqModel-LFxpdœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}"
       }
     ],
     "viewport": {
-      "x": -560.4586092416064,
-      "y": -460.63773375342623,
-      "zoom": 1.021053028962951
+      "x": -333.66506424526597,
+      "y": -248.05046142262927,
+      "zoom": 0.7765840806042874
     }
   },
   "description": "Bridging Prompts for Brilliance.",
