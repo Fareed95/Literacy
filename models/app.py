@@ -3,6 +3,7 @@ import asyncio
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import json
+from fastapi.middleware.cors import CORSMiddleware
 
 # Apply nest_asyncio to allow nesting of event loops
 nest_asyncio.apply()
@@ -11,7 +12,13 @@ from roadmap import roadmap  # Assuming synchronous function
 from youtube_scrapping import youtube_search  # Assuming synchronous function
 
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://marketlenss.vercel.app","http://localhost:3000","http://localhost:3001"],  # Allow only this origin
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 class RoadmapInput(BaseModel):
     input_value: str
 
