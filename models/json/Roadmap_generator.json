@@ -39,7 +39,7 @@
                 "placeholder": "",
                 "show": true,
                 "name": "template",
-                "value": "Create a learning roadmap in JSON format based on the **key subject** extracted from the user's input. The roadmap should contain multiple **blocks**, with each block describing a specific skill, topic, or concept.\n\nEach block must include:\n- **name**: Name of the skill/topic (e.g., Python, OOP, Django).\n- **description**: A brief description of the skill/topic, its importance, and what to focus on.\n- **document**: Reliable official documentation or references to study.\n-**test_series**: provide the 20 questions with options and answer of that topic of that particular block\n\nYour user input is - {input}\n\n### Guidelines:\n1. Extract the key subject from the input (e.g., \"I want to learn Django\" → Key Subject: \"Django\").\n2. Progress from beginner to advanced levels. For example, if the subject is Django:\n    - Python Basics\n    - Object-Oriented Programming (OOP) in Python\n    - Web Development Basics\n    - Django Introduction\n    - Building a Simple Django Application\n3. **Output Format**: Strictly use the JSON syntax as shown below. Ensure no explanations, additional text, or nested serializers(NESTED SERIALIZER SHOULD BE MUST TIN test_series in each block).:\n   ```\n   (\n   (\"name\": \"name\", \"description\": \"description\", \"document\": \"document\"),\n\n   (\"name\": \"name\", \"description\": \"description\", \"document\": \"document\")\n   )\n   \n",
+                "value": "Create a learning roadmap in JSON format based on the **key subject** extracted from the user's input. The roadmap should contain multiple **blocks**, with each block describing a specific skill, topic, or concept.\n\nEach block must include:\n- **name**: Name of the skill/topic (e.g., Python, OOP, Django).\n- **description**: A brief description of the skill/topic, its importance, and what to focus on.\n- **document**: Reliable official documentation or references to study.\n-**test_series**: provide the 3 questions with options and answer of that topic of that particular block\n\nYour user input is - {input}\n\n### Guidelines:\n1. Extract the key subject from the input (e.g., \"I want to learn Django\" → Key Subject: \"Django\").\n2. Progress from beginner to advanced levels. For example, if the subject is Django:\n    - Python Basics\n    - Object-Oriented Programming (OOP) in Python\n    - Web Development Basics\n    - Django Introduction\n    - Building a Simple Django Application\n3. **Output Format**: Strictly use the JSON syntax as shown below. Ensure no explanations, additional text, or nested serializers(NESTED SERIALIZER SHOULD BE MUST TIN test_series in each block).:\n   ```\n   (\n   (\"name\": \"name\", \"description\": \"description\", \"document\": \"document\"),\n\n   (\"name\": \"name\", \"description\": \"description\", \"document\": \"document\")\n   )\n   \n",
                 "display_name": "Template",
                 "advanced": false,
                 "dynamic": false,
@@ -116,8 +116,7 @@
             "error": null,
             "edited": false,
             "metadata": {},
-            "tool_mode": false,
-            "lf_version": "1.1.1"
+            "tool_mode": false
           },
           "type": "Prompt",
           "id": "Prompt-D4Qpb"
@@ -526,7 +525,7 @@
           "type": "TextOutput",
           "id": "TextOutput-vqJjc"
         },
-        "selected": false,
+        "selected": true,
         "width": 320,
         "height": 233,
         "dragging": false,
@@ -972,12 +971,12 @@
       {
         "source": "TextInput-PDOUC",
         "sourceHandle": "{œdataTypeœ:œTextInputœ,œidœ:œTextInput-PDOUCœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "Prompt-BUQC5",
-        "targetHandle": "{œfieldNameœ:œinputœ,œidœ:œPrompt-BUQC5œ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}",
+        "target": "Prompt-D4Qpb",
+        "targetHandle": "{œfieldNameœ:œinputœ,œidœ:œPrompt-D4Qpbœ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}",
         "data": {
           "targetHandle": {
             "fieldName": "input",
-            "id": "Prompt-BUQC5",
+            "id": "Prompt-D4Qpb",
             "inputTypes": [
               "Message",
               "Text"
@@ -993,11 +992,11 @@
             ]
           }
         },
-        "id": "reactflow__edge-TextInput-PDOUC{œdataTypeœ:œTextInputœ,œidœ:œTextInput-PDOUCœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-Prompt-BUQC5{œfieldNameœ:œinputœ,œidœ:œPrompt-BUQC5œ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}"
+        "id": "reactflow__edge-TextInput-PDOUC{œdataTypeœ:œTextInputœ,œidœ:œTextInput-PDOUCœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-Prompt-D4Qpb{œfieldNameœ:œinputœ,œidœ:œPrompt-D4Qpbœ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}"
       },
       {
-        "source": "Prompt-BUQC5",
-        "sourceHandle": "{œdataTypeœ:œPromptœ,œidœ:œPrompt-BUQC5œ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}",
+        "source": "Prompt-D4Qpb",
+        "sourceHandle": "{œdataTypeœ:œPromptœ,œidœ:œPrompt-D4Qpbœ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}",
         "target": "GroqModel-LFxpd",
         "targetHandle": "{œfieldNameœ:œsystem_messageœ,œidœ:œGroqModel-LFxpdœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
         "data": {
@@ -1011,19 +1010,19 @@
           },
           "sourceHandle": {
             "dataType": "Prompt",
-            "id": "Prompt-BUQC5",
+            "id": "Prompt-D4Qpb",
             "name": "prompt",
             "output_types": [
               "Message"
             ]
           }
         },
-        "id": "reactflow__edge-Prompt-BUQC5{œdataTypeœ:œPromptœ,œidœ:œPrompt-BUQC5œ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}-GroqModel-LFxpd{œfieldNameœ:œsystem_messageœ,œidœ:œGroqModel-LFxpdœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}"
+        "id": "reactflow__edge-Prompt-D4Qpb{œdataTypeœ:œPromptœ,œidœ:œPrompt-D4Qpbœ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}-GroqModel-LFxpd{œfieldNameœ:œsystem_messageœ,œidœ:œGroqModel-LFxpdœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}"
       }
     ],
     "viewport": {
-      "x": -333.66506424526597,
-      "y": -248.05046142262927,
+      "x": -124.66506424526551,
+      "y": -238.7738773420249,
       "zoom": 0.7765840806042874
     }
   },
