@@ -1,45 +1,48 @@
-import asyncio
-
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 import json
-from fastapi.middleware.cors import CORSMiddleware
+import os
+from flask import Flask, request, jsonify
+from concurrent.futures import ThreadPoolExecutor
 from roadmap import roadmap  # Assuming synchronous function
 from youtube_scrapping import youtube_search  # Assuming synchronous function
 from pdf_scrapping import search_and_download_pdf  # PDF scraping module
-import os
 
-app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://marketlenss.vercel.app",
-        "http://localhost:3000",
-        "http://localhost:3001"
-    ],  # Allow only these origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers
-)
+app = Flask(__name__)
+executor = ThreadPoolExecutor(max_workers=5)
 
-# Input data model
-class RoadmapInput(BaseModel):
-    input_value: str
+# Define allowed origins for CORS (same as in FastAPI)
+from flask_cors import CORS
+CORS(app, origins=[
+    "https://marketlenss.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:3001"
+], supports_credentials=True)
 
-@app.post("/generate-roadmap")
-async def generate_roadmap(data: RoadmapInput):
+# Input data model (using Flask's request format)
+class RoadmapInput:
+    def __init__(self, input_value):
+        self.input_value = input_value
+
+@app.route("/generate-roadmap", methods=["POST"])
+def generate_roadmap():
     """
     Generate a roadmap with YouTube videos and PDF resources.
     """
     try:
-        # Fetch roadmap components asynchronously
-        result = await asyncio.to_thread(roadmap, data.input_value)
-        result_json = json.loads(result)
+        # Get data from request body
+        data = request.get_json()
+        input_value = data.get('input_value')
+        
+        if not input_value:
+            return jsonify({"error": "input_value is required"}), 400
+        
+        roadmap_result = executor.submit(roadmap, input_value)
+        result_json = json.loads(roadmap_result.result())
         length_json = len(result_json)
 
-        # Add YouTube videos for each component asynchronously
+        # Add YouTube videos for each component
         for i in range(length_json):
-            search_results = await asyncio.to_thread(youtube_search, f"one shot video for {result_json[i]['name']}")
+            search_results = executor.submit(youtube_search, f"one shot video for {result_json[i]['name']}")
+            search_results = search_results.result()
             if search_results:
                 first_video = search_results[0]
                 result_json[i]['embed_url'] = first_video['embed_url']
@@ -47,7 +50,8 @@ async def generate_roadmap(data: RoadmapInput):
                 result_json[i]['embed_url'] = "No video found"
 
         # Fetch PDFs for the overall roadmap topic
-        pdf_result = await asyncio.to_thread(search_and_download_pdf, data.input_value)
+        pdf_result = executor.submit(search_and_download_pdf, input_value)
+        pdf_result = pdf_result.result()
         if "error" in pdf_result:
             pdf_links = []
         else:
@@ -62,12 +66,15 @@ async def generate_roadmap(data: RoadmapInput):
                     print(f"Error cleaning up file {file_path}: {e}")
 
         # Return the final response
-        return {
+        return jsonify({
             "roadmap": result_json,
             "pdf_links": pdf_links
-        }
+        })
 
     except KeyError:
-        raise HTTPException(status_code=500, detail="Error parsing roadmap data.")
+        return jsonify({"error": "Error parsing roadmap data."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
