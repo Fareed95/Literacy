@@ -1,12 +1,12 @@
 import nest_asyncio
-import asyncio
+# import asyncio
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import json
 from fastapi.middleware.cors import CORSMiddleware
 
 # Apply nest_asyncio to allow nesting of event loops
-nest_asyncio.apply()
+# nest_asyncio.apply()
 
 from roadmap import roadmap  # Assuming synchronous function
 from youtube_scrapping import youtube_search  # Assuming synchronous function
