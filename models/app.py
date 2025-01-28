@@ -1,45 +1,71 @@
-import nest_asyncio
-# import asyncio
+import asyncio
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import json
 from fastapi.middleware.cors import CORSMiddleware
-
-# Apply nest_asyncio to allow nesting of event loops
-# nest_asyncio.apply()
-
 from roadmap import roadmap  # Assuming synchronous function
 from youtube_scrapping import youtube_search  # Assuming synchronous function
+from pdf_scrapping import search_and_download_pdf  # PDF scraping module
+import os
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://marketlenss.vercel.app","http://localhost:3000","http://localhost:3001"],  # Allow only this origin
+    allow_origins=[
+        "https://marketlenss.vercel.app",
+        "http://localhost:3000",
+        "http://localhost:3001"
+    ],  # Allow only these origins
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # Allow all headers
 )
+
+# Input data model
 class RoadmapInput(BaseModel):
     input_value: str
 
 @app.post("/generate-roadmap")
 async def generate_roadmap(data: RoadmapInput):
+    """
+    Generate a roadmap with YouTube videos and PDF resources.
+    """
     try:
-        # Sync calls - no await needed
-        result = roadmap(input_value=data.input_value)
+        # Fetch roadmap components asynchronously
+        result = await asyncio.to_thread(roadmap, data.input_value)
         result_json = json.loads(result)
         length_json = len(result_json)
 
-        # Sync calls - no await needed
+        # Add YouTube videos for each component asynchronously
         for i in range(length_json):
-            search_results = youtube_search(f"one shot video for {result_json[i]['name']}")
+            search_results = await asyncio.to_thread(youtube_search, f"one shot video for {result_json[i]['name']}")
             if search_results:
                 first_video = search_results[0]
                 result_json[i]['embed_url'] = first_video['embed_url']
             else:
                 result_json[i]['embed_url'] = "No video found"
 
-        return {"roadmap": result_json}
+        # Fetch PDFs for the overall roadmap topic
+        pdf_result = await asyncio.to_thread(search_and_download_pdf, data.input_value)
+        if "error" in pdf_result:
+            pdf_links = []
+        else:
+            pdf_links = pdf_result["links"]
+
+            # Cleanup downloaded PDF files
+            for file_path in pdf_result["files"]:
+                try:
+                    os.remove(file_path)  # Remove the file after processing
+                    print(f"Deleted PDF file: {file_path}")
+                except Exception as e:
+                    print(f"Error cleaning up file {file_path}: {e}")
+
+        # Return the final response
+        return {
+            "roadmap": result_json,
+            "pdf_links": pdf_links
+        }
 
     except KeyError:
         raise HTTPException(status_code=500, detail="Error parsing roadmap data.")
