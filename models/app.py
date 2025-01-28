@@ -57,14 +57,6 @@ def generate_roadmap():
         else:
             pdf_links = pdf_result["links"]
 
-            # Cleanup downloaded PDF files
-            for file_path in pdf_result["files"]:
-                try:
-                    os.remove(file_path)  # Remove the file after processing
-                    print(f"Deleted PDF file: {file_path}")
-                except Exception as e:
-                    print(f"Error cleaning up file {file_path}: {e}")
-
         # Return the final response
         return jsonify({
             "roadmap": result_json,

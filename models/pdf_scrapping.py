@@ -17,19 +17,5 @@ def search_and_download_pdf(topic, save_dir="temp_pdfs"):
     if not pdf_links:
         return {"error": "No PDFs found for the given topic."}
 
-    downloaded_files = []
-    for i, link in enumerate(pdf_links, start=1):
-        try:
-            response = requests.get(link, stream=True)
-            if response.status_code == 200:
-                pdf_path = os.path.join(save_dir, f"{topic.replace(' ', '_')}_{i}.pdf")
-                with open(pdf_path, "wb") as pdf_file:
-                    for chunk in response.iter_content(1024):
-                        pdf_file.write(chunk)
-                downloaded_files.append(pdf_path)
-            else:
-                print(f"Failed to download: {link}")
-        except Exception as e:
-            print(f"Error downloading {link}: {e}")
 
-    return {"files": downloaded_files, "links": pdf_links}
+    return { "links": pdf_links}
