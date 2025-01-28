@@ -1,104 +1,16 @@
 services:
-  django:
+  model:
     build:
-      context: ./server
+      context: ./models
       dockerfile: Dockerfile
-    container_name: django_server
+    container_name: model_api
     volumes:
-      - ./server:/app
+      - ./models:/app
     ports:
       - "8000:8000"
     networks:
       - templet
 
-  express:
-    build:
-      context: ./express_server
-      dockerfile: Dockerfile
-    container_name: express_server
-    volumes:
-      - ./express_server:/app
-    ports:
-      - "8080:8080"
-    networks:
-      - templet
-    depends_on:
-      - django
-
-  chat_app:
-    build:
-      context: ./chatapp_server/chat_server
-      dockerfile: Dockerfile
-    container_name: chat_app_server
-    volumes:
-      - ./chatapp_server/chat_server:/app
-    ports:
-      - "3500:3500"
-    networks:
-      - templet
-    depends_on:
-      - express
-
-  video_call:
-    build:
-      context: ./videocall_server
-      dockerfile: Dockerfile
-    container_name: video_call_server
-    volumes:
-      - ./videocall_server:/app
-    ports:
-      - "7500:7500"
-    networks:
-      - templet
-    depends_on:
-      - chat_app
-
-  rag_llm:
-    build:
-      context: ./models/Rag
-      dockerfile: Dockerfile
-    container_name: rag_llm_fastapi
-    volumes:
-      - ./models/Rag:/app
-    ports:
-      - "8001:8001"
-    networks:
-      - templet
-    
-    depends_on:
-    - video_call
-
-  chat_app_curse_detection:
-    build:
-      context: ./models/chatapp_curse
-      dockerfile: Dockerfile
-    container_name: chat_app_curse_detection
-    volumes:
-    - ./models/chatapp_curse:/app
-    ports:
-      - "8002:8002"
-    networks:
-      - templet
-    
-    depends_on:
-      - rag_llm
-    
-
-  videocall_curse_detection:
-    build:
-      context: ./models/Curse_Detection_Video
-      dockerfile: Dockerfile
-    container_name: videocall_curse_detection
-    volumes:
-    - ./models/Curse_Detection_Video:/app
-    ports:
-      - "8003:8003"
-    networks:
-      - templet
-    
-    depends_on:
-    - chat_app_curse_detection
-    
 
 
 networks:
