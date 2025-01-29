@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 from roadmap import roadmap  # Assuming synchronous function
 from youtube_scrapping import youtube_search  # Assuming synchronous function
 from pdf_scrapping import search_and_download_pdf  # PDF scraping module
+from skill_extractor import extraction
 
 app = Flask(__name__)
 executor = ThreadPoolExecutor(max_workers=5)
@@ -32,9 +33,12 @@ def generate_roadmap():
         data = request.get_json()
         input_value = data.get('input_value')
         
+        
         if not input_value:
             return jsonify({"error": "input_value is required"}), 400
         
+        extractor = extraction(input_value)
+        print(extractor)
         roadmap_result = executor.submit(roadmap, input_value)
         result_json = json.loads(roadmap_result.result())
         length_json = len(result_json)
