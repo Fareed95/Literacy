@@ -24,7 +24,7 @@ export function PlaceholdersAndVanishInputDemo() {
   return (
     <div className="h-[40rem] flex flex-col justify-center items-center px-4">
       {/* Added margin-bottom for spacing */}
-      <div className="mb-15">
+      <div className="mb-50">
         <TextGenerateEffectDemo />
       </div>
       

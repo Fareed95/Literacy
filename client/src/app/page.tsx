@@ -30,11 +30,11 @@ export default function Home() {
   return (
     
     <div className="min-h-screen" id="root">
-      <div className='mt-[10vh]'>
+      {/* <div className='mt-[10vh]'>
         <Spline
           scene="https://prod.spline.design/SEtXNDI9u2wUw6jp/scene.splinecode" 
         />
-      </div>
+      </div> */}
 
       <div>
         <div className="min-h-screen">
