@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import Herotext from '@/components/Herotext';
 import HomeEventCard from '@/components/HomeEventCard';
 import Footer from '@/components/Footer';
@@ -8,14 +8,28 @@ import Spline from '@splinetool/react-spline/next';
 import { Spotlight } from "@/components/ui/Spotlight";
 import { buttons } from '@/components/Buttons'; // Import the buttons array
 import React from 'react';
+import { PlaceholdersAndVanishInputDemo } from '@/components/Placeholder';
 
 export default function Home() {
+  // Create a reference for the PlaceholdersAndVanishInputDemo component
+  const placeholderRef = useRef<HTMLElement | null>(null);
+
   // Find the Playlist button from the buttons array
   const playlistButton = buttons.find((button) => button.name === "Playlist");
 
+  // Scroll to the placeholder section
+  const handleScrollToPlaceholder = () => {
+    if (placeholderRef.current) {
+      placeholderRef.current.scrollIntoView({
+        behavior: "smooth", // smooth scroll
+        block: "start",     // align the element to the top of the viewport
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen" id="root">
-      <div className='mt-[15vh]'> {/* Reduced the margin-top */}
+      <div className='mt-[10vh]'> {/* Reduced the margin-top */}
         <Spline
           scene="https://prod.spline.design/SEtXNDI9u2wUw6jp/scene.splinecode" 
         />
@@ -27,11 +41,11 @@ export default function Home() {
             className="-top-45 left-5 sm:left-60 sm:-top-20"
             fill="white"
           />
-          <div className="p-4 max-w-7xl mx-auto relative z-10 w-full pt-20 md:pt-0 mt-4"> {/* Reduced margin-top */}
+          <div className="p-4 max-w-7xl mx-auto relative z-10 w-full pt-10 md:pt-0 mt-4"> {/* Reduced margin-top */}
             <h1 className="text-6xl md:text-7xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">
               GET STARTED 
             </h1>
-            <div className="mt-4 max-w-4xl mx-auto px-4 text-center font-serif text-xl md:text-2xl text-neutral-200 leading-relaxed space-y-4">
+            <div className="mt-2 max-w-4xl mx-auto px-4 text-center font-serif text-xl md:text-2xl text-neutral-200 leading-relaxed space-y-4">
               <p>🚀 <strong>Literacyy takes education to the next level</strong> by:</p>
               <ul className="list-none space-y-3 text-left mx-auto max-w-3xl">
                 <li>📌 <strong>Eliminating the tedious research phase</strong> for students.</li>
@@ -47,7 +61,9 @@ export default function Home() {
             <div className="flex justify-center items-center my-4"> {/* Adjusted the gap */}
               {playlistButton ? (
                 <div>
-                  <div>{React.cloneElement(playlistButton.component, { children: "Get started" })}</div>
+                  <div onClick={handleScrollToPlaceholder}>
+                    {React.cloneElement(playlistButton.component, { children: "Get started" })}
+                  </div>
                 </div> 
               ) : (
                 <p>Playlist button not found</p>
@@ -65,11 +81,11 @@ export default function Home() {
             className="-top-45 left-5 sm:left-60 sm:-top-20"
             fill="white"
           />
-          <div className="p-4 max-w-7xl mx-auto relative z-10 w-full pt-20 md:pt-0 mt-0"> {/* Removed margin-top */}
+          <div className="p-4 max-w-7xl mx-auto relative z-10 w-full pt-10 md:pt-0 mt-0"> {/* Reduced margin-top */}
             <h1 className="text-6xl md:text-7xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">
               How to use Literacy ??  
             </h1>
-            <div className="mt-4 max-w-4xl mx-auto px-4 text-center font-serif text-xl md:text-2xl text-neutral-200 leading-relaxed space-y-4">
+            <div className="mt-2 max-w-4xl mx-auto px-4 text-center font-serif text-xl md:text-2xl text-neutral-200 leading-relaxed space-y-4">
               <p>🚀 <strong>Literacyy takes education to the next level</strong> by:</p>
               <ul className="list-none space-y-3 text-left mx-auto max-w-3xl">
                 <li>📌 <strong>Eliminating the tedious research phase</strong> for students.</li>
@@ -80,9 +96,13 @@ export default function Home() {
               <p className="italic">🎯 Making skill acquisition <strong>seamless, efficient, and stress-free!</strong></p>
               <p className="font-bold text-neutral-100">🌟 Step into the future of learning with <strong>Literacyy</strong>—where knowledge is just a click away!</p>
             </div>
-
           </div>
         </div>
+      </div>
+
+      {/* PlaceholdersAndVanishInputDemo */}
+      <div className="mt-0" ref={placeholderRef}> {/* Ensured no margin-top and set ref */}
+        <PlaceholdersAndVanishInputDemo />
       </div>
 
       <Footer />

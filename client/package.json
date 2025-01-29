@@ -22,7 +22,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "framer-motion": "^11.11.10",
+    "framer-motion": "^11.18.2",
     "html5-qrcode": "^2.1.5",
     "input-otp": "^1.2.5",
     "install": "^0.13.0",
