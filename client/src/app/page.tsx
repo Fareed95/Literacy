@@ -28,8 +28,9 @@ export default function Home() {
   };
 
   return (
+    
     <div className="min-h-screen" id="root">
-      <div className='mt-[10vh]'> {/* Reduced the margin-top */}
+      <div className='mt-[10vh]'>
         <Spline
           scene="https://prod.spline.design/SEtXNDI9u2wUw6jp/scene.splinecode" 
         />
@@ -41,7 +42,7 @@ export default function Home() {
             className="-top-45 left-5 sm:left-60 sm:-top-20"
             fill="white"
           />
-          <div className="p-4 max-w-7xl mx-auto relative z-10 w-full pt-10 md:pt-0 mt-4"> {/* Reduced margin-top */}
+          <div className="p-4 max-w-7xl mx-auto relative z-10 w-full pt-10 md:pt-0 mt-4">
             <h1 className="text-6xl md:text-7xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">
               GET STARTED 
             </h1>
@@ -58,9 +59,10 @@ export default function Home() {
             </div>
 
             {/* Playlist Button Right After "GET STARTED" */}
-            <div className="flex justify-center items-center my-4"> {/* Adjusted the gap */}
+            <div className="flex justify-center items-center my-4">
               {playlistButton ? (
                 <div>
+                  {/* The button click calls handleScrollToPlaceholder */}
                   <div onClick={handleScrollToPlaceholder}>
                     {React.cloneElement(playlistButton.component, { children: "Get started" })}
                   </div>
@@ -75,13 +77,13 @@ export default function Home() {
       </div>
 
       {/* Next Section - How to use Literacy */}
-      <div className="mt-0"> {/* Removed margin-top completely */}
+      <div className="mt-0">
         <div className="min-h-screen">
           <Spotlight
             className="-top-45 left-5 sm:left-60 sm:-top-20"
             fill="white"
           />
-          <div className="p-4 max-w-7xl mx-auto relative z-10 w-full pt-10 md:pt-0 mt-0"> {/* Reduced margin-top */}
+          <div className="p-4 max-w-7xl mx-auto relative z-10 w-full pt-10 md:pt-0 mt-0">
             <h1 className="text-6xl md:text-7xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">
               How to use Literacy ??  
             </h1>
