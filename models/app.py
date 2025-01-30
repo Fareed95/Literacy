@@ -213,9 +213,9 @@ def update_roadmap_completion(roadmap_id):
         data = request.get_json()
         is_completed = data.get('is_completed')
 
-        # Validate is_completed value
-        if is_completed not in [0, 1]:
-            return jsonify({"error": "is_completed must be 0 or 1"}), 400
+        # # Validate is_completed value
+        # if is_completed not in [0, 1]:
+        #     return jsonify({"error": "is_completed must be 0 or 1"}), 400
 
         # Update the roadmap in the database
         try:
@@ -276,6 +276,66 @@ def get_roadmap_by_id(roadmap_id):
                 "id": roadmap_id,
                 "name": name,
                 "roadmap_json": roadmap_json
+            }), 200
+
+        except Exception as db_error:
+            return jsonify({"error": f"Database error: {str(db_error)}"}), 500
+
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500    
+    
+@app.route("/roadmaps/<int:roadmap_id>/component", methods=["POST"])
+def get_roadmap_component(roadmap_id):
+    """
+    Fetch a specific component from a roadmap by its ID and component index.
+    """
+    try:
+        # Get component number from request body
+        data = request.get_json()
+        component_number = data.get('component_number')
+
+        if component_number is None:
+            return jsonify({"error": "component_number is required"}), 400
+
+        # Fetch roadmap from the database
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Fetch the roadmap by ID
+            cursor.execute(
+                "SELECT id, name, roadmap_json FROM roadmap WHERE id = %s;",
+                (roadmap_id,)
+            )
+            roadmap = cursor.fetchone()
+            cursor.close()
+            conn.close()
+
+            # If roadmap not found, return 404
+            if not roadmap:
+                return jsonify({"error": "Roadmap not found"}), 404
+
+            # Convert roadmap_json from string to JSON
+            roadmap_id, name, roadmap_json_str = roadmap
+            roadmap_json = json.loads(roadmap_json_str)  # Convert string to JSON
+
+            # Check if roadmap_components exists and component_number is valid
+            if "roadmap_components" not in roadmap_json:
+                return jsonify({"error": "No components found in the roadmap"}), 404
+
+            if not isinstance(roadmap_json["roadmap_components"], list):
+                return jsonify({"error": "Invalid roadmap components format"}), 500
+
+            if component_number < 0 or component_number >= len(roadmap_json["roadmap_components"]):
+                return jsonify({"error": "Invalid component_number"}), 400
+
+            # Get the specific component
+            component = roadmap_json["roadmap_components"][component_number]
+
+            return jsonify({
+                "id": roadmap_id,
+                "name": name,
+                "component": component
             }), 200
 
         except Exception as db_error:
