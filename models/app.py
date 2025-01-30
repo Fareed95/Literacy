@@ -51,6 +51,7 @@ def create_roadmap_table():
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,  -- New field for roadmap name
                 roadmap_json TEXT NOT NULL,
+                 is_completed INT DEFAULT 0,
                 user_id INT NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES api_user(id)
             );
@@ -149,7 +150,139 @@ def generate_roadmap():
         return jsonify({"error": "Error parsing roadmap data."}), 500
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+# Add this new route to your existing Flask app
+@app.route("/user-roadmaps", methods=["POST"])
+def get_user_roadmaps():
+    """
+    Fetch all roadmaps for a specific user by email.
+    """
+    try:
+        # Get email from request body
+        data = request.get_json()
+        email = data.get('email')
 
+        if not email:
+            return jsonify({"error": "email is required"}), 400
+
+        # Fetch roadmaps from the database
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Get user ID from email
+            cursor.execute("SELECT id FROM api_user WHERE email = %s;", (email,))
+            user_id = cursor.fetchone()
+            if not user_id:
+                return jsonify({"error": "User not found"}), 404
+
+            # Fetch all roadmaps for the user
+            cursor.execute(
+                "SELECT id, name, roadmap_json FROM roadmap WHERE user_id = %s;",
+                (user_id[0],)
+            )
+            roadmaps = cursor.fetchall()
+            cursor.close()
+            conn.close()
+
+            # Convert roadmap_json from string to JSON and prepare response
+            roadmap_list = []
+            for roadmap in roadmaps:
+                roadmap_id, name, roadmap_json_str = roadmap
+                roadmap_json = json.loads(roadmap_json_str)  # Convert string to JSON
+                roadmap_list.append({
+                    "id": roadmap_id,
+                    "name": name,
+                    "roadmap_json": roadmap_json
+                })
+
+            return jsonify(roadmap_list), 200
+
+        except Exception as db_error:
+            return jsonify({"error": f"Database error: {str(db_error)}"}), 500
+
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+    
+@app.route("/roadmaps/<int:roadmap_id>/complete", methods=["PATCH"])
+def update_roadmap_completion(roadmap_id):
+    """
+    Update the is_completed field for a specific roadmap.
+    """
+    try:
+        # Get data from request body
+        data = request.get_json()
+        is_completed = data.get('is_completed')
+
+        # Validate is_completed value
+        if is_completed not in [0, 1]:
+            return jsonify({"error": "is_completed must be 0 or 1"}), 400
+
+        # Update the roadmap in the database
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Check if the roadmap exists
+            cursor.execute("SELECT id FROM roadmap WHERE id = %s;", (roadmap_id,))
+            if not cursor.fetchone():
+                return jsonify({"error": "Roadmap not found"}), 404
+
+            # Update the is_completed field
+            cursor.execute(
+                "UPDATE roadmap SET is_completed = %s WHERE id = %s;",
+                (is_completed, roadmap_id)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            return jsonify({"message": "Roadmap completion status updated successfully"}), 200
+
+        except Exception as db_error:
+            return jsonify({"error": f"Database error: {str(db_error)}"}), 500
+
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+    
+@app.route("/roadmaps/<int:roadmap_id>", methods=["GET"])
+def get_roadmap_by_id(roadmap_id):
+    """
+    Fetch a specific roadmap by its ID.
+    """
+    try:
+        # Fetch roadmap from the database
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Fetch the roadmap by ID
+            cursor.execute(
+                "SELECT id, name, roadmap_json FROM roadmap WHERE id = %s;",
+                (roadmap_id,)
+            )
+            roadmap = cursor.fetchone()
+            cursor.close()
+            conn.close()
+
+            # If roadmap not found, return 404
+            if not roadmap:
+                return jsonify({"error": "Roadmap not found"}), 404
+
+            # Convert roadmap_json from string to JSON and prepare response
+            roadmap_id, name, roadmap_json_str = roadmap
+            roadmap_json = json.loads(roadmap_json_str)  # Convert string to JSON
+
+            return jsonify({
+                "id": roadmap_id,
+                "name": name,
+                "roadmap_json": roadmap_json
+            }), 200
+
+        except Exception as db_error:
+            return jsonify({"error": f"Database error: {str(db_error)}"}), 500
+
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 # Run Flask app
 if __name__ == '__main__':
     create_roadmap_table()  # Ensure roadmap table is created
