@@ -14,9 +14,6 @@ const page = () => {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const peerConnection = useRef(null);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [audioChunks, setAudioChunks] = useState([]);
-  const [audioFile, setAudioFile] = useState(null); // To store audio file locally
   const { contextisLoggedIn, contextname } = useUserContext();
 
   // Automatically set name from context when logged in
@@ -100,38 +97,6 @@ const page = () => {
     }
   }, [isNameEntered, room, name]);
 
-  // Start audio recording
-  const startRecording = async (stream) => {
-    const recorder = new MediaRecorder(stream);
-    setMediaRecorder(recorder);
-
-    recorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        setAudioChunks((prevChunks) => [...prevChunks, event.data]);
-      }
-    };
-
-    recorder.onstop = async () => {
-      if (audioChunks.length > 0) {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        setAudioFile(audioBlob); // Save Blob as audio file on the client
-
-        // Optionally, create a download link for the user
-        const url = URL.createObjectURL(audioBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'audio_recording.webm'; // Give it a name
-        link.click();
-
-        // Reset audio chunks after storing the file
-        setAudioChunks([]);
-      }
-    };
-
-    recorder.start(); // Start recording without sending data every second
-  };
-
-  // Start the WebRTC call and audio recording
   const startCall = async () => {
     peerConnection.current = new RTCPeerConnection();
 
@@ -159,9 +124,6 @@ const page = () => {
 
     localVideoRef.current.srcObject = localStream;
 
-    // Start audio recording
-    startRecording(localStream);
-
     const offer = await peerConnection.current.createOffer();
     await peerConnection.current.setLocalDescription(offer);
 
@@ -175,7 +137,6 @@ const page = () => {
     });
   };
 
-  // End the call and stop audio recording
   const endCall = () => {
     if (peerConnection.current) {
       peerConnection.current.close();
@@ -190,11 +151,6 @@ const page = () => {
     if (remoteVideoRef.current.srcObject) {
       remoteVideoRef.current.srcObject.getTracks().forEach((track) => track.stop());
       remoteVideoRef.current.srcObject = null;
-    }
-
-    if (mediaRecorder) {
-      mediaRecorder.stop();
-      setMediaRecorder(null);
     }
 
     if (socket) {
