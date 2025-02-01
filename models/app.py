@@ -346,4 +346,4 @@ def get_roadmap_component(roadmap_id):
 # Run Flask app
 if __name__ == '__main__':
     create_roadmap_table()  # Ensure roadmap table is created
-    app.run(debug=True)
+    app.run(port=8000,debug=True)
