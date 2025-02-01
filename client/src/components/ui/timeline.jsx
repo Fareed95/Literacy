@@ -58,7 +58,7 @@ export const Timeline = ({ data }) => {
     >
       <div className="max-w-7xl mx-auto py-20 px-4 md:px-8 lg:px-10">
         <h2 className="text-lg md:text-6xl mb-4 text-black dark:text-neutral-300 max-w-4xl font-semibold">
-          Codecell Team Overview
+          Roadmap
         </h2>
       </div>
       {/* {data.map((head, index) => (
