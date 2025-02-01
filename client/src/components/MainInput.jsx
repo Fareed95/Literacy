@@ -57,7 +57,7 @@ function MainInput() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center px-4 sm:min-h-screen">
+    <div className="flex flex-col justify-start items-center px-4 sm:mt-10 sm:min-h-screen">
       <h2 className="mb-10 sm:mb-20 text-xl text-center sm:text-5xl dark:text-white text-black">
         <div className="flex justify-center">
           Tell us what you want to <div className="text-green-500 px-2">LEARN</div>

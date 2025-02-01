@@ -5,7 +5,7 @@ import MainInput from '@/components/MainInput';
 import PrevCources from '@/components/PrevCources';
 import Footer from '@/components/Footer';
 import Spline from '@splinetool/react-spline';
-import  Timeline_roadmap_function  from '@/components/Timeline_roadmap';
+// import  Timeline_roadmap_function  from '@/components/Timeline_roadmap';
 
 export default function Home() {
 

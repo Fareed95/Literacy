@@ -132,7 +132,7 @@ def generate_roadmap():
                 "INSERT INTO roadmap (name, roadmap_json, user_id) VALUES (%s, %s, %s) RETURNING id;",
                 (extractor, roadmap_json_str, user_id[0])
             )
-            roadmap_id = cursor.fetchone()[0]
+            roadmap_id = cursor.fetchone()[0]  # Fetch the ID of the newly created roadmap
             conn.commit()
             cursor.close()
             conn.close()
