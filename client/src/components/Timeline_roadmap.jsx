@@ -36,8 +36,8 @@ function Timeline_roadmap_function({ roadmapData }) {
   const handleButtonClick = () => {
     // Set the roadmap data in context
     setRoadmap({
-      roadmap_id: roadmapData.id, // Send the roadmap id
-      total_components: roadmapData.roadmap_components.length,  // Send the total components count
+      roadmap_id: roadmapData.roadmap_id, // Send the roadmap id
+      total_components: roadmapData.total_components,  // Send the total components count
     });
     router.push('/Learning');  // Navigate to the Learning page
   };

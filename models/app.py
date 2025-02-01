@@ -257,7 +257,7 @@ def get_roadmap_by_id(roadmap_id):
 
             # Fetch the roadmap by ID
             cursor.execute(
-                "SELECT id, name, roadmap_json FROM roadmap WHERE id = %s;",
+                "SELECT id, name, roadmap_json, is_completed FROM roadmap WHERE id = %s;",
                 (roadmap_id,)
             )
             roadmap = cursor.fetchone()
@@ -269,13 +269,14 @@ def get_roadmap_by_id(roadmap_id):
                 return jsonify({"error": "Roadmap not found"}), 404
 
             # Convert roadmap_json from string to JSON and prepare response
-            roadmap_id, name, roadmap_json_str = roadmap
+            roadmap_id, name, roadmap_json_str,is_completed = roadmap
             roadmap_json = json.loads(roadmap_json_str)  # Convert string to JSON
 
             return jsonify({
                 "id": roadmap_id,
                 "name": name,
-                "roadmap_json": roadmap_json
+                "roadmap_json": roadmap_json,
+                "is_completed":is_completed
             }), 200
 
         except Exception as db_error:

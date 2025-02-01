@@ -1,70 +1,83 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { Clock, PlayIcon, FileText, CheckCircle2 } from 'lucide-react';
+import { Clock, PlayIcon, FileText, CheckCircle2, ArrowRight } from 'lucide-react';
+import React from 'react';
+import { useRoadmap } from '@/app/context/RoadmapContext';  // Import the custom hook
 
 export default function Home() {
-  const [componentData, setComponentData] = useState({
-    component: {
-      description: "Understanding the basics of web development, including HTTP, HTML, CSS, and JavaScript.",
-      document: "https://developer.mozilla.org/en-US/docs/Learn",
-      embed_url: "https://www.youtube.com/embed/HcOc7P5BMi4",
-      name: "Web Development Basics",
-      test_series: [
-        {
-          answer: "To send data between a client and a server",
-          options: [
-            "To send data between a client and a server",
-            "To receive data from a client and a server",
-            "To create a new web page",
-            "To delete a web page"
-          ],
-          question: "What is the purpose of the HTTP protocol?"
-        },
-        {
-          answer: "HTML is used for structure, CSS is used for styling",
-          options: [
-            "HTML is used for styling, CSS is used for structure",
-            "HTML is used for structure, CSS is used for styling",
-            "HTML is used for both structure and styling",
-            "CSS is used for both structure and styling"
-          ],
-          question: "What is the difference between HTML and CSS?"
-        },
-        {
-          answer: "To add interactivity to a web page",
-          options: [
-            "To create a new web page",
-            "To send data between a client and a server",
-            "To add interactivity to a web page",
-            "To delete a web page"
-          ],
-          question: "What is JavaScript used for in web development?"
-        }
-      ]
-    },
-    id: 1,
-    name: "Django"
-  });
-
+  const { roadmap } = useRoadmap(); 
+  const [componentData, setComponentData] = useState(null);
   const [quizAnswers, setQuizAnswers] = useState({});
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const [currentComponentIndex, setCurrentComponentIndex] = useState(0);
+
+  useEffect(() => {
+    if (roadmap?.roadmap_id) {
+      console.log("Roadmap ID from context:", roadmap.roadmap_id); // Log roadmap ID
+      fetchRoadmapData(roadmap.roadmap_id);
+    } else {
+      console.log("Roadmap ID is not available in context."); // Log if roadmap ID is missing
+    }
+  }, [roadmap]);
+
+  const fetchRoadmapData = async (roadmapId) => {
+    try {
+      console.log("Fetching roadmap data for ID:", roadmapId); // Log before fetching roadmap data
+      const response = await fetch(`http://localhost:8000/roadmaps/${roadmapId}`);
+      const data = await response.json();
+      console.log("Fetched roadmap data:", data); // Log fetched roadmap data
+      const { is_completed } = data;
+      fetchComponentData(roadmapId, is_completed);
+    } catch (error) {
+      console.error("Error fetching roadmap data:", error);
+    }
+  };
+
+  const fetchComponentData = async (roadmapId, componentNumber) => {
+    try {
+      console.log("Fetching component data for roadmap ID:", roadmapId, "and component number:", componentNumber); // Log before fetching component data
+      const response = await fetch(`http://localhost:8000/roadmaps/${roadmapId}/component`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ component_number: componentNumber }),
+      });
+      const data = await response.json();
+      console.log("Fetched component data:", data); // Log fetched component data
+      setComponentData(data);
+    } catch (error) {
+      console.error("Error fetching component data:", error);
+    }
+  };
 
   const handleQuizAnswerChange = (question, answer) => {
     setQuizAnswers({ ...quizAnswers, [question]: answer });
   };
 
   const handleQuizSubmit = () => {
-    const allAnswered = componentData.component.test_series.every(q => quizAnswers[q.question]);
+    const allAnswered = componentData.test_series.every(q => quizAnswers[q.question]);
     if (allAnswered) {
       setQuizCompleted(true);
     }
   };
 
+  const handleNextComponent = () => {
+    setCurrentComponentIndex(prevIndex => prevIndex + 1);
+    fetchComponentData(roadmap.id, currentComponentIndex + 1);
+    setQuizAnswers({});
+    setQuizCompleted(false);
+  };
+
+  if (!componentData) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="bg-black text-cyan-300 min-h-screen flex flex-col items-center p-4 overflow-hidden">
       <Head>
-        <title>{componentData.component.name}</title>
+        <title>{componentData.name}</title>
       </Head>
 
       <div className="w-full max-w-7xl bg-neutral-900 border border-cyan-800/30 rounded-2xl shadow-2xl shadow-cyan-500/10 p-6 space-y-6 relative">
@@ -78,8 +91,8 @@ export default function Home() {
             <iframe
               width="100%"
               height="100%"
-              src={componentData.component.embed_url}
-              title="Web Development Basics Video"
+              src={componentData.embed_url}
+              title={`${componentData.name} Video`}
               frameBorder="0"
               className="transform transition-all hover:scale-[1.02]"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -96,14 +109,14 @@ export default function Home() {
           </div>
           <div className="w-full bg-neutral-800 border border-cyan-800/30 rounded-xl p-4">
             <iframe 
-              src={componentData.component.document} 
+              src={componentData.document} 
               width="100%" 
               height="600px" 
               className="rounded-lg border border-cyan-700/30"
               title="PDF Viewer"
             ></iframe>
             <a
-              href={componentData.component.document}
+              href={componentData.document}
               download
               className="mt-4 inline-block bg-cyan-600 hover:bg-cyan-700 text-black font-bold py-2 px-4 rounded-md transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
             >
@@ -122,7 +135,7 @@ export default function Home() {
           <div className="w-full bg-neutral-800 border border-cyan-800/30 rounded-xl p-4">
             <p className="text-cyan-300">Here you can read more about the topics covered in the course or explore related materials.</p>
             <a
-              href={componentData.component.document}
+              href={componentData.document}
               target="_blank"
               className="mt-4 inline-block bg-cyan-600 hover:bg-cyan-700 text-black font-bold py-2 px-4 rounded-md transition-all transform hover:scale-105"
             >
@@ -133,7 +146,7 @@ export default function Home() {
 
         {/* Description Section */}
         <div className="mb-6 z-10 relative bg-neutral-800/50 rounded-xl p-4 border border-cyan-800/30">
-          <p className="text-cyan-300 italic">{componentData.component.description}</p>
+          <p className="text-cyan-300 italic">{componentData.description}</p>
         </div>
 
         {/* Quiz Section */}
@@ -143,7 +156,7 @@ export default function Home() {
             <h2 className="text-xl font-bold">Knowledge Checkpoint</h2>
           </div>
           <div className="space-y-6">
-            {componentData.component.test_series.map((q, index) => (
+            {componentData.test_series.map((q, index) => (
               <div 
                 key={index} 
                 className="bg-neutral-800 border border-cyan-800/30 rounded-xl p-4 hover:border-cyan-500 transition-all"
@@ -171,7 +184,7 @@ export default function Home() {
             ))}
             <button
               onClick={handleQuizSubmit}
-              disabled={!componentData.component.test_series.every(q => quizAnswers[q.question])}
+              disabled={!componentData.test_series.every(q => quizAnswers[q.question])}
               className="w-full bg-cyan-600 text-black font-bold py-3 px-6 rounded-xl 
                 hover:bg-cyan-500 transition-all 
                 disabled:opacity-50 disabled:cursor-not-allowed
@@ -188,6 +201,17 @@ export default function Home() {
             </button>
           </div>
         </div>
+
+        {/* Next Button */}
+        <button
+          onClick={handleNextComponent}
+          className="w-full bg-cyan-600 text-black font-bold py-3 px-6 rounded-xl 
+            hover:bg-cyan-500 transition-all 
+            flex items-center justify-center space-x-2"
+        >
+          <span>Next Component</span>
+          <ArrowRight />
+        </button>
       </div>
     </div>
   );
