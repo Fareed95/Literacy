@@ -1,10 +1,16 @@
 {
-  "id": "97936f99-0b10-406d-b8f9-30fa4ed66a59",
+  "id": "2d695f3d-35a8-4e58-b554-74f8d15dc1ca",
   "data": {
     "nodes": [
       {
+        "id": "ChatInput-Bp974",
+        "type": "genericNode",
+        "position": {
+          "x": 852.4900246519621,
+          "y": -148.3265502546039
+        },
         "data": {
-          "id": "ChatInput-cjWJK",
+          "id": "ChatInput-Bp974",
           "node": {
             "base_classes": [
               "Message"
@@ -174,7 +180,7 @@
                 "trace_as_input": true,
                 "trace_as_metadata": true,
                 "type": "str",
-                "value": "what is my name"
+                "value": "whats my name ?"
               },
               "sender": {
                 "_input_type": "DropdownInput",
@@ -284,26 +290,21 @@
           },
           "type": "ChatInput"
         },
-        "dragging": false,
-        "height": 319,
-        "id": "ChatInput-cjWJK",
-        "position": {
-          "x": 2321.5543981677606,
-          "y": 374.0457826421628
-        },
-        "positionAbsolute": {
-          "x": 2321.5543981677606,
-          "y": 374.0457826421628
-        },
         "selected": false,
-        "type": "genericNode",
-        "width": 320
+        "width": 320,
+        "height": 319
       },
       {
+        "id": "ChatOutput-6HuYU",
+        "type": "genericNode",
+        "position": {
+          "x": 1634.3202598210275,
+          "y": 254.0685576726172
+        },
         "data": {
           "description": "Display a chat message in the Playground.",
           "display_name": "Chat Output",
-          "id": "ChatOutput-VIgwN",
+          "id": "ChatOutput-6HuYU",
           "node": {
             "base_classes": [
               "Message"
@@ -561,24 +562,20 @@
           },
           "type": "ChatOutput"
         },
-        "dragging": false,
+        "selected": true,
+        "width": 320,
         "height": 319,
-        "id": "ChatOutput-VIgwN",
-        "position": {
-          "x": 3103.384633336826,
-          "y": 776.4408905693839
-        },
-        "positionAbsolute": {
-          "x": 3103.384633336826,
-          "y": 776.4408905693839
-        },
-        "selected": false,
-        "type": "genericNode",
-        "width": 320
+        "dragging": false
       },
       {
+        "id": "note-ffxBp",
+        "type": "noteNode",
+        "position": {
+          "x": -332.2110796693172,
+          "y": -281.1615700461789
+        },
         "data": {
-          "id": "note-T4Muo",
+          "id": "note-ffxBp",
           "node": {
             "description": "# Memory Chatbot\n\nA flexible chatbot implementation featuring advanced conversation memory capabilities. This serves as a foundational tool for building chat experiences with persistent context.\n\n## Core Components\n\n1. **Chat Input**\n   - Accepts user messages\n   - Configures conversation storage\n   - Tracks session identity\n\n2. **Chat Memory**\n   - Stores and retrieves up to 100 previous messages\n   - Maintains conversation context\n   - Tracks separate chat sessions\n   - Preserves sender information and message order\n\n3. **Prompt**\n   - Creates dynamic prompt templates\n   - Integrates memory into conversation flow\n\n4. **OpenAI**\n   - Processes user input with context\n   - Accesses conversation history\n   - Includes options for model configuration and API key setup\n\n5. **Chat Output**\n   - Displays formatted responses\n   - Maintains conversation flow\n   - Syncs with memory storage\n\n## Memory Features\n\n- Stores message history\n- Plans conversation trajectory\n- Differentiates between chat sessions\n- Preserves sender and message metadata\n\n## Quick Start\n\n1. **Initialize** with a clear session ID\n2. **Enter** message in Chat Input\n3. **AI Processes** with context from memory\n4. **Response** appears in Chat Output\n5. Context remains available for follow-ups\n\nThis robust system demonstrates thorough memory integration with minimal complexity. 🧠💬\n",
             "display_name": "",
@@ -587,29 +584,24 @@
           },
           "type": "note"
         },
-        "dragging": false,
-        "height": 736,
-        "id": "note-T4Muo",
-        "position": {
-          "x": 1512.8976594415833,
-          "y": 312.9558305744385
-        },
-        "positionAbsolute": {
-          "x": 1512.8976594415833,
-          "y": 312.9558305744385
-        },
-        "resizing": false,
         "selected": false,
-        "style": {
-          "height": 736,
-          "width": 382
+        "width": 325,
+        "height": 325,
+        "positionAbsolute": {
+          "x": -332.2110796693172,
+          "y": -281.1615700461789
         },
-        "type": "noteNode",
-        "width": 382
+        "dragging": false
       },
       {
+        "id": "note-Shv4c",
+        "type": "noteNode",
+        "position": {
+          "x": 1720.3739651325077,
+          "y": -529.8656413115757
+        },
         "data": {
-          "id": "note-jRosq",
+          "id": "note-Shv4c",
           "node": {
             "description": "## Get Your OpenAI API Key\n\n**Steps**:\n\n1. **Visit** [OpenAI's API Key Page](https://platform.openai.com/api-keys).\n\n2. **Log In/Sign Up**:\n   - Log in or create a new OpenAI account.\n\n3. **Generate API Key**:\n   - Click \"Create New Secret Key\" to obtain your key.\n\n4. **Store Your Key Securely**:\n   - Note it down as it will only display once.\n\n5. **Enter API Key**:\n   - Input your key in the OpenAI API Key field within the component setup.\n\nKeep your key safe and manage it responsibly!",
             "display_name": "",
@@ -620,24 +612,24 @@
           },
           "type": "note"
         },
-        "dragging": false,
-        "height": 325,
-        "id": "note-jRosq",
-        "position": {
-          "x": 2727.7060397092964,
-          "y": 115.42518754847691
-        },
-        "positionAbsolute": {
-          "x": 2727.7060397092964,
-          "y": 115.42518754847691
-        },
         "selected": false,
-        "type": "noteNode",
-        "width": 325
+        "width": 325,
+        "height": 325,
+        "positionAbsolute": {
+          "x": 1720.3739651325077,
+          "y": -529.8656413115757
+        },
+        "dragging": false
       },
       {
+        "id": "Memory-uYZj8",
+        "type": "genericNode",
+        "position": {
+          "x": 478.71616643163816,
+          "y": 243.73926558318067
+        },
         "data": {
-          "id": "Memory-T2BgA",
+          "id": "Memory-uYZj8",
           "node": {
             "base_classes": [
               "Data",
@@ -860,24 +852,19 @@
           },
           "type": "Memory"
         },
-        "dragging": false,
-        "height": 349,
-        "id": "Memory-T2BgA",
-        "position": {
-          "x": 1947.7805399474369,
-          "y": 766.1115984799474
-        },
-        "positionAbsolute": {
-          "x": 1947.7805399474369,
-          "y": 766.1115984799474
-        },
         "selected": false,
-        "type": "genericNode",
-        "width": 320
+        "width": 320,
+        "height": 349
       },
       {
+        "id": "Prompt-obAuK",
+        "type": "genericNode",
+        "position": {
+          "x": 828.6215772438225,
+          "y": 328.0847766948625
+        },
         "data": {
-          "id": "Prompt-AgQx8",
+          "id": "Prompt-obAuK",
           "node": {
             "template": {
               "_type": "Component",
@@ -937,7 +924,7 @@
                 "tool_mode": false,
                 "trace_as_input": true,
                 "type": "prompt",
-                "value": "You are a helpful ai genz mentor that answer students questions based on the the the json format provided to you. Please note not answer any question beyond this skill provided to you.. please make your output with beautiful genz slangs and even if the user going out of the topic motivates them with this beautiful genz slangs. \n\nskill data in json - {skill}\n\nUse markdown to format your answer, properly embedding images and urls.\n\nHistory: \n\n{memory}\n"
+                "value": "You are a helpful ai mentor that answer students questions based on the the the json format provided to you. Please note strictly do not answer any question beyond this skill provided to you.. please make your output clean and straightforward and even if the user going out of the topic motivates them . \n\nskill data in json - {skill}\n\nUse markdown to format your answer, properly embedding images and urls.\n\nHistory: \n\n{memory}.\n\nEnsure that:\n1. Strictly dont go to any topic than the skill json provided to you\n2. Don any json code in the output"
               },
               "skill": {
                 "field_type": "str",
@@ -1013,27 +1000,16 @@
           },
           "type": "Prompt"
         },
-        "dragging": false,
-        "height": 430,
-        "id": "Prompt-AgQx8",
-        "position": {
-          "x": 2297.685950759621,
-          "y": 850.4571095916292
-        },
-        "positionAbsolute": {
-          "x": 2297.685950759621,
-          "y": 850.4571095916292
-        },
         "selected": false,
-        "type": "genericNode",
-        "width": 320
+        "width": 320,
+        "height": 431
       },
       {
-        "id": "GroqModel-v1qB4",
+        "id": "GroqModel-lJSRC",
         "type": "genericNode",
         "position": {
-          "x": 2724.7525608892006,
-          "y": 536.2144772450645
+          "x": 1255.6881873734021,
+          "y": 13.84214434829778
         },
         "data": {
           "node": {
@@ -1321,23 +1297,19 @@
             "lf_version": "1.1.1"
           },
           "type": "GroqModel",
-          "id": "GroqModel-v1qB4"
+          "id": "GroqModel-lJSRC"
         },
         "selected": false,
         "width": 320,
-        "height": 668,
-        "positionAbsolute": {
-          "x": 2724.7525608892006,
-          "y": 536.2144772450645
-        },
+        "height": 669,
         "dragging": false
       },
       {
-        "id": "TextInput-Ob80U",
+        "id": "TextInput-RKP2J",
         "type": "genericNode",
         "position": {
-          "x": 1596.2259009604768,
-          "y": 1143.874846739994
+          "x": 127.16152744467809,
+          "y": 621.5025138432272
         },
         "data": {
           "node": {
@@ -1417,28 +1389,129 @@
             "legacy": false,
             "edited": false,
             "metadata": {},
-            "tool_mode": false
+            "tool_mode": false,
+            "lf_version": "1.1.1"
           },
           "type": "TextInput",
-          "id": "TextInput-Ob80U"
+          "id": "TextInput-RKP2J"
         },
-        "selected": true,
+        "selected": false,
+        "width": 320,
+        "height": 233,
+        "dragging": false
+      },
+      {
+        "id": "TextInput-PIfou",
+        "type": "genericNode",
+        "position": {
+          "x": 309.34358974641634,
+          "y": -328.59394075998637
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from langflow.base.io.text import TextComponent\nfrom langflow.io import MultilineInput, Output\nfrom langflow.schema.message import Message\n\n\nclass TextInputComponent(TextComponent):\n    display_name = \"Text Input\"\n    description = \"Get text inputs from the Playground.\"\n    icon = \"type\"\n    name = \"TextInput\"\n\n    inputs = [\n        MultilineInput(\n            name=\"input_value\",\n            display_name=\"Text\",\n            info=\"Text to be passed as input.\",\n        ),\n    ]\n    outputs = [\n        Output(display_name=\"Text\", name=\"text\", method=\"text_response\"),\n    ]\n\n    def text_response(self) -> Message:\n        return Message(\n            text=self.input_value,\n        )\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "input_value": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "input_value",
+                "value": "what is my bestfreind name?",
+                "display_name": "Text",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Text to be passed as input.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              }
+            },
+            "description": "Get text inputs from the Playground.",
+            "icon": "type",
+            "base_classes": [
+              "Message"
+            ],
+            "display_name": "Text Input",
+            "documentation": "",
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "text",
+                "display_name": "Text",
+                "method": "text_response",
+                "value": "__UNDEFINED__",
+                "cache": true
+              }
+            ],
+            "field_order": [
+              "input_value"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.1.1"
+          },
+          "type": "TextInput",
+          "id": "TextInput-PIfou"
+        },
+        "selected": false,
         "width": 320,
         "height": 233,
         "positionAbsolute": {
-          "x": 1596.2259009604768,
-          "y": 1143.874846739994
+          "x": 309.34358974641634,
+          "y": -328.59394075998637
         },
         "dragging": false
       }
     ],
     "edges": [
       {
-        "className": "",
+        "source": "Memory-uYZj8",
+        "target": "Prompt-obAuK",
+        "sourceHandle": "{œdataTypeœ:œMemoryœ,œidœ:œMemory-uYZj8œ,œnameœ:œmessages_textœ,œoutput_typesœ:[œMessageœ]}",
+        "targetHandle": "{œfieldNameœ:œmemoryœ,œidœ:œPrompt-obAuKœ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}",
+        "id": "reactflow__edge-Memory-uYZj8{œdataTypeœ:œMemoryœ,œidœ:œMemory-uYZj8œ,œnameœ:œmessages_textœ,œoutput_typesœ:[œMessageœ]}-Prompt-obAuK{œfieldNameœ:œmemoryœ,œidœ:œPrompt-obAuKœ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}",
         "data": {
           "sourceHandle": {
             "dataType": "Memory",
-            "id": "Memory-T2BgA",
+            "id": "Memory-uYZj8",
             "name": "messages_text",
             "output_types": [
               "Message"
@@ -1446,7 +1519,7 @@
           },
           "targetHandle": {
             "fieldName": "memory",
-            "id": "Prompt-AgQx8",
+            "id": "Prompt-obAuK",
             "inputTypes": [
               "Message",
               "Text"
@@ -1454,22 +1527,20 @@
             "type": "str"
           }
         },
-        "id": "reactflow__edge-Memory-T2BgA{œdataTypeœ:œMemoryœ,œidœ:œMemory-T2BgAœ,œnameœ:œmessages_textœ,œoutput_typesœ:[œMessageœ]}-Prompt-AgQx8{œfieldNameœ:œmemoryœ,œidœ:œPrompt-AgQx8œ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}",
-        "source": "Memory-T2BgA",
-        "sourceHandle": "{œdataTypeœ:œMemoryœ,œidœ:œMemory-T2BgAœ,œnameœ:œmessages_textœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "Prompt-AgQx8",
-        "targetHandle": "{œfieldNameœ:œmemoryœ,œidœ:œPrompt-AgQx8œ,œinputTypesœ:[œMessageœ,œTextœ],œtypeœ:œstrœ}",
-        "animated": false
+        "selected": false,
+        "animated": false,
+        "className": ""
       },
       {
-        "source": "ChatInput-cjWJK",
-        "sourceHandle": "{œdataTypeœ:œChatInputœ,œidœ:œChatInput-cjWJKœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "GroqModel-v1qB4",
-        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œGroqModel-v1qB4œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "source": "ChatInput-Bp974",
+        "target": "GroqModel-lJSRC",
+        "sourceHandle": "{œdataTypeœ:œChatInputœ,œidœ:œChatInput-Bp974œ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}",
+        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œGroqModel-lJSRCœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "id": "reactflow__edge-ChatInput-Bp974{œdataTypeœ:œChatInputœ,œidœ:œChatInput-Bp974œ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}-GroqModel-lJSRC{œfieldNameœ:œinput_valueœ,œidœ:œGroqModel-lJSRCœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
         "data": {
           "targetHandle": {
             "fieldName": "input_value",
-            "id": "GroqModel-v1qB4",
+            "id": "GroqModel-lJSRC",
             "inputTypes": [
               "Message"
             ],
@@ -1477,26 +1548,27 @@
           },
           "sourceHandle": {
             "dataType": "ChatInput",
-            "id": "ChatInput-cjWJK",
+            "id": "ChatInput-Bp974",
             "name": "message",
             "output_types": [
               "Message"
             ]
           }
         },
-        "id": "reactflow__edge-ChatInput-cjWJK{œdataTypeœ:œChatInputœ,œidœ:œChatInput-cjWJKœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}-GroqModel-v1qB4{œfieldNameœ:œinput_valueœ,œidœ:œGroqModel-v1qB4œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "selected": false,
         "animated": false,
         "className": ""
       },
       {
-        "source": "Prompt-AgQx8",
-        "sourceHandle": "{œdataTypeœ:œPromptœ,œidœ:œPrompt-AgQx8œ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "GroqModel-v1qB4",
-        "targetHandle": "{œfieldNameœ:œsystem_messageœ,œidœ:œGroqModel-v1qB4œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "source": "Prompt-obAuK",
+        "target": "GroqModel-lJSRC",
+        "sourceHandle": "{œdataTypeœ:œPromptœ,œidœ:œPrompt-obAuKœ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}",
+        "targetHandle": "{œfieldNameœ:œsystem_messageœ,œidœ:œGroqModel-lJSRCœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "id": "reactflow__edge-Prompt-obAuK{œdataTypeœ:œPromptœ,œidœ:œPrompt-obAuKœ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}-GroqModel-lJSRC{œfieldNameœ:œsystem_messageœ,œidœ:œGroqModel-lJSRCœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
         "data": {
           "targetHandle": {
             "fieldName": "system_message",
-            "id": "GroqModel-v1qB4",
+            "id": "GroqModel-lJSRC",
             "inputTypes": [
               "Message"
             ],
@@ -1504,26 +1576,27 @@
           },
           "sourceHandle": {
             "dataType": "Prompt",
-            "id": "Prompt-AgQx8",
+            "id": "Prompt-obAuK",
             "name": "prompt",
             "output_types": [
               "Message"
             ]
           }
         },
-        "id": "reactflow__edge-Prompt-AgQx8{œdataTypeœ:œPromptœ,œidœ:œPrompt-AgQx8œ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}-GroqModel-v1qB4{œfieldNameœ:œsystem_messageœ,œidœ:œGroqModel-v1qB4œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "selected": false,
         "animated": false,
         "className": ""
       },
       {
-        "source": "GroqModel-v1qB4",
-        "sourceHandle": "{œdataTypeœ:œGroqModelœ,œidœ:œGroqModel-v1qB4œ,œnameœ:œtext_outputœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "ChatOutput-VIgwN",
-        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-VIgwNœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "source": "GroqModel-lJSRC",
+        "target": "ChatOutput-6HuYU",
+        "sourceHandle": "{œdataTypeœ:œGroqModelœ,œidœ:œGroqModel-lJSRCœ,œnameœ:œtext_outputœ,œoutput_typesœ:[œMessageœ]}",
+        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-6HuYUœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "id": "reactflow__edge-GroqModel-lJSRC{œdataTypeœ:œGroqModelœ,œidœ:œGroqModel-lJSRCœ,œnameœ:œtext_outputœ,œoutput_typesœ:[œMessageœ]}-ChatOutput-6HuYU{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-6HuYUœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
         "data": {
           "targetHandle": {
             "fieldName": "input_value",
-            "id": "ChatOutput-VIgwN",
+            "id": "ChatOutput-6HuYU",
             "inputTypes": [
               "Message"
             ],
@@ -1531,26 +1604,27 @@
           },
           "sourceHandle": {
             "dataType": "GroqModel",
-            "id": "GroqModel-v1qB4",
+            "id": "GroqModel-lJSRC",
             "name": "text_output",
             "output_types": [
               "Message"
             ]
           }
         },
-        "id": "reactflow__edge-GroqModel-v1qB4{œdataTypeœ:œGroqModelœ,œidœ:œGroqModel-v1qB4œ,œnameœ:œtext_outputœ,œoutput_typesœ:[œMessageœ]}-ChatOutput-VIgwN{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-VIgwNœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "selected": false,
         "animated": false,
         "className": ""
       },
       {
-        "source": "TextInput-Ob80U",
-        "sourceHandle": "{œdataTypeœ:œTextInputœ,œidœ:œTextInput-Ob80Uœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "Memory-T2BgA",
-        "targetHandle": "{œfieldNameœ:œsession_idœ,œidœ:œMemory-T2BgAœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "source": "TextInput-RKP2J",
+        "target": "Memory-uYZj8",
+        "sourceHandle": "{œdataTypeœ:œTextInputœ,œidœ:œTextInput-RKP2Jœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}",
+        "targetHandle": "{œfieldNameœ:œsession_idœ,œidœ:œMemory-uYZj8œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "id": "reactflow__edge-TextInput-RKP2J{œdataTypeœ:œTextInputœ,œidœ:œTextInput-RKP2Jœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-Memory-uYZj8{œfieldNameœ:œsession_idœ,œidœ:œMemory-uYZj8œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
         "data": {
           "targetHandle": {
             "fieldName": "session_id",
-            "id": "Memory-T2BgA",
+            "id": "Memory-uYZj8",
             "inputTypes": [
               "Message"
             ],
@@ -1558,24 +1632,27 @@
           },
           "sourceHandle": {
             "dataType": "TextInput",
-            "id": "TextInput-Ob80U",
+            "id": "TextInput-RKP2J",
             "name": "text",
             "output_types": [
               "Message"
             ]
           }
         },
-        "id": "reactflow__edge-TextInput-Ob80U{œdataTypeœ:œTextInputœ,œidœ:œTextInput-Ob80Uœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-Memory-T2BgA{œfieldNameœ:œsession_idœ,œidœ:œMemory-T2BgAœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}"
+        "selected": false,
+        "animated": false,
+        "className": ""
       },
       {
-        "source": "TextInput-Ob80U",
-        "sourceHandle": "{œdataTypeœ:œTextInputœ,œidœ:œTextInput-Ob80Uœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "ChatInput-cjWJK",
-        "targetHandle": "{œfieldNameœ:œsession_idœ,œidœ:œChatInput-cjWJKœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "source": "TextInput-RKP2J",
+        "target": "ChatInput-Bp974",
+        "sourceHandle": "{œdataTypeœ:œTextInputœ,œidœ:œTextInput-RKP2Jœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}",
+        "targetHandle": "{œfieldNameœ:œsession_idœ,œidœ:œChatInput-Bp974œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "id": "reactflow__edge-TextInput-RKP2J{œdataTypeœ:œTextInputœ,œidœ:œTextInput-RKP2Jœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-ChatInput-Bp974{œfieldNameœ:œsession_idœ,œidœ:œChatInput-Bp974œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
         "data": {
           "targetHandle": {
             "fieldName": "session_id",
-            "id": "ChatInput-cjWJK",
+            "id": "ChatInput-Bp974",
             "inputTypes": [
               "Message"
             ],
@@ -1583,24 +1660,27 @@
           },
           "sourceHandle": {
             "dataType": "TextInput",
-            "id": "TextInput-Ob80U",
+            "id": "TextInput-RKP2J",
             "name": "text",
             "output_types": [
               "Message"
             ]
           }
         },
-        "id": "reactflow__edge-TextInput-Ob80U{œdataTypeœ:œTextInputœ,œidœ:œTextInput-Ob80Uœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-ChatInput-cjWJK{œfieldNameœ:œsession_idœ,œidœ:œChatInput-cjWJKœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}"
+        "selected": false,
+        "animated": false,
+        "className": ""
       },
       {
-        "source": "TextInput-Ob80U",
-        "sourceHandle": "{œdataTypeœ:œTextInputœ,œidœ:œTextInput-Ob80Uœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "ChatOutput-VIgwN",
-        "targetHandle": "{œfieldNameœ:œsession_idœ,œidœ:œChatOutput-VIgwNœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "source": "TextInput-RKP2J",
+        "target": "ChatOutput-6HuYU",
+        "sourceHandle": "{œdataTypeœ:œTextInputœ,œidœ:œTextInput-RKP2Jœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}",
+        "targetHandle": "{œfieldNameœ:œsession_idœ,œidœ:œChatOutput-6HuYUœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "id": "reactflow__edge-TextInput-RKP2J{œdataTypeœ:œTextInputœ,œidœ:œTextInput-RKP2Jœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-ChatOutput-6HuYU{œfieldNameœ:œsession_idœ,œidœ:œChatOutput-6HuYUœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
         "data": {
           "targetHandle": {
             "fieldName": "session_id",
-            "id": "ChatOutput-VIgwN",
+            "id": "ChatOutput-6HuYU",
             "inputTypes": [
               "Message"
             ],
@@ -1608,24 +1688,53 @@
           },
           "sourceHandle": {
             "dataType": "TextInput",
-            "id": "TextInput-Ob80U",
+            "id": "TextInput-RKP2J",
             "name": "text",
             "output_types": [
               "Message"
             ]
           }
         },
-        "id": "reactflow__edge-TextInput-Ob80U{œdataTypeœ:œTextInputœ,œidœ:œTextInput-Ob80Uœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-ChatOutput-VIgwN{œfieldNameœ:œsession_idœ,œidœ:œChatOutput-VIgwNœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}"
+        "selected": false,
+        "animated": false,
+        "className": ""
+      },
+      {
+        "source": "TextInput-PIfou",
+        "sourceHandle": "{œdataTypeœ:œTextInputœ,œidœ:œTextInput-PIfouœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}",
+        "target": "ChatInput-Bp974",
+        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œChatInput-Bp974œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "data": {
+          "targetHandle": {
+            "fieldName": "input_value",
+            "id": "ChatInput-Bp974",
+            "inputTypes": [
+              "Message"
+            ],
+            "type": "str"
+          },
+          "sourceHandle": {
+            "dataType": "TextInput",
+            "id": "TextInput-PIfou",
+            "name": "text",
+            "output_types": [
+              "Message"
+            ]
+          }
+        },
+        "id": "reactflow__edge-TextInput-PIfou{œdataTypeœ:œTextInputœ,œidœ:œTextInput-PIfouœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-ChatInput-Bp974{œfieldNameœ:œinput_valueœ,œidœ:œChatInput-Bp974œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "animated": false,
+        "className": ""
       }
     ],
     "viewport": {
-      "x": -1034.972663665154,
-      "y": -324.1690594434999,
-      "zoom": 0.7047703354445247
+      "x": 49.56516561756109,
+      "y": 343.3723935257881,
+      "zoom": 0.6020862135940981
     }
   },
-  "description": "Create a chatbot that saves and references previous messages, enabling the model to maintain context throughout the conversation.",
-  "name": "Memory Chatbot",
+  "description": "The Power of Language at Your Fingertips.",
+  "name": "AI_MENTOR",
   "last_tested_version": "1.1.1",
   "endpoint_name": null,
   "is_component": false
