@@ -5,6 +5,7 @@ function page() {
     <div>
       <GalleryPics />
     </div>
+
   )
 }
 

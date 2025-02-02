@@ -21,10 +21,10 @@ export default function Home() {
       <PrevCources />
       <MainInput />
       {/* <Timeline_roadmap_function /> */}
-
       <Footer />
     </div>
     </div>
+
   );
   
 }
