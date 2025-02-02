@@ -31,16 +31,16 @@ const resources = {
 function Resources() {
   return (
     <div>
-          <h2 className="text-2xl font-bold mb-8">AI-Curated Resources</h2>
+          <h2 className="text-2xl font-bold mb-8 text-white before">AI-Curated Resources</h2>
           <div className="grid md:grid-cols-2 gap-8">
             {/* Left Column - Articles */}
             <div>
-              <h3 className="text-xl font-semibold mb-6">Reading Materials</h3>
+              <h3 className="text-xl font-semibold mb-6 text-white">Reading Materials</h3>
               <div className="space-y-4">
                 {resources.articles.map(article => (
                   <div 
                     key={article.id}
-                    className="p-6 rounded-xl bg-gray-800 hover:bg-gray-700 transition-colors cursor-pointer"
+                    className="p-6 rounded-xl bg-gray-800 hover:bg-gray-700 transition-colors cursor-pointer text-white"
                   >
                     <div className="flex items-start gap-4">
                       <div className="p-3 rounded-lg bg-indigo-600/20">

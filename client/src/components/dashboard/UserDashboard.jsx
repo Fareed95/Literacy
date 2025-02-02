@@ -6,6 +6,10 @@ import ProgressCircle from './ProgressCircle';
 import StreakTracker from './StreakTracker';
 import ActivityGraph from './ActivityGraph';
 import { BookOpen, Clock, ArrowRight } from 'lucide-react';
+import Book3D from '../dashboard/Book3D';
+import LiveClass from '../dashboard/LiveClass';
+import ParticleBackground from '../animations/ParticleBackground';
+
 
 export default function UserDashboard() {
   const bookRef = useRef(null);
@@ -24,6 +28,8 @@ export default function UserDashboard() {
   }, []);
 
   return (
+    <>
+        <ParticleBackground/>
     <div className="min-h-screen bg-gray-900 py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -80,31 +86,18 @@ export default function UserDashboard() {
 
           {/* Right Column */}
           <div className="space-y-8">
-            {/* Live Class */}
-            <div className="glass-card p-6 rounded-2xl text-center">
-              <h3 className="text-xl font-semibold text-white mb-6">Next Live Class</h3>
-              <div className="mb-6">
-                <div className="w-16 h-16 mx-auto rounded-full bg-indigo-500/20 flex items-center justify-center mb-4">
-                  <Clock className="w-8 h-8 text-indigo-400" />
-                </div>
-                <p className="text-white font-medium">Advanced React Patterns</p>
-                <p className="text-sm text-gray-400">Starts in 2 hours</p>
-              </div>
-              <button
-                ref={liveClassButtonRef}
-                className="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors"
-              >
-                Join Live Class
-              </button>
-            </div>
+            {/* Live Class Component */}
+            <LiveClass />
 
-            {/* 3D Book Animation Container */}
-            <div ref={bookRef} className="h-64 glass-card rounded-2xl overflow-hidden">
-              {/* Three.js will render here */}
+            {/* 3D Book Animation */}
+            <div className="glass-card rounded-2xl overflow-hidden h-64">
+              {/* <Book3D /> */}
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    </>
   );
 } 

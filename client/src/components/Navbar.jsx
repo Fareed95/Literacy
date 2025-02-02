@@ -57,9 +57,10 @@ function Navbar({ className }) {
         <MenuItem setActive={setActive} active={active} item="Discover">
           <div className="text-sm grid grid-cols-1 md:grid-cols-2 gap-4 p-2">
             <ProductItem
-              title="Events"
+              title="Dashboard"
               href="/Events"
               src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+
               description="All the upcoming, ongoing, and past events conducted by Code Cell RCOE"
             />
             <ProductItem
