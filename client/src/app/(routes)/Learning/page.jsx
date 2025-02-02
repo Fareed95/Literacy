@@ -1,42 +1,48 @@
 "use client";
+
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { Clock, PlayIcon, FileText, CheckCircle2, ArrowRight } from 'lucide-react';
-import React from 'react';
-import { useRoadmap } from '@/app/context/RoadmapContext';  // Import the custom hook
+import { useRoadmap } from '@/app/context/RoadmapContext';
 
 export default function Home() {
-  const { roadmap } = useRoadmap(); 
+  const { roadmap } = useRoadmap();
   const [componentData, setComponentData] = useState(null);
   const [quizAnswers, setQuizAnswers] = useState({});
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [currentComponentIndex, setCurrentComponentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (roadmap?.roadmap_id) {
-      console.log("Roadmap ID from context:", roadmap.roadmap_id); // Log roadmap ID
+      console.log(roadmap);
+      console.log(roadmap.roadmap_id);
       fetchRoadmapData(roadmap.roadmap_id);
     } else {
-      console.log("Roadmap ID is not available in context."); // Log if roadmap ID is missing
+      setError("Roadmap ID is not available in context.");
+      setIsLoading(false);
     }
   }, [roadmap]);
 
   const fetchRoadmapData = async (roadmapId) => {
     try {
-      console.log("Fetching roadmap data for ID:", roadmapId); // Log before fetching roadmap data
       const response = await fetch(`http://localhost:8000/roadmaps/${roadmapId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       const data = await response.json();
-      console.log("Fetched roadmap data:", data); // Log fetched roadmap data
-      const { is_completed } = data;
-      fetchComponentData(roadmapId, is_completed);
+      console.log(data);
+      fetchComponentData(roadmapId, data.is_completed);
     } catch (error) {
       console.error("Error fetching roadmap data:", error);
+      setError("Failed to fetch roadmap data. Please try again.");
+      setIsLoading(false);
     }
   };
 
   const fetchComponentData = async (roadmapId, componentNumber) => {
     try {
-      console.log("Fetching component data for roadmap ID:", roadmapId, "and component number:", componentNumber); // Log before fetching component data
       const response = await fetch(`http://localhost:8000/roadmaps/${roadmapId}/component`, {
         method: 'POST',
         headers: {
@@ -44,11 +50,18 @@ export default function Home() {
         },
         body: JSON.stringify({ component_number: componentNumber }),
       });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       const data = await response.json();
-      console.log("Fetched component data:", data); // Log fetched component data
+      console.log(data);
       setComponentData(data);
+      setError(null);
     } catch (error) {
       console.error("Error fetching component data:", error);
+      setError("Failed to fetch component data. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,27 +70,40 @@ export default function Home() {
   };
 
   const handleQuizSubmit = () => {
-    const allAnswered = componentData.test_series.every(q => quizAnswers[q.question]);
+    const allAnswered = componentData.component.test_series.every(q => quizAnswers[q.question]);
     if (allAnswered) {
       setQuizCompleted(true);
     }
   };
 
   const handleNextComponent = () => {
-    setCurrentComponentIndex(prevIndex => prevIndex + 1);
-    fetchComponentData(roadmap.id, currentComponentIndex + 1);
-    setQuizAnswers({});
-    setQuizCompleted(false);
+    if (currentComponentIndex + 1 < roadmap.total_components) {
+      setCurrentComponentIndex(prevIndex => prevIndex + 1);
+      fetchComponentData(roadmap.roadmap_id, currentComponentIndex + 1);
+      setQuizAnswers({});
+      setQuizCompleted(false);
+    } else {
+      console.log("No more components available.");
+      // Optionally, navigate to a completion page or show a message
+    }
   };
 
-  if (!componentData) {
+  if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500 text-center py-8">{error}</div>;
+  }
+
+  if (!componentData) {
+    return <div>No component data available.</div>;
   }
 
   return (
     <div className="bg-black text-cyan-300 min-h-screen flex flex-col items-center p-4 overflow-hidden">
       <Head>
-        <title>{componentData.name}</title>
+        <title>{componentData.component.name}</title>
       </Head>
 
       <div className="w-full max-w-7xl bg-neutral-900 border border-cyan-800/30 rounded-2xl shadow-2xl shadow-cyan-500/10 p-6 space-y-6 relative">
@@ -86,13 +112,14 @@ export default function Home() {
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-transparent via-cyan-900/10 to-transparent opacity-50 blur-3xl"></div>
         </div>
 
+        {/* Video Section */}
         <div className="relative z-10 mb-6">
           <div className="w-full aspect-video rounded-xl overflow-hidden border-2 border-cyan-700/50 shadow-lg shadow-cyan-500/20">
             <iframe
               width="100%"
               height="100%"
-              src={componentData.embed_url}
-              title={`${componentData.name} Video`}
+              src={componentData.component.embed_url}
+              title={`${componentData.component.name} Video`}
               frameBorder="0"
               className="transform transition-all hover:scale-[1.02]"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -109,14 +136,14 @@ export default function Home() {
           </div>
           <div className="w-full bg-neutral-800 border border-cyan-800/30 rounded-xl p-4">
             <iframe 
-              src={componentData.document} 
+              src={componentData.component.document} 
               width="100%" 
               height="600px" 
               className="rounded-lg border border-cyan-700/30"
               title="PDF Viewer"
             ></iframe>
             <a
-              href={componentData.document}
+              href={componentData.component.document}
               download
               className="mt-4 inline-block bg-cyan-600 hover:bg-cyan-700 text-black font-bold py-2 px-4 rounded-md transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
             >
@@ -126,7 +153,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Space for Document (after PDF) */}
+        {/* Document Section */}
         <div className="mb-6 z-10 relative">
           <div className="flex items-center mb-4 space-x-3">
             <FileText className="text-cyan-500" />
@@ -135,18 +162,19 @@ export default function Home() {
           <div className="w-full bg-neutral-800 border border-cyan-800/30 rounded-xl p-4">
             <p className="text-cyan-300">Here you can read more about the topics covered in the course or explore related materials.</p>
             <a
-              href={componentData.document}
+              href={componentData.component.document}
               target="_blank"
               className="mt-4 inline-block bg-cyan-600 hover:bg-cyan-700 text-black font-bold py-2 px-4 rounded-md transition-all transform hover:scale-105"
             >
               Open Full Document
             </a>
+            setError("Roadmap ID is not available in context.");
           </div>
         </div>
 
         {/* Description Section */}
         <div className="mb-6 z-10 relative bg-neutral-800/50 rounded-xl p-4 border border-cyan-800/30">
-          <p className="text-cyan-300 italic">{componentData.description}</p>
+          <p className="text-cyan-300 italic">{componentData.component.description}</p>
         </div>
 
         {/* Quiz Section */}
@@ -156,7 +184,7 @@ export default function Home() {
             <h2 className="text-xl font-bold">Knowledge Checkpoint</h2>
           </div>
           <div className="space-y-6">
-            {componentData.test_series.map((q, index) => (
+            {componentData.component.test_series.map((q, index) => (
               <div 
                 key={index} 
                 className="bg-neutral-800 border border-cyan-800/30 rounded-xl p-4 hover:border-cyan-500 transition-all"
@@ -184,7 +212,7 @@ export default function Home() {
             ))}
             <button
               onClick={handleQuizSubmit}
-              disabled={!componentData.test_series.every(q => quizAnswers[q.question])}
+              disabled={!componentData.component.test_series.every(q => quizAnswers[q.question])}
               className="w-full bg-cyan-600 text-black font-bold py-3 px-6 rounded-xl 
                 hover:bg-cyan-500 transition-all 
                 disabled:opacity-50 disabled:cursor-not-allowed

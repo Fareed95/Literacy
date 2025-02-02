@@ -50,7 +50,7 @@ function PrevCources() {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8 ">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {roadmaps.map((roadmap) => (
           <div
