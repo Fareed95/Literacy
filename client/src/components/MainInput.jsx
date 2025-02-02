@@ -32,7 +32,7 @@ function MainInput() {
 
     try {
       // Make the POST request to the API
-      const response = await fetch('http://localhost:8000/generate-roadmap', {
+      const response = await fetch('http://localhost:8001/generate-roadmap', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

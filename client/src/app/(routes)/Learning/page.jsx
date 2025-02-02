@@ -27,7 +27,7 @@ export default function Home() {
 
   const fetchRoadmapData = async (roadmapId) => {
     try {
-      const response = await fetch(`http://localhost:8000/roadmaps/${roadmapId}`);
+      const response = await fetch(`http://localhost:8001/roadmaps/${roadmapId}`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -43,7 +43,7 @@ export default function Home() {
 
   const fetchComponentData = async (roadmapId, componentNumber) => {
     try {
-      const response = await fetch(`http://localhost:8000/roadmaps/${roadmapId}/component`, {
+      const response = await fetch(`http://localhost:8001/roadmaps/${roadmapId}/component`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

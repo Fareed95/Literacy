@@ -15,7 +15,7 @@ function PrevCources() {
   useEffect(() => {
     // Make the POST request to the API only if the email is available
     if (contextemail) {
-      fetch('http://localhost:8000/user-roadmaps', {
+      fetch('http://localhost:8001/user-roadmaps', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
