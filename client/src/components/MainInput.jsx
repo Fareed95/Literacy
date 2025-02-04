@@ -1,64 +1,70 @@
 "use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import { PlaceholdersAndVanishInput } from "./ui/placeholders-and-vanish-input";
-import { useUserContext } from '@/app/context/Userinfo';
-import Timeline_roadmap_function from './Timeline_roadmap'; // Import the context to use it as the parameteric 
+import { useUserContext } from "@/app/context/Userinfo";
+import Timeline_roadmap_function from "./Timeline_roadmap";
 
 function MainInput() {
-  const [inputValue, setInputValue] = useState('');
-  const [roadmapData, setRoadmapData] = useState(null); 
-  const [loading, setLoading] = useState(false); 
-  const { contextemail } = useUserContext(); 
+  const [inputValue, setInputValue] = useState("");
+  const [roadmapData, setRoadmapData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const { contextemail } = useUserContext();
 
   const placeholders = [
     "How can I learn advanced backend development?",
     "How can I learn linear algebra?",
     "How can I learn database optimization?",
     "How can I learn to design scalable APIs?",
-    "How can I learn machine learning?"
+    "How can I learn machine learning?",
   ];
 
   const handleChange = (e) => {
-    setInputValue(e.target.value); 
+    setInputValue(e.target.value);
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (!inputValue || !contextemail) return; // Ensure input and email are present
+    if (!inputValue || !contextemail) return;
 
-    setLoading(true); // Start loading
-    setRoadmapData(null); // Reset roadmap data
+    setLoading(true);
+    setRoadmapData(null);
 
-    try {
-      // Make the POST request to the API
-      const response = await fetch('http://localhost:8001/generate-roadmap', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          input_value: inputValue,
-          email: contextemail,
-        }),
-      });
+    const MAX_RETRIES = 3;
+    let attempts = 0;
+    let success = false;
 
-      if (!response.ok) {
-        <div className="mt-10">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        <p className="mt-4 text-neutral-600 dark:text-neutral-400">
-          Failed to get the roadmap please try again...
-        </p>
-      </div>
+    while (attempts < MAX_RETRIES && !success) {
+      try {
+        const response = await fetch("http://localhost:8001/generate-roadmap", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            input_value: inputValue,
+            email: contextemail,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch roadmap");
+        }
+
+        const data = await response.json();
+        setRoadmapData(data);
+        success = true;
+      } catch (error) {
+        console.error(`Attempt ${attempts + 1} failed:`, error);
+        attempts++;
+
+        if (attempts >= MAX_RETRIES) {
+          window.alert("Failed to load roadmap. Please try again.");
+        }
       }
-
-      const data = await response.json();
-      setRoadmapData(data); // Set the fetched roadmap data
-    } catch (error) {
-      console.error('Error fetching roadmap:', error);
-    } finally {
-      setLoading(false); // Stop loading
     }
+
+    setLoading(false);
   };
 
   return (
@@ -71,13 +77,13 @@ function MainInput() {
           and we'll guide you with the best <div className="text-blue-500 px-2">RESOURCES</div>
         </div>
       </h2>
+
       <PlaceholdersAndVanishInput
         placeholders={placeholders}
         onChange={handleChange}
         onSubmit={onSubmit}
       />
 
-      {/* Show loader while loading */}
       {loading && (
         <div className="mt-10">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -87,7 +93,6 @@ function MainInput() {
         </div>
       )}
 
-      {/* Render the Timeline component if roadmapData is available */}
       {roadmapData && !loading && (
         <div className="mt-10 w-full">
           <Timeline_roadmap_function roadmapData={roadmapData} />
