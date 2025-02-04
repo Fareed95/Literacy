@@ -44,7 +44,12 @@ function MainInput() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch roadmap');
+        <div className="mt-10">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <p className="mt-4 text-neutral-600 dark:text-neutral-400">
+          Failed to get the roadmap please try again...
+        </p>
+      </div>
       }
 
       const data = await response.json();
