@@ -48,7 +48,11 @@ function MainInput() {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch roadmap");
+          attempts++;
+
+        if (attempts >= MAX_RETRIES) {
+          window.alert("Failed to load roadmap. Please try again.");
+        }
         }
 
         const data = await response.json();

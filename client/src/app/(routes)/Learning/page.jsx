@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { Clock, PlayIcon, FileText, CheckCircle2, ArrowRight } from 'lucide-react';
 import { useRoadmap } from '@/app/context/RoadmapContext';
+import { useRouter } from 'next/navigation';
+
 
 export default function Home() {
   const { roadmap } = useRoadmap();
@@ -13,15 +15,17 @@ export default function Home() {
   const [currentComponentIndex, setCurrentComponentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (roadmap?.roadmap_id) {
       console.log(roadmap);
       console.log(roadmap.roadmap_id);
       fetchRoadmapData(roadmap.roadmap_id);
+      
     } else {
-      setError("Roadmap ID is not available in context.");
-      setIsLoading(false);
+      console.log('No roadmap ID found');
+      router.push('/');
     }
   }, [roadmap]);
 
@@ -76,17 +80,40 @@ export default function Home() {
     }
   };
 
-  const handleNextComponent = () => {
+  const handleNextComponent = async () => {
     if (currentComponentIndex + 1 < roadmap.total_components) {
-      setCurrentComponentIndex(prevIndex => prevIndex + 1);
-      fetchComponentData(roadmap.roadmap_id, currentComponentIndex + 1);
-      setQuizAnswers({});
-      setQuizCompleted(false);
+      try {
+        // Send PATCH request to update completion status
+        const response = await fetch(`http://localhost:8001/roadmaps/${roadmap.roadmap_id}/complete`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ is_completed: currentComponentIndex + 1 }),
+        });
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+  
+        const data = await response.json();
+        console.log("Completion status updated:", data.message);
+  
+        // Proceed to fetch next component data
+        setCurrentComponentIndex(prevIndex => prevIndex + 1);
+        fetchComponentData(roadmap.roadmap_id, currentComponentIndex + 1);
+        setQuizAnswers({});
+        setQuizCompleted(false);
+      } catch (error) {
+        console.error("Error updating completion status:", error);
+        setError("Failed to update completion status. Please try again.");
+      }
     } else {
       console.log("No more components available.");
       // Optionally, navigate to a completion page or show a message
     }
   };
+  
 
   if (isLoading) {
     return <div>Loading...</div>;
