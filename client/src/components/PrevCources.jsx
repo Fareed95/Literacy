@@ -44,7 +44,7 @@ function PrevCources() {
   const handleCardClick = (roadmap) => {
     setRoadmap({
       
-      roadmap_id: roadmap.id,
+      roadmap_id: roadmap.id
     });
     console.log(roadmap.id);
     console.log(roadmap.total_components);
