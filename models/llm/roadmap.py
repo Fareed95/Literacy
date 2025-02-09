@@ -33,7 +33,7 @@ def roadmap(input_value):
 
     # Run the flow
     result = run_flow_from_json(
-        flow="json/Roadmap_generator.json",
+        flow="../json/Roadmap_generator.json",
         input_value="message",
         session_id=session_id,  # Provide a session ID
         fallback_to_env_vars=True,  # Allows environment variable fallback
@@ -59,6 +59,6 @@ def roadmap(input_value):
 
 if __name__ == "__main__":
 
-    result = roadmap(input_value="mern")
+    result = roadmap(input_value="drafting in laws")
     result_json = json.loads(result)
     print(result_json[1]['name'])
