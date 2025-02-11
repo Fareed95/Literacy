@@ -67,4 +67,6 @@ if __name__ == "__main__":
     print(search)
     result = youtube_search(str(search), max_results=10)
     print(result)
-    print(youtube_filteration_best(main_topic=main_topic,sub_topic=sub_topic, json_field=result))   
+    filter = youtube_filteration_best(main_topic=main_topic,sub_topic=sub_topic, json_field=result)
+    print(filter)   
+    print(type(filter))

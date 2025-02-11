@@ -45,11 +45,14 @@ def youtube_filteration_best(main_topic, sub_topic, json_field):
     raw_message = result[0].outputs[0].results['text']
     # Ensure the text is properly cleaned and formatted
     if isinstance(raw_message, str):
-        cleaned_message = json.dumps(json.loads(raw_message), indent=4)
-        return cleaned_message
+        cleaned_message = json.loads(raw_message)  # Convert JSON string to dictionary
+    elif hasattr(raw_message, "text"):  # Handle object case
+        cleaned_message = json.loads(raw_message.text)
     else:
-        cleaned_message = json.dumps(json.loads(raw_message.text), indent=4)
-        return cleaned_message
+        raise ValueError("Unexpected response format from LangFlow.")
+
+    # Return only the search query
+    return cleaned_message.get("best_videos", "No search query found")
 
 
 

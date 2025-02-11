@@ -1,37 +1,31 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import json
 import os
 from flask import Flask, request, jsonify
 from concurrent.futures import ThreadPoolExecutor
-from models.llm.roadmap import roadmap  # Assuming synchronous function
-from models.scrapping.youtube_scrapping import youtube_search  # Assuming synchronous function
-from models.scrapping.pdf_scrapping import search_and_download_pdf  # PDF scraping module
-from models.extraction.skill_extractor import extraction
+from llm.roadmap import roadmap  # Assuming synchronous function
+from llm.search_query import search_query  # Assuming synchronous function
+from llm.youtube_filteration import youtube_filteration_best  # Assuming synchronous function
+from scrapping.youtube_scrapping import youtube_search  # Assuming synchronous function
+from scrapping.pdf_scrapping import search_and_download_pdf  # PDF scraping module
+from extraction.skill_extractor import extraction
 import psycopg2
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-# Fetch database credentials from .env
+'''
+Data base configuration 
+'''
 USER = os.getenv("user")
 PASSWORD = os.getenv("password")
 HOST = os.getenv("host")
 PORT = os.getenv("port")
 DBNAME = os.getenv("dbname")
 
-# Initialize Flask app
-app = Flask(__name__)
-executor = ThreadPoolExecutor(max_workers=5)
-
-# Define allowed origins for CORS
-from flask_cors import CORS
-CORS(app, origins=[
-    "https://marketlenss.vercel.app",
-    "http://localhost:3000",
-    "http://localhost:3001"
-], supports_credentials=True)
-
-# Database connection function
 def get_db_connection():
     return psycopg2.connect(
         user=USER,
@@ -41,7 +35,6 @@ def get_db_connection():
         dbname=DBNAME
     )
 
-# Create roadmap table if not exists
 def create_roadmap_table():
     try:
         conn = get_db_connection()
@@ -63,39 +56,57 @@ def create_roadmap_table():
     except Exception as e:
         print(f"Error creating roadmap table: {e}")
 
-# API route to generate roadmap and save to database
+
+'''
+Flask app setup 
+'''
+app = Flask(__name__)
+executor = ThreadPoolExecutor(max_workers=5)
+
+# Define allowed origins for CORS
+from flask_cors import CORS
+CORS(app, origins=[
+    "https://marketlenss.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:3001"
+], supports_credentials=True)
+
+'''
+API BUILDING
+'''
 @app.route("/generate-roadmap", methods=["POST"])
 def generate_roadmap():
     """
     Generate a roadmap with YouTube videos and PDF resources and save it to the database.
     """
     try:
-        # Get data from request body
+        
         data = request.get_json()
         input_value = data.get('input_value')
-        email = data.get('email')  # Get email from request
+        email = data.get('email')  
 
         if not input_value or not email:
             return jsonify({"error": "input_value and email are required"}), 400
+        
 
-        # Extract skills (roadmap name)
         extractor = extraction(input_value)
-        print(extractor)
-
-        # Generate roadmap
         roadmap_result = executor.submit(roadmap, input_value)
         result_json = json.loads(roadmap_result.result())
         length_json = len(result_json)
 
-        # Add YouTube videos for each component
         for i in range(length_json):
-            search_results = executor.submit(youtube_search, f"one shot video for {result_json[i]['name']}")
+            # Get YouTube search query
+            querry = search_query(main_topic=extractor, sub_topic=result_json[i]['name'])
+            search_results = executor.submit(youtube_search, querry)
+            print(search_results)
             search_results = search_results.result()
-            if search_results:
-                first_video = search_results[0]
-                result_json[i]['embed_url'] = first_video['embed_url']
-            else:
-                result_json[i]['embed_url'] = "No video found"
+            print(search_results)
+
+            # Get the list of video URLs directly
+            best_videos = youtube_filteration_best(main_topic=extractor, sub_topic=result_json[i]['name'], json_field=search_results)
+
+            # Directly assign the list to the roadmap component
+            result_json[i]['videos'] = best_videos if best_videos else []
 
         # Fetch PDFs for the overall roadmap topic
         pdf_result = executor.submit(search_and_download_pdf, input_value)
@@ -150,7 +161,7 @@ def generate_roadmap():
         return jsonify({"error": "Error parsing roadmap data."}), 500
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
-# Add this new route to your existing Flask app
+
 @app.route("/user-roadmaps", methods=["POST"])
 def get_user_roadmaps():
     """

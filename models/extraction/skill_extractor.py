@@ -28,8 +28,11 @@ def extraction(input_value):
         }
     }
 
+    json_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "json"))
+    json_file = os.path.join(json_dir, "Skill_extractor_from_sentences.json")
+
     result = run_flow_from_json(
-        flow="json/Skill_extractor_from_sentences.json",
+        flow=json_file,
         input_value="message",
         session_id=session_id,
         fallback_to_env_vars=True,

@@ -30,10 +30,11 @@ def roadmap(input_value):
             "input_value": input_value
         }
     }
-
+    json_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "json"))
+    json_file = os.path.join(json_dir, "Roadmap_generator.json")
     # Run the flow
     result = run_flow_from_json(
-        flow="../json/Roadmap_generator.json",
+        flow=json_file,
         input_value="message",
         session_id=session_id,  # Provide a session ID
         fallback_to_env_vars=True,  # Allows environment variable fallback
