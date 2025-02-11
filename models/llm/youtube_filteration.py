@@ -1,43 +1,72 @@
 from langflow.load import run_flow_from_json
-TWEAKS = {
-  "Prompt-nxIyu": {
-    "template": "You are an AI assistant. Given data from 20 YouTube videos (including name and description), along with a specific subtopic and its related main topic, your task is to identify the best 5 videos for learning that skill.  \n\n### Requirements:  \n1. Analyze the provided video data and rank the videos based on their relevance and quality for learning the given subtopic.  \n2. Ensure the selected videos are the most effective resources for skill acquisition.  \n3. Output only in **strict JSON format**, containing the embedding URLs of the top 5 videos.  \n4. No additional explanation text—just return the JSON response.  \n\n**Input:**  \n- `videos_data`: A list containing YouTube video details (name, description, etc.).  \n- `subtopic`: The specific skill or concept being searched.  \n- `main_topic`: The broader category under which the subtopic falls.  \n\nFor this response :\n1. video_data - {data}.\n2.subtopic -{subtopic}.\n3.maintopic - {maintopic}.\n**Output Example:**  \n```json\n(\n  \"best_videos\": [\n    \"https://www.youtube.com/embed/VIDEO_ID1\",\n    \"https://www.youtube.com/embed/VIDEO_ID2\",\n    \"https://www.youtube.com/embed/VIDEO_ID3\",\n    \"https://www.youtube.com/embed/VIDEO_ID4\",\n    \"https://www.youtube.com/embed/VIDEO_ID5\"\n  ]\n)\n",
-    "data": "",
-    "subtopic": "",
-    "maintopic": ""
-  },
-  "GroqModel-F4G8v": {
-    "groq_api_base": "https://api.groq.com",
-    "groq_api_key": "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",
-    "input_value": "",
-    "max_tokens": None,
-    "model_name": "llama3-8b-8192",
-    "n": None,
-    "stream": False,
-    "system_message": "",
-    "temperature": 0.2
-  },
-  "TextInput-DdJSI": {
-    "input_value": "(myenv) fareed-sayed@fareed-sayed-VivoBook-ASUSLaptop-M1603QA-M1603QA:~/Documents/Literacy/models/scrapping$ python youtube_scrapping.py \n[\n    {\n        \"video_id\": \"3Jg9fVKcsew\",\n        \"title\": \"How to do Legal Research | Law Research\",\n        \"description\": \"For ease of your preparation, I have launched a few courses that are available on my website: https://www.lawdigest.in/ law digest ...\",\n        \"channel\": \"Law Digest by Ayushi\",\n        \"channel_id\": \"UCpAYS6qtw9XEjUcnOGR3Wkw\",\n        \"published_at\": \"2022-12-04T14:30:10Z\",\n        \"thumbnails\": {\n            \"default\": {\n                \"url\": \"https://i.ytimg.com/vi/3Jg9fVKcsew/default.jpg\",\n                \"width\": 120,\n                \"height\": 90\n            },\n            \"medium\": {\n                \"url\": \"https://i.ytimg.com/vi/3Jg9fVKcsew/mqdefault.jpg\",\n                \"width\": 320,\n                \"height\": 180\n            },\n            \"high\": {\n                \"url\": \"https://i.ytimg.com/vi/3Jg9fVKcsew/hqdefault.jpg\",\n                \"width\": 480,\n                \"height\": 360\n            }\n        },\n        \"url\": \"https://www.youtube.com/watch?v=3Jg9fVKcsew\",\n        \"embed_url\": \"https://www.youtube.com/embed/3Jg9fVKcsew\"\n    },\n    {\n        \"video_id\": \"fyrQ4C59eyg\",\n        \"title\": \"Legal Research and Legal Drafting in One month with TOA\",\n        \"description\": \"For more queries or joining msg us here: https://wa.me/+919998826259.\",\n        \"channel\": \"Theory of Abrogation\",\n        \"channel_id\": \"UCbvWgv55ElrNlzp7cDQ47_A\",\n        \"published_at\": \"2024-05-24T20:50:34Z\",\n        \"thumbnails\": {\n            \"default\": {\n                \"url\": \"https://i.ytimg.com/vi/fyrQ4C59eyg/default.jpg\",\n                \"width\": 120,\n                \"height\": 90\n            },\n            \"medium\": {\n                \"url\": \"https://i.ytimg.com/vi/fyrQ4C59eyg/mqdefault.jpg\",\n                \"width\": 320,\n                \"height\": 180\n            },\n            \"high\": {\n                \"url\": \"https://i.ytimg.com/vi/fyrQ4C59eyg/hqdefault.jpg\",\n                \"width\": 480,\n                \"height\": 360\n            }\n        },\n        \"url\": \"https://www.youtube.com/watch?v=fyrQ4C59eyg\",\n        \"embed_url\": \"https://www.youtube.com/embed/fyrQ4C59eyg\"\n    },\n    {\n        \"video_id\": \"lrwgc-Cbd5E\",\n        \"title\": \"How to Read a Case Citation\",\n        \"description\": \"In this video, we will understand how to read a judgment or a legal case citation. I hope you find this video useful, Leave us a ...\",\n        \"channel\": \"Priya Jain\",\n        \"channel_id\": \"UCItJsxqZNWUyxFn-A2tzizQ\",\n        \"published_at\": \"2021-05-15T10:40:15Z\",\n        \"thumbnails\": {\n            \"default\": {\n                \"url\": \"https://i.ytimg.com/vi/lrwgc-Cbd5E/default.jpg\",\n                \"width\": 120,\n                \"height\": 90\n            },\n            \"medium\": {\n                \"url\": \"https://i.ytimg.com/vi/lrwgc-Cbd5E/mqdefault.jpg\",\n                \"width\": 320,\n                \"height\": 180\n            },\n            \"high\": {\n                \"url\": \"https://i.ytimg.com/vi/lrwgc-Cbd5E/hqdefault.jpg\",\n                \"width\": 480,\n                \"height\": 360\n            }\n        },\n        \"url\": \"https://www.youtube.com/watch?v=lrwgc-Cbd5E\",\n        \"embed_url\": \"https://www.youtube.com/embed/lrwgc-Cbd5E\"\n    },\n    {\n        \"video_id\": \"0ZXKmIXJ7lk\",\n        \"title\": \"Legal Writing Basics: Three Key Skills Sample\",\n        \"description\": \"This video introduces you to the \\\"Golden Rule\\\" of Legal Writing, to help the reader get the content quickly and easily. Our Three ...\",\n        \"channel\": \"Synergetics Education\",\n        \"channel_id\": \"UCMHzuVaK5_8A2w7DGjBixmg\",\n        \"published_at\": \"2019-12-01T20:13:50Z\",\n        \"thumbnails\": {\n            \"default\": {\n                \"url\": \"https://i.ytimg.com/vi/0ZXKmIXJ7lk/default.jpg\",\n                \"width\": 120,\n                \"height\": 90\n            },\n            \"medium\": {\n                \"url\": \"https://i.ytimg.com/vi/0ZXKmIXJ7lk/mqdefault.jpg\",\n                \"width\": 320,\n                \"height\": 180\n            },\n            \"high\": {\n                \"url\": \"https://i.ytimg.com/vi/0ZXKmIXJ7lk/hqdefault.jpg\",\n                \"width\": 480,\n                \"height\": 360\n            }\n        },\n        \"url\": \"https://www.youtube.com/watch?v=0ZXKmIXJ7lk\",\n        \"embed_url\": \"https://www.youtube.com/embed/0ZXKmIXJ7lk\"\n    },\n    {\n        \"video_id\": \"lYipQzef8N8\",\n        \"title\": \"How to read extremely long judgments faster!\",\n        \"description\": \"I am a Delhi based lawyer. You can send me your stories at amish.aggarwala@gmail.com https://wa.me/+919958177114 I post ...\",\n        \"channel\": \"Law Chambers of Amish Aggarwala\",\n        \"channel_id\": \"UC_39GbojQPbzFX5xqB0Gu2g\",\n        \"published_at\": \"2023-05-16T06:03:24Z\",\n        \"thumbnails\": {\n            \"default\": {\n                \"url\": \"https://i.ytimg.com/vi/lYipQzef8N8/default.jpg\",\n                \"width\": 120,\n                \"height\": 90\n            },\n            \"medium\": {\n                \"url\": \"https://i.ytimg.com/vi/lYipQzef8N8/mqdefault.jpg\",\n                \"width\": 320,\n                \"height\": 180\n            },\n            \"high\": {\n                \"url\": \"https://i.ytimg.com/vi/lYipQzef8N8/hqdefault.jpg\",\n                \"width\": 480,\n                \"height\": 360\n            }\n        },\n        \"url\": \"https://www.youtube.com/watch?v=lYipQzef8N8\",\n        \"embed_url\": \"https://www.youtube.com/embed/lYipQzef8N8\"\n    },\n    {\n        \"video_id\": \"Y66vN4ia_OY\",\n        \"title\": \"Searching Case Laws: How to Research Case Laws : Legal Research Tips :: Online Legal Research\",\n        \"description\": \"Searching for case laws as a lawyer or a law student can be a pain if you are not aware of the right tricks for researching a case ...\",\n        \"channel\": \"Law Giri\",\n        \"channel_id\": \"UCEHVfgn7f4gP0oa0O1WKq8g\",\n        \"published_at\": \"2020-06-21T12:15:50Z\",\n        \"thumbnails\": {\n            \"default\": {\n                \"url\": \"https://i.ytimg.com/vi/Y66vN4ia_OY/default.jpg\",\n                \"width\": 120,\n                \"height\": 90\n            },\n            \"medium\": {\n                \"url\": \"https://i.ytimg.com/vi/Y66vN4ia_OY/mqdefault.jpg\",\n                \"width\": 320,\n                \"height\": 180\n            },\n            \"high\": {\n                \"url\": \"https://i.ytimg.com/vi/Y66vN4ia_OY/hqdefault.jpg\",\n                \"width\": 480,\n                \"height\": 360\n            }\n        },\n        \"url\": \"https://www.youtube.com/watch?v=Y66vN4ia_OY\",\n        \"embed_url\": \"https://www.youtube.com/embed/Y66vN4ia_OY\"\n    },\n    {\n        \"video_id\": \"CUQru8ILd98\",\n        \"title\": \"How to Find Case-Laws: A Guide for Young Advocates\",\n        \"description\": \"Are you a young advocate struggling to find relevant case-laws for your legal research? Look no further! In this video, Adv.\",\n        \"channel\": \"Legal Inspiration\",\n        \"channel_id\": \"UCTurO4neny9FOHspWmmj3HA\",\n        \"published_at\": \"2023-03-13T17:34:45Z\",\n        \"thumbnails\": {\n            \"default\": {\n                \"url\": \"https://i.ytimg.com/vi/CUQru8ILd98/default.jpg\",\n                \"width\": 120,\n                \"height\": 90\n            },\n            \"medium\": {\n                \"url\": \"https://i.ytimg.com/vi/CUQru8ILd98/mqdefault.jpg\",\n                \"width\": 320,\n                \"height\": 180\n            },\n            \"high\": {\n                \"url\": \"https://i.ytimg.com/vi/CUQru8ILd98/hqdefault.jpg\",\n                \"width\": 480,\n                \"height\": 360\n            }\n        },\n        \"url\": \"https://www.youtube.com/watch?v=CUQru8ILd98\",\n        \"embed_url\": \"https://www.youtube.com/embed/CUQru8ILd98\"\n    },\n    {\n        \"video_id\": \"YnbpGTusaEc\",\n        \"title\": \"How to read a case file within 5 minutes: For young litigation lawyers\",\n        \"description\": \"There have been a lot of occasions when as a junior counsel I was told to rush to court and argue a matter at very short notice.\",\n        \"channel\": \"Law Chambers of Amish Aggarwala\",\n        \"channel_id\": \"UC_39GbojQPbzFX5xqB0Gu2g\",\n        \"published_at\": \"2020-06-25T16:59:00Z\",\n        \"thumbnails\": {\n            \"default\": {\n                \"url\": \"https://i.ytimg.com/vi/YnbpGTusaEc/default.jpg\",\n                \"width\": 120,\n                \"height\": 90\n            },\n            \"medium\": {\n                \"url\": \"https://i.ytimg.com/vi/YnbpGTusaEc/mqdefault.jpg\",\n                \"width\": 320,\n                \"height\": 180\n            },\n            \"high\": {\n                \"url\": \"https://i.ytimg.com/vi/YnbpGTusaEc/hqdefault.jpg\",\n                \"width\": 480,\n                \"height\": 360\n            }\n        },\n        \"url\": \"https://www.youtube.com/watch?v=YnbpGTusaEc\",\n        \"embed_url\": \"https://www.youtube.com/embed/YnbpGTusaEc\"\n    },\n    {\n        \"video_id\": \"QZ1CXLeZYk8\",\n        \"title\": \"Cows, Science, and the Law\",\n        \"description\": \"This webinar analyzes the intersection of cows, science and the law. Speakers: Greg Berns, Emory University Laura Fox, Yale ...\",\n        \"channel\": \"GW Animal Law Program\",\n        \"channel_id\": \"UCQteLUWSH0nfjWTWdNCdoTg\",\n        \"published_at\": \"2025-02-07T19:36:54Z\",\n        \"thumbnails\": {\n            \"default\": {\n                \"url\": \"https://i.ytimg.com/vi/QZ1CXLeZYk8/default.jpg\",\n                \"width\": 120,\n                \"height\": 90\n            },\n            \"medium\": {\n                \"url\": \"https://i.ytimg.com/vi/QZ1CXLeZYk8/mqdefault.jpg\",\n                \"width\": 320,\n                \"height\": 180\n            },\n            \"high\": {\n                \"url\": \"https://i.ytimg.com/vi/QZ1CXLeZYk8/hqdefault.jpg\",\n                \"width\": 480,\n                \"height\": 360\n            }\n        },\n        \"url\": \"https://www.youtube.com/watch?v=QZ1CXLeZYk8\",\n        \"embed_url\": \"https://www.youtube.com/embed/QZ1CXLeZYk8\"\n    },\n    {\n        \"video_id\": \"NHykzrRkpxE\",\n        \"title\": \"Learning Legal Drafting- Easy Ways to become best lawyer\",\n        \"description\": \"Legal drafting for young lawyers is always a problem. They don't know how to be good at drafting but you know what legal drafting ...\",\n        \"channel\": \"Law Giri\",\n        \"channel_id\": \"UCEHVfgn7f4gP0oa0O1WKq8g\",\n        \"published_at\": \"2020-04-09T08:15:52Z\",\n        \"thumbnails\": {\n            \"default\": {\n                \"url\": \"https://i.ytimg.com/vi/NHykzrRkpxE/default.jpg\",\n                \"width\": 120,\n                \"height\": 90\n            },\n            \"medium\": {\n                \"url\": \"https://i.ytimg.com/vi/NHykzrRkpxE/mqdefault.jpg\",\n                \"width\": 320,\n                \"height\": 180\n            },\n            \"high\": {\n                \"url\": \"https://i.ytimg.com/vi/NHykzrRkpxE/hqdefault.jpg\",\n                \"width\": 480,\n                \"height\": 360\n            }\n        },\n        \"url\": \"https://www.youtube.com/watch?v=NHykzrRkpxE\",\n        \"embed_url\": \"https://www.youtube.com/embed/NHykzrRkpxE\"\n    }\n]\n"
-  },
-  "TextInput-QPGcB": {
-    "input_value": "Legal Research and Analysis"
-  },
-  "TextInput-1cIAI": {
-    "input_value": "drafting in law"
-  },
-  "JSONCleaner-09OFa": {
-    "json_str": "",
-    "normalize_unicode": False,
-    "remove_control_chars": False,
-    "validate_json": False
-  },
-  "TextOutput-HkgeY": {
-    "input_value": ""
-  }
-}
+import os 
+from dotenv import load_dotenv
+import warnings
+import logging
+import json
+import uuid
 
-result = run_flow_from_json(flow="Untitled document.json",
-                            session_id="", # provide a session id if you want to use session state
-                            fallback_to_env_vars=True, # False by default
-                            tweaks=TWEAKS)
+load_dotenv()
+# Generate a unique session ID
+session_id = str(uuid.uuid4())
+
+# Suppress warnings and logs
+warnings.filterwarnings("ignore")
+logging.getLogger("langchain").setLevel(logging.ERROR)
+
+
+def youtube_filteration_best(main_topic, sub_topic, json_field):
+    TWEAKS = {
+    "GroqModel-F4G8v": {
+        "groq_api_key": os.getenv("GROQ_API_KEY"),
+        "model_name": "llama3-8b-8192",
+        "temperature": 0.2
+    },
+    "TextInput-DdJSI": {
+       "input_value":json_field
+    },
+    "TextInput-QPGcB": {
+        "input_value":sub_topic
+    },
+    "TextInput-1cIAI": {
+        "input_value":main_topic
+    }
+    }
+    json_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "json"))
+    json_file = os.path.join(json_dir, "Filteration_youtube_videos.json")
+
+    result = run_flow_from_json(
+        flow=json_file,
+        input_value="message",
+        session_id=session_id,  # Provide a session ID
+        fallback_to_env_vars=True,  # Allows environment variable fallback
+        tweaks=TWEAKS
+    )
+    raw_message = result[0].outputs[0].results['text']
+    # Ensure the text is properly cleaned and formatted
+    if isinstance(raw_message, str):
+        cleaned_message = json.dumps(json.loads(raw_message), indent=4)
+        return cleaned_message
+    else:
+        cleaned_message = json.dumps(json.loads(raw_message.text), indent=4)
+        return cleaned_message
+
+
+
+if __name__ == "__main__":
+    import sys
+    import os
+
+    # Get the parent directory (models/) and add it to sys.path
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+    # Now import the module
+    from scrapping.youtube_scrapping import youtube_search
+
+
+    main_topic = "Python"
+    sub_topic = "Python Basics"
+    json_field = youtube_search(sub_topic)
+    # print(json_field)
+    # json_field = "{'name': 'Python'}"
+    print(youtube_filteration_best(main_topic=main_topic,sub_topic= sub_topic,json_field= json_field))  # prints:

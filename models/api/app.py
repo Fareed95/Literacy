@@ -2,10 +2,10 @@ import json
 import os
 from flask import Flask, request, jsonify
 from concurrent.futures import ThreadPoolExecutor
-from roadmap import roadmap  # Assuming synchronous function
-from youtube_scrapping import youtube_search  # Assuming synchronous function
-from pdf_scrapping import search_and_download_pdf  # PDF scraping module
-from skill_extractor import extraction
+from models.llm.roadmap import roadmap  # Assuming synchronous function
+from models.scrapping.youtube_scrapping import youtube_search  # Assuming synchronous function
+from models.scrapping.pdf_scrapping import search_and_download_pdf  # PDF scraping module
+from models.extraction.skill_extractor import extraction
 import psycopg2
 from dotenv import load_dotenv
 
@@ -344,6 +344,11 @@ def get_roadmap_component(roadmap_id):
 
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+    
+
+
+
+
 # Run Flask app
 if __name__ == '__main__':
     create_roadmap_table()  # Ensure roadmap table is created
