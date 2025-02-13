@@ -20,6 +20,8 @@ load_dotenv()
 '''
 Data base configuration 
 '''
+
+
 USER = os.getenv("user")
 PASSWORD = os.getenv("password")
 HOST = os.getenv("host")
@@ -74,6 +76,8 @@ CORS(app, origins=[
 '''
 API BUILDING
 '''
+
+
 @app.route("/generate-roadmap", methods=["POST"])
 def generate_roadmap():
     """
@@ -96,11 +100,11 @@ def generate_roadmap():
 
         for i in range(length_json):
             # Get YouTube search query
-            querry = search_query(main_topic=extractor, sub_topic=result_json[i]['name'])
+            querry = search_query( input_value=result_json[i]['name'])
             search_results = executor.submit(youtube_search, querry)
-            print(search_results)
+            # print(search_results)
             search_results = search_results.result()
-            print(search_results)
+            # print(search_results)
 
             # Get the list of video URLs directly
             best_videos = youtube_filteration_best(main_topic=extractor, sub_topic=result_json[i]['name'], json_field=search_results)
@@ -148,7 +152,6 @@ def generate_roadmap():
             cursor.close()
             conn.close()
 
-            # Add roadmap ID to the response
             final_response["roadmap_id"] = roadmap_id
 
         except Exception as db_error:
@@ -161,6 +164,8 @@ def generate_roadmap():
         return jsonify({"error": "Error parsing roadmap data."}), 500
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+
+
 
 @app.route("/user-roadmaps", methods=["POST"])
 def get_user_roadmaps():
@@ -213,7 +218,10 @@ def get_user_roadmaps():
 
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
-    
+
+
+
+
 @app.route("/roadmaps/<int:roadmap_id>/complete", methods=["PATCH"])
 def update_roadmap_completion(roadmap_id):
     """
@@ -223,12 +231,6 @@ def update_roadmap_completion(roadmap_id):
         # Get data from request body
         data = request.get_json()
         is_completed = data.get('is_completed')
-
-        # # Validate is_completed value
-        # if is_completed not in [0, 1]:
-        #     return jsonify({"error": "is_completed must be 0 or 1"}), 400
-
-        # Update the roadmap in the database
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
