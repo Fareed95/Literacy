@@ -49,14 +49,12 @@ export default function Home() {
 
   const fetchComponentData = async (roadmapId, componentNumber) => {
     try {
-      
       const response = await fetch(`http://localhost:8001/roadmaps/${roadmapId}/component`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ component_number: componentNumber }),
-        
       });
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -64,7 +62,6 @@ export default function Home() {
       const data = await response.json();
       console.log(data);
       setComponentData(data);
-      
       setError(null);
     } catch (error) {
       console.error("Error fetching component data:", error);
@@ -107,6 +104,29 @@ export default function Home() {
     }
   };
 
+  const handleQuizAnswer = (questionIndex, selectedAnswer) => {
+    setQuizAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [questionIndex]: selectedAnswer,
+    }));
+  };
+
+  const checkQuizCompletion = () => {
+    if (!componentData || !componentData.component || !componentData.component.test_series) {
+      setQuizCompleted(false); // If test_series is not available, mark quiz as incomplete
+      return;
+    }
+
+    const allQuestionsAnswered = componentData.component.test_series.every(
+      (_, index) => quizAnswers[index] !== undefined
+    );
+    setQuizCompleted(allQuestionsAnswered);
+  };
+
+  useEffect(() => {
+    checkQuizCompletion();
+  }, [quizAnswers]);
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500 text-center py-8">{error}</div>;
   if (!componentData) return <div>No component data available.</div>;
@@ -122,21 +142,27 @@ export default function Home() {
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-transparent via-cyan-900/10 to-transparent opacity-50 blur-3xl"></div>
         </div>
 
+        {/* Video Section */}
         <div className="relative z-10 mb-6">
-          <div className="w-full aspect-video rounded-xl overflow-hidden border-2 border-cyan-700/50 shadow-lg shadow-cyan-500/20">
-            <iframe
-              width="100%"
-              height="100%"
-              src={componentData.component.embed_url}
-              title={`${componentData.component.name} Video`}
-              frameBorder="0"
-              className="transform transition-all hover:scale-[1.02]"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {componentData.component.videos.map((video, index) => (
+              <div key={index} className="w-full aspect-video rounded-xl overflow-hidden border-2 border-cyan-700/50 shadow-lg shadow-cyan-500/20">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={video}
+                  title={`${componentData.component.name} Video ${index + 1}`}
+                  frameBorder="0"
+                  className="transform transition-all hover:scale-[1.02]"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* Supplementary Materials Section */}
         <div className="mb-6 z-10 relative">
           <div className="flex items-center mb-4 space-x-3">
             <FileText className="text-cyan-500" />
@@ -161,17 +187,55 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Description Section */}
         <div className="mb-6 z-10 relative bg-neutral-800/50 rounded-xl p-4 border border-cyan-800/30">
           <p className="text-cyan-300 italic">{componentData.component.description}</p>
         </div>
 
+        {/* Quiz Section */}
         <div className="z-10 relative">
           <div className="flex items-center space-x-3 mb-4">
             <Clock className="text-cyan-500" />
             <h2 className="text-xl font-bold">Knowledge Checkpoint</h2>
           </div>
+          <div className="bg-neutral-800/50 rounded-xl p-4 border border-cyan-800/30">
+            {componentData.component.test_series.map((question, index) => (
+              <div key={index} className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">{question.question}</h3>
+                <div className="space-y-2">
+                  {question.options.map((option, optionIndex) => (
+                    <label key={optionIndex} className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name={`question-${index}`}
+                        value={option}
+                        onChange={() => handleQuizAnswer(index, option)}
+                        className="form-radio text-cyan-500"
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+            {quizCompleted && componentData?.component?.test_series && (
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-2">Quiz Results</h3>
+                {componentData.component.test_series.map((question, index) => (
+                  <div key={index} className="mb-4">
+                    <p className="font-semibold">{question.question}</p>
+                    <p className={quizAnswers[index] === question.answer ? "text-green-500" : "text-red-500"}>
+                      Your answer: {quizAnswers[index]}
+                      {quizAnswers[index] === question.answer ? " ✅" : " ❌"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
+        {/* Next Component Button */}
         <button
           onClick={handleNextComponent}
           className="w-full bg-cyan-600 text-black font-bold py-3 px-6 rounded-xl 
