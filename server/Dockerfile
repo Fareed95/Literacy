@@ -3,10 +3,6 @@
 # Use the official Python image from the Docker Hub
 FROM python:3.11
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
 # Set the working directory to /app
 WORKDIR /app
 
