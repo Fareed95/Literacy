@@ -17,6 +17,7 @@ export default function Home() {
   const [roadmapId, setRoadmapId] = useState(null);  // Store roadmap_id
   const [isCompleted, setIsCompleted] = useState(null); // Store is_completed
   const router = useRouter();
+  const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER
 
   useEffect(() => {
     if (roadmap?.roadmap_id) {
@@ -31,7 +32,7 @@ export default function Home() {
 
   const fetchRoadmapData = async (roadmapId) => {
     try {
-      const response = await fetch(`http://localhost:8001/roadmaps/${roadmapId}`);
+      const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -49,7 +50,7 @@ export default function Home() {
 
   const fetchComponentData = async (roadmapId, componentNumber) => {
     try {
-      const response = await fetch(`http://localhost:8001/roadmaps/${roadmapId}/component`, {
+      const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}/component`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +76,7 @@ export default function Home() {
     if (currentComponentIndex + 1 < roadmap.total_components) {
       try {
         const newCompletedIndex = currentComponentIndex + 1;
-        const response = await fetch(`http://localhost:8001/roadmaps/${roadmapId}/complete`, {
+        const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}/complete`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',

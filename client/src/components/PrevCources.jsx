@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRoadmap } from '@/app/context/RoadmapContext';
 import { useUserContext } from '@/app/context/Userinfo';
-import { CompressedTextureLoader } from 'three/src/Three.Core.js';
 
 function PrevCources() {
   const [roadmaps, setRoadmaps] = useState([]);
@@ -13,9 +12,11 @@ function PrevCources() {
   const { setRoadmap } = useRoadmap();
   const { contextemail } = useUserContext();
 
+  const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER; // Fetching the env variable
+
   useEffect(() => {
-    if (contextemail) {
-      fetch('http://localhost:8001/user-roadmaps', {
+    if (contextemail && MODEL_API_SERVER) {
+      fetch(`${MODEL_API_SERVER}/user-roadmaps`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,15 +40,10 @@ function PrevCources() {
     } else {
       setLoading(false);
     }
-  }, [contextemail]);
+  }, [contextemail, MODEL_API_SERVER]);
 
   const handleCardClick = (roadmap) => {
-    setRoadmap({
-      
-      roadmap_id: roadmap.id
-    });
-    console.log(roadmap.id);
-    console.log(roadmap.total_components);
+    setRoadmap({ roadmap_id: roadmap.id });
     router.push('/Learning'); // Navigate to Learning page
   };
 
@@ -61,7 +57,7 @@ function PrevCources() {
           <div
             key={roadmap.id}
             className="bg-neutral-900 rounded-xl overflow-hidden border border-neutral-800 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer"
-            onClick={() => handleCardClick(roadmap)} // Clicking whole card triggers navigation
+            onClick={() => handleCardClick(roadmap)}
           >
             <div className="p-6">
               <h2 className="text-2xl font-bold text-white mb-4">{roadmap.name}</h2>
@@ -79,7 +75,6 @@ function PrevCources() {
                   <p className="text-neutral-400">No components available.</p>
                 )}
               </div>
-
             </div>
           </div>
         ))}

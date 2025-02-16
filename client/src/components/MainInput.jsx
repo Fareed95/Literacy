@@ -10,6 +10,8 @@ function MainInput() {
   const [roadmapData, setRoadmapData] = useState(null);
   const [loading, setLoading] = useState(false);
   const { contextemail } = useUserContext();
+  
+  const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER; // Fetch API URL from .env
 
   const placeholders = [
     "How can I learn advanced backend development?",
@@ -25,7 +27,7 @@ function MainInput() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (!inputValue || !contextemail) return;
+    if (!inputValue || !contextemail || !MODEL_API_SERVER) return;
 
     setLoading(true);
     setRoadmapData(null);
@@ -36,7 +38,7 @@ function MainInput() {
 
     while (attempts < MAX_RETRIES && !success) {
       try {
-        const response = await fetch("http://localhost:8001/generate-roadmap", {
+        const response = await fetch(`${MODEL_API_SERVER}/generate-roadmap`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -49,19 +51,17 @@ function MainInput() {
 
         if (!response.ok) {
           attempts++;
-
-        if (attempts >= MAX_RETRIES) {
-          window.alert("Failed to load roadmap. Please try again.");
+          if (attempts >= MAX_RETRIES) {
+            window.alert("Failed to load roadmap. Please try again.");
+          }
+        } else {
+          const data = await response.json();
+          setRoadmapData(data);
+          success = true;
         }
-        }
-
-        const data = await response.json();
-        setRoadmapData(data);
-        success = true;
       } catch (error) {
         console.error(`Attempt ${attempts + 1} failed:`, error);
         attempts++;
-
         if (attempts >= MAX_RETRIES) {
           window.alert("Failed to load roadmap. Please try again.");
         }
