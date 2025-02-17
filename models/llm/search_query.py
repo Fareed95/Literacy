@@ -56,8 +56,8 @@ if __name__ == "__main__":
     from llm.youtube_filteration import youtube_filteration_best
     main_topic = "drafting in laws"
     sub_topic = "legal terminology"
-    search =search_query(main_topic=main_topic, sub_topic=sub_topic)
-    search = "legal terminology explained in simple terms video"
+    search =search_query(input_value=sub_topic)
+    # search = "legal terminology explained in simple terms video"
     print(search)
     result = youtube_search(str(search), max_results=10)
     print(result)

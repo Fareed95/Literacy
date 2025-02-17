@@ -46,6 +46,7 @@ def create_roadmap_table():
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,  -- New field for roadmap name
                 roadmap_json TEXT NOT NULL,
+                roadmap_first_component TEXT NOT NULL,
                  is_completed INT DEFAULT 0,
                 user_id INT NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES api_user(id)
@@ -77,39 +78,40 @@ CORS(app, origins=[
 API BUILDING
 '''
 
-
-@app.route("/generate-roadmap", methods=["POST"])
-def generate_roadmap():
+@app.route("/generate-roadmap-all", methods=["POST"])
+def generate_roadmap_all():
     """
-    Generate a roadmap with YouTube videos and PDF resources and save it to the database.
+    Generate a full roadmap with all components and update the roadmap_json column for the given ID (if provided).
+    If no ID is provided, create a new roadmap entry.
     """
     try:
-        
         data = request.get_json()
         input_value = data.get('input_value')
-        email = data.get('email')  
+        email = data.get('email')
+        roadmap_id = data.get('id')  # Optional: ID of the roadmap to update
 
         if not input_value or not email:
             return jsonify({"error": "input_value and email are required"}), 400
-        
 
+        # Extract the main topic name
         extractor = extraction(input_value)
-        roadmap_result = executor.submit(roadmap, input_value)
-        result_json = json.loads(roadmap_result.result())
+
+        # Generate the full roadmap
+        result = roadmap(input_value=input_value)  # Directly call the roadmap function
+        result_json = json.loads(result)  # Parse the JSON string into a Python object
         length_json = len(result_json)
 
+        # Process each component to fetch YouTube videos
         for i in range(length_json):
-            # Get YouTube search query
-            querry = search_query( input_value=result_json[i]['name'])
-            search_results = executor.submit(youtube_search, querry)
-            # print(search_results)
+            # Get YouTube search query for the component
+            query = search_query(input_value=result_json[i]['name'])
+            search_results = executor.submit(youtube_search, query)
             search_results = search_results.result()
-            # print(search_results)
 
-            # Get the list of video URLs directly
+            # Get the list of video URLs for the component
             best_videos = youtube_filteration_best(main_topic=extractor, sub_topic=result_json[i]['name'], json_field=search_results)
 
-            # Directly assign the list to the roadmap component
+            # Add videos to the component
             result_json[i]['videos'] = best_videos if best_videos else []
 
         # Fetch PDFs for the overall roadmap topic
@@ -120,7 +122,7 @@ def generate_roadmap():
         else:
             pdf_links = pdf_result["links"]
 
-        # Prepare final response
+        # Prepare the final response
         final_response = {
             "roadmap_name": extractor,
             "roadmap_components": result_json,
@@ -131,7 +133,7 @@ def generate_roadmap():
         # Convert final response to string for storage
         roadmap_json_str = json.dumps(final_response)
 
-        # Save roadmap to database
+        # Save or update the roadmap in the database
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
@@ -142,12 +144,12 @@ def generate_roadmap():
             if not user_id:
                 return jsonify({"error": "User not found"}), 404
 
-            # Insert roadmap into database with name field
             cursor.execute(
-                "INSERT INTO roadmap (name, roadmap_json, user_id) VALUES (%s, %s, %s) RETURNING id;",
-                (extractor, roadmap_json_str, user_id[0])
-            )
-            roadmap_id = cursor.fetchone()[0]  # Fetch the ID of the newly created roadmap
+                    "UPDATE roadmap SET roadmap_json = %s WHERE id = %s AND user_id = %s RETURNING id;",
+                    (roadmap_json_str, roadmap_id, user_id[0]))
+            updated_roadmap_id = cursor.fetchone()
+            roadmap_id = updated_roadmap_id[0]
+           
             conn.commit()
             cursor.close()
             conn.close()
@@ -164,9 +166,89 @@ def generate_roadmap():
         return jsonify({"error": "Error parsing roadmap data."}), 500
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+    
 
+@app.route("/generate-roadmap-first-component", methods=["POST"])
+def generate_roadmap_first_component():
+    """
+    Generate only the first component of the roadmap, fetch its YouTube videos,
+    and save the first component's data in the database.
+    """
+    try:
+        data = request.get_json()
+        input_value = data.get('input_value')
+        email = data.get('email')
 
+        if not input_value or not email:
+            return jsonify({"error": "input_value and email are required"}), 400
 
+        # Extract the main topic name
+        extractor = extraction(input_value)
+
+        # Generate the roadmap (only the first component)
+        result = roadmap(input_value=input_value)
+        result_json = json.loads(result)
+        first_name = result_json[0]['name']
+        description = result_json[0]['description']
+        document = result_json[0]['document']
+
+            
+        # Debugging: Print the roadmap_result to check its format
+        print("Roadmap Result:", first_name)
+
+        # Get YouTube search query for the first component
+        query = search_query(input_value=str(first_name))
+        search_results = executor.submit(youtube_search, query)
+        search_results = search_results.result()
+
+        # Get the list of video URLs for the first component
+        best_videos = youtube_filteration_best(main_topic=extractor, sub_topic=first_name, json_field=search_results)
+
+        # Prepare the response for the first component
+        first_component_response = {
+            "roadmap_name": extractor,
+            "roadmap": result_json,
+            "first_component": {
+                "name": str(first_name),
+                "description": str(description),
+                "document": str(document),
+                "videos": best_videos if best_videos else []
+            }
+        }
+
+        # Save the first component's data in the database
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Get user ID from email
+            cursor.execute("SELECT id FROM api_user WHERE email = %s;", (email,))
+            user_id = cursor.fetchone()
+            if not user_id:
+                return jsonify({"error": "User not found"}), 404
+
+            # Insert the first component's data into the database
+            cursor.execute(
+                "INSERT INTO roadmap (name, roadmap_json, roadmap_first_component, user_id) VALUES (%s, %s, %s, %s) RETURNING id;",
+                (extractor, json.dumps({}), json.dumps(first_component_response["first_component"]), user_id[0])
+            )
+            roadmap_id = cursor.fetchone()[0]  # Fetch the ID of the newly created roadmap
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            first_component_response["roadmap_id"] = roadmap_id
+
+        except Exception as db_error:
+            return jsonify({"error": f"Database error: {str(db_error)}"}), 500
+
+        # Return the first component's data
+        return jsonify(first_component_response), 200
+
+    except KeyError as e:
+        return jsonify({"error": f"KeyError: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 @app.route("/user-roadmaps", methods=["POST"])
 def get_user_roadmaps():
     """
