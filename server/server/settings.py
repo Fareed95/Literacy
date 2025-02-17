@@ -25,6 +25,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',  
     'templet-backend-server.onrender.com',
+    '192.168.49.2'
     ]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",

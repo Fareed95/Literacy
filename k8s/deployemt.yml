@@ -1,4 +1,3 @@
-
 # next-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -16,9 +15,11 @@ spec:
     spec:
       containers:
         - name: nextjs-deployment
-          image: your-nextjs-image:latest
+          image: fareed95/literacy-client:01
+          envFrom:
+            - configMapRef:
+                name: my-config
 
-# next-service.yaml
 ---
 apiVersion: v1
 kind: Service
@@ -33,8 +34,8 @@ spec:
       targetPort: 3000
   type: LoadBalancer
 
-# django-deployment.yaml
 ---
+# django-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -52,8 +53,11 @@ spec:
     spec:
       containers:
         - name: django-deployment
-          image: your-django-image:latest
-# django-service.yaml
+          image: fareed95/literacy-server:02
+          envFrom:
+            - configMapRef:
+                name: my-config
+
 ---
 apiVersion: v1
 kind: Service
@@ -68,8 +72,8 @@ spec:
       targetPort: 8000
   type: LoadBalancer
 
-# flask-deployment.yaml
 ---
+# flask-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -87,12 +91,13 @@ spec:
     spec:
       containers:
         - name: flask-deployment
-          image: your-flask-image:latest
+          image: fareed95/literacy-models:01
           ports:
             - containerPort: 8001
-        
+          envFrom:
+            - configMapRef:
+                name: my-config
 
-# flask-service.yaml
 ---
 apiVersion: v1
 kind: Service
