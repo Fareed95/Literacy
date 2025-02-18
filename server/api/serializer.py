@@ -10,7 +10,7 @@ from testimonials.serializers import TestimonialSerializer
 from certificate.serializers import CertificateSerializer
 
 
-class UserSerializer(serializers.ModelSerializer):
+class StudentSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
     otp = serializers.CharField(write_only=True, required=False)
     testimonial = TestimonialSerializer(many=True, read_only=True)
@@ -27,6 +27,61 @@ class UserSerializer(serializers.ModelSerializer):
             'is_staff',
             'testimonial',
             'certificate',
+            ]
+        extra_kwargs = {
+            'password': {'write_only': True},
+        }
+
+    def validate(self, data):
+        password = data.get('password')
+        confirm_password = data.pop('confirm_password', None)
+
+        if password != confirm_password:
+            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+
+        return data
+
+    def create(self, validated_data):
+        otp = str(random.randint(1000, 9999))
+        validated_data['otp'] = otp
+        validated_data['otp_expiration'] = datetime.datetime.now() + datetime.timedelta(minutes=10)
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+
+        html_message = render_to_string('emails/registeration_otp.html', {'otp': otp})
+        plain_message = strip_tags(html_message)
+
+        # Send email with OTP
+        send_mail(
+            'Your OTP Code',
+            plain_message,
+            'codecell@eng.rizvi.edu.in',  # Replace with your email
+            [validated_data['email']],
+            fail_silently=False,
+            html_message=html_message,
+        )
+
+        return user
+
+
+
+class CompanySerializer(serializers.ModelSerializer):
+    confirm_password = serializers.CharField(write_only=True)
+    otp = serializers.CharField(write_only=True, required=False)
+    testimonial = TestimonialSerializer(many=True, read_only=True)
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'name',
+            'email',
+            'password',
+            'confirm_password',
+            'otp',
+            'is_staff',
+            'testimonial',
             ]
         extra_kwargs = {
             'password': {'write_only': True},

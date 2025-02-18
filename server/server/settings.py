@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'api',
     'demo',
     'testimonials',
-    'certificate'
+    'certificate',
+    'company',
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

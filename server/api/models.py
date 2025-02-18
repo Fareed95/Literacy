@@ -12,6 +12,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     otp_expiration = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)  # Default to True for active users
     is_staff = models.BooleanField(default=False)  # Add is_staff field if missing
+    is_company = models.BooleanField(default=False)  # Add is_staff field if missing
     date_joined = models.DateTimeField(default=timezone.now)  # Add this line
 
     USERNAME_FIELD = 'email'
