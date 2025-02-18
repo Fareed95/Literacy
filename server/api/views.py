@@ -7,7 +7,7 @@ import jwt
 import datetime
 from django.utils import timezone
 from .models import User
-from .serializer import UserSerializer,PasswordResetRequestSerializer,PasswordResetSerializer
+from .serializer import StudentSerializer,CompanySerializer,PasswordResetRequestSerializer,PasswordResetSerializer
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.core.cache import cache
@@ -19,7 +19,11 @@ ssl._create_default_https_context = ssl._create_unverified_context
 class RegisterView(APIView):
     @csrf_exempt
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        if request.data.get('is_company'):
+            serializer = CompanySerializer(data=request.data)
+        else:
+            serializer = StudentSerializer(data=request.data)
+
         if serializer.is_valid():
             serializer.save()
             return Response({'message': 'OTP sent to your email. Please verify to complete registration.'})

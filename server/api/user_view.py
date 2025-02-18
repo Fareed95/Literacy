@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 import jwt
 from . models import User
-from .serializer import UserSerializer
+from .serializer import StudentSerializer,CompanySerializer
 
 
 class UserView(APIView):
@@ -26,6 +26,9 @@ class UserView(APIView):
             raise AuthenticationFailed('Invalid token!')
 
         user = User.objects.filter(id=payload['id']).first()
-        serializer = UserSerializer(user)
+        if user.is_company:
+            serializer = CompanySerializer(user)
+        else:   
+            serializer = StudentSerializer(user)
 
         return Response(serializer.data)
