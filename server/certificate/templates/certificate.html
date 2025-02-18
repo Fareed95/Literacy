@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            text-align: center;
+            background-color: #f8f8f8;
+            padding: 20px;
+        }
+        .certificate-container {
+            width: 80%;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border: 10px solid #2c3e50;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        .certificate-header {
+            text-transform: uppercase;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .certificate-title {
+            font-size: 40px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #34495e;
+        }
+        .certificate-body {
+            font-size: 18px;
+            margin: 20px 0;
+        }
+        .certificate-body span {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .certificate-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            font-size: 16px;
+        }
+        .signature {
+            text-align: center;
+            border-top: 2px solid black;
+            width: 200px;
+            margin: auto;
+        }
+        .date {
+            text-align: left;
+        }
+        .issued-by {
+            text-align: right;
+        }
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate-container">
+        <img src="https://via.placeholder.com/80" class="logo" alt="Literacy Team Logo"> <!-- Replace with your actual logo -->
+        
+        <p class="certificate-header">Certificate of Achievement</p>
+        <h1 class="certificate-title">This is to certify that</h1>
+        
+        <p class="certificate-body">
+            <span>{{name }}</span> has successfully completed the <span>{{ name_of_certificate }}</span> 
+            program from <span>Literacy Team</span>.
+        </p>
+        
+        <p class="certificate-body">
+            {{name}} has started <span>{{ started_at }}</span> to <span>{{ ended_at }}</span>. 
+            During this period, the participant attempted <span>{{ additionol_testseries_attempted }}</span> test series, 
+            battled in <span>{{ competition_battled }}</span> competitions, and won <span>{{ competition_won }}</span> competitions.
+        </p>
+
+        <div class="certificate-footer">
+            <div class="date">Date: <span>{{ ended_at }}</span></div>
+            <div class="issued-by">Issued by: <span>Literacy Team</span></div>
+        </div>
+        
+        <div class="signature">
+            Authorized Signature
+        </div>
+    </div>
+</body>
+</html>

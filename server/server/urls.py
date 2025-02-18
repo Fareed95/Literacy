@@ -3,7 +3,6 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import  staticfiles_urlpatterns
-from .image_view import ImageView
 
 
 urlpatterns = [
@@ -11,6 +10,7 @@ urlpatterns = [
     path('api/',include('api.urls')),
     path('api/',include('demo.urls')),
     path('api/',include('testimonials.urls')),
+    path('api/',include('certificate.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
