@@ -25,6 +25,7 @@ class StudentSerializer(serializers.ModelSerializer):
             'confirm_password',
             'otp',
             'is_staff',
+            'is_company'
             'testimonial',
             'certificate',
             ]
@@ -82,6 +83,7 @@ class CompanySerializer(serializers.ModelSerializer):
             'otp',
             'is_staff',
             'testimonial',
+            'is_company',
             ]
         extra_kwargs = {
             'password': {'write_only': True},
@@ -105,8 +107,15 @@ class CompanySerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
 
+        if user.is_company:
+            from company.models import Company  # Avoid circular import
+            Company.objects.create(
+                name=user.name,  # Use the user's name as the company name by default
+                contact_email=user.email,
+            )
         html_message = render_to_string('emails/registeration_otp.html', {'otp': otp})
         plain_message = strip_tags(html_message)
+
 
         # Send email with OTP
         send_mail(
