@@ -1,159 +1,154 @@
 "use client";
-import React, { use, useState,useEffect } from "react";
-import { HoveredLink, Menu, MenuItem, ProductItem } from "./ui/navbar-menu";
-import { cn } from "@/lib/utils";
-import img from '../../public/CC_RCOE.png';
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useSession ,signOut} from 'next-auth/react';
-import UserIcon from '@/components/UserIcon';
+import { useSession, signOut } from 'next-auth/react';
 import { useUserContext } from '@/app/context/Userinfo';
+import UserIcon from '@/components/UserIcon';
+import { motion } from "framer-motion";
+import img from '../../public/CC_RCOE.png';
 
-function NavbarUse() {
-  return (
-    <div className="relative max-w-2xl flex items-center justify-between z-100 ">
-      <Navbar className="top-2" />
-    </div>
-  );
-}
+function Navbar() {
+  const { data: session } = useSession();
+  const { contextisLoggedIn, contextsetIsLoggedIn, contextsetName, contextsetEmail } = useUserContext();
+  const [isOpen, setIsOpen] = useState(false);
 
-function Navbar({ className }) {
-  const { data: session } = useSession()
-  const {contextisLoggedIn,contextsetIsLoggedIn,contextsetName,contextsetEmail} = useUserContext();
-  const [active, setActive] = useState(null);
   useEffect(() => {
-
-      if (session) {
-    contextsetIsLoggedIn(true)
-    contextsetEmail(session.user.email);
-    contextsetName(session.user.name);
-  }
+    if (session) {
+      contextsetIsLoggedIn(true);
+      contextsetEmail(session.user.email);
+      contextsetName(session.user.name);
+    }
   }, [session]);
 
-  const Logout =()=>{
-    localStorage.setItem('authToken', "-")
-  }
+  const menuItems = [
+    { label: "Home", href: "/" },
+    { label: "Events", href: "/Events" },
+    { label: "Gallery", href: "/Gallery" },
+    { label: "About", href: "/About" },
+    { label: "Lobby", href: "/Lobby" },
+  ];
+
+  const Logout = () => {
+    localStorage.setItem('authToken', "-");
+  };
+
   return (
-    <div
-      className={cn(
-        "fixed top-10 inset-x-0 max-w-xl mx-auto z-50 p-2 md:p-4",
-        className,
-        "block"
-      )}
-    >
-      <Menu setActive={setActive}>
-        
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
+      <div className="glass mx-4 mt-4 rounded-2xl backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link href="/" className="flex-shrink-0">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="h-10 w-10 rounded-full overflow-hidden glass"
+              >
+                <img src={img.src} alt="Logo" className="h-full w-full object-cover" />
+              </motion.div>
+            </Link>
 
-        
-    
-        
-        
-          <Link href="/">
-          <MenuItem setActive={setActive} active={active} item="Home" />
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-8">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-electric-blue hover:text-neon-cyan transition-colors"
+                >
+                  <motion.span
+                    whileHover={{ y: -2 }}
+                    className="relative group"
+                  >
+                    {item.label}
+                    <span className="absolute inset-x-0 bottom-0 h-0.5 bg-neon-cyan transform scale-x-0 group-hover:scale-x-100 transition-transform" />
+                  </motion.span>
+                </Link>
+              ))}
+            </div>
 
-          </Link>
-       
-        
+            {/* Auth Buttons */}
+            <div className="flex items-center space-x-4">
+              {session || contextisLoggedIn ? (
+                <div className="flex items-center space-x-4">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="neon-btn text-sm"
+                    onClick={() => signOut() && Logout()}
+                  >
+                    Logout
+                  </motion.button>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="hover-glow rounded-full"
+                  >
+                    <UserIcon />
+                  </motion.div>
+                </div>
+              ) : (
+                <Link href="/Login">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="neon-btn text-sm"
+                  >
+                    Login
+                  </motion.button>
+                </Link>
+              )}
 
-        <MenuItem setActive={setActive} active={active} item="Discover">
-          <div className="text-sm grid grid-cols-1 md:grid-cols-2 gap-4 p-2">
-            <ProductItem
-              title="Dashboard"
-              href="/Events"
-              src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-
-              description="All the upcoming, ongoing, and past events conducted by Code Cell RCOE"
-            />
-            <ProductItem
-              title="Gallery"
-              href="/Gallery"
-              src="https://images.pexels.com/photos/1226721/pexels-photo-1226721.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-              description="Check out the gallery of all the events conducted by Code Cell RCOE"
-            />
-            <ProductItem
-              title="About us"
-              href="/About"
-              src={img}
-              description="Know more about Code Cell RCOE"
-            />
-            <ProductItem
-              title="Lobby"
-              href="/Lobby"
-              src={img}
-              description="Lobby"
-            />
+              {/* Mobile Menu Button */}
+              <div className="md:hidden">
+                <button
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="glass p-2 rounded-lg hover:bg-deep-indigo/20"
+                >
+                  <svg
+                    className="h-6 w-6 text-electric-blue"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    {isOpen ? (
+                      <path d="M6 18L18 6M6 6l12 12" />
+                    ) : (
+                      <path d="M4 6h16M4 12h16M4 18h16" />
+                    )}
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
-        </MenuItem>
-        {session||contextisLoggedIn ? (
 
-          
-        <button className="bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-s font-semibold leading-6 text-white inline-block" onClick={() => signOut()&&Logout()}>
-          <span className="absolute inset-0 overflow-hidden rounded-full">
-            <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"></span>
-          </span>
-          <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10">
-            <span>{`LogOut`}</span>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+          {/* Mobile Menu */}
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="md:hidden py-4"
             >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M10.75 8.75L14.25 12L10.75 15.25"
-              ></path>
-            </svg>
-          </div>
-          <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40"></span>
-        </button>
-        
-        ):(
-          <Link href="/Login">
-        <button className="bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-s font-semibold leading-6 text-white inline-block">
-          <span className="absolute inset-0 overflow-hidden rounded-full">
-            <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"></span>
-          </span>
-          <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10">
-            <span>{`Login`}</span>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M10.75 8.75L14.25 12L10.75 15.25"
-              ></path>
-            </svg>
-          </div>
-          <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40"></span>
-        </button>
-        </Link>
-
-
-        )}
-        {
-          session||contextisLoggedIn?(
-            <div className="pl-1">
-          <UserIcon></UserIcon>
+              <div className="flex flex-col space-y-4">
+                {menuItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="text-electric-blue hover:text-neon-cyan px-4 py-2 rounded-lg hover:bg-deep-indigo/20 transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          )}
         </div>
-          ):''
-        }
-        
-    
-
-      </Menu>
-    </div>
+      </div>
+    </nav>
   );
 }
 
-export default NavbarUse;
+export default Navbar;

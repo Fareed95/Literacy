@@ -24,6 +24,14 @@ const config: Config = {
       },
     },
     extend: {
+      colors: {
+        'electric-blue': '#0A84FF',
+        'neon-cyan': '#00E6E6',
+        'dark-space': '#121212',
+        'deep-indigo': '#3D348B',
+        'glass-white': 'rgba(255, 255, 255, 0.2)',
+        'soft-purple': '#7B61FF',
+      },
       animation: {
         "caret-blink": "caret-blink 1.25s ease-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -31,9 +39,13 @@ const config: Config = {
         scroll: "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
         spotlight: "spotlight 2s ease .75s 1 forwards",
         shimmer: "shimmer 2s linear infinite",
+        'neon-glow': 'neon-glow 1.5s ease-in-out infinite alternate',
+        'float': 'float 3s ease-in-out infinite',
       },
       boxShadow: {
         input: `0px 2px 3px -1px rgba(0,0,0,0.1), 0px 1px 0px 0px rgba(25,28,33,0.02), 0px 0px 0px 1px rgba(25,28,33,0.08)`,
+        'neon': '0 0 20px rgba(0, 230, 230, 0.5)',
+        'neon-hover': '0 0 30px rgba(0, 230, 230, 0.8)',
       },
       keyframes: {
         "caret-blink": {
@@ -70,6 +82,14 @@ const config: Config = {
           to: {
             backgroundPosition: "-200% 0",
           },
+        },
+        'neon-glow': {
+          '0%': { boxShadow: '0 0 10px #0A84FF, 0 0 20px #0A84FF, 0 0 30px #00E6E6' },
+          '100%': { boxShadow: '0 0 20px #0A84FF, 0 0 30px #0A84FF, 0 0 40px #00E6E6' }
+        },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' }
         },
       },
       backgroundImage: {

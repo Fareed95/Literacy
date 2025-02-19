@@ -72,33 +72,35 @@ function MainInput() {
   };
 
   return (
-    <div className="flex flex-col justify-start items-center px-4 sm:mt-10 sm:min-h-screen">
-      <h2 className="mb-10 sm:mb-20 text-xl text-center sm:text-5xl dark:text-white text-black">
-        <div className="flex justify-center">
-          Tell us what you want to <div className="text-green-500 px-2">LEARN</div>
+    <div className="flex flex-col justify-start items-center px-4">
+      <h2 className="mb-8 text-xl text-center sm:text-5xl glass p-8 rounded-2xl backdrop-blur-md">
+        <div className="flex justify-center items-center space-x-2 floating">
+          Tell us what you want to <span className="text-electric-blue font-bold px-2 hover-glow">LEARN</span>
         </div>
-        <div className="flex justify-center">
-          and we'll guide you with the best <div className="text-blue-500 px-2">RESOURCES</div>
+        <div className="flex justify-center items-center space-x-2 mt-4">
+          and we'll guide you with the best <span className="text-neon-cyan font-bold px-2 hover-glow">RESOURCES</span>
         </div>
       </h2>
 
-      <PlaceholdersAndVanishInput
-        placeholders={placeholders}
-        onChange={handleChange}
-        onSubmit={onSubmit}
-      />
+      <div className="w-full max-w-2xl glass p-4 rounded-xl">
+        <PlaceholdersAndVanishInput
+          placeholders={placeholders}
+          onChange={handleChange}
+          onSubmit={onSubmit}
+        />
+      </div>
 
       {loading && (
-        <div className="mt-10">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-          <p className="mt-4 text-neutral-600 dark:text-neutral-400">
+        <div className="mt-8 glass p-6 rounded-xl">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-electric-blue"></div>
+          <p className="mt-4 text-neon-cyan">
             Generating your roadmap...
           </p>
         </div>
       )}
 
       {roadmapData && !loading && (
-        <div className="mt-10 w-full">
+        <div className="mt-8 w-full glass p-6 rounded-xl page-transition">
           <Timeline_roadmap_function roadmapData={roadmapData} />
         </div>
       )}

@@ -43,22 +43,22 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 18, 18, 18;
+    --background-end-rgb: 61, 52, 139;
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
+    --primary: 10 100% 50%;
     --primary-foreground: 240 5.9% 10%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
+    --accent: 191 100% 45%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
@@ -133,12 +133,105 @@ body {
 
 
 /* Glassmorphism */
-.glass-card {
+.glass {
+  background: rgba(61, 52, 139, 0.2); /* Deep Indigo with opacity */
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  border-radius: 10px;
+  border: 1px solid rgba(123, 97, 255, 0.2); /* Soft Purple border */
+  box-shadow: 
+    0 4px 6px -1px rgba(61, 52, 139, 0.1),
+    0 2px 4px -1px rgba(61, 52, 139, 0.06),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.glass:hover {
+  background: rgba(61, 52, 139, 0.25);
+  border: 1px solid rgba(123, 97, 255, 0.3);
+  box-shadow: 
+    0 8px 12px -1px rgba(61, 52, 139, 0.15),
+    0 4px 6px -1px rgba(61, 52, 139, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Enhanced Neon Button Effect */
+.neon-btn {
+  background: linear-gradient(135deg, #3D348B, #7B61FF);
+  color: white;
+  box-shadow: 
+    0 4px 20px rgba(123, 97, 255, 0.5),
+    0 0 20px rgba(10, 132, 255, 0.3);
+  transition: all 0.3s ease-in-out;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid rgba(123, 97, 255, 0.3);
+}
+
+.neon-btn:hover {
+  background: linear-gradient(135deg, #4A3FA3, #8E78FF);
+  box-shadow: 
+    0 4px 30px rgba(123, 97, 255, 0.7),
+    0 0 30px rgba(10, 132, 255, 0.5);
+  transform: scale(1.05);
+}
+
+/* Smooth Page Transitions */
+.page-transition {
+  animation: pageTransition 0.5s ease-in-out;
+}
+
+@keyframes pageTransition {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Interactive Elements */
+.hover-glow {
+  transition: all 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px #7B61FF;
+  transform: translateY(-2px);
+}
+
+/* Floating Animation */
+.floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #121212;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3D348B;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7B61FF;
 }
 
 /* Animations */
@@ -149,16 +242,6 @@ body {
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
-}
-
-/* Hover Effects */
-.hover-glow {
-  transition: all 0.3s ease;
-}
-
-.hover-glow:hover {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
-  transform: translateY(-2px);
 }
 
 /* Page Transitions */
