@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useUserContext } from '@/app/context/Userinfo';
 import UserIcon from '@/components/UserIcon';
 import { motion } from "framer-motion";
-import img from '../../public/CC_RCOE.png';
+import img from '../../public/logo.png';
 
 function Navbar() {
   const { data: session } = useSession();
@@ -41,7 +41,7 @@ function Navbar() {
             <Link href="/" className="flex-shrink-0">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="h-10 w-10 rounded-full overflow-hidden glass"
+                className="h-10 w-10 overflow-hidden"
               >
                 <img src={img.src} alt="Logo" className="h-full w-full object-cover" />
               </motion.div>
