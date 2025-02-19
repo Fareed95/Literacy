@@ -103,11 +103,23 @@
 
         .signature {
             text-align: center;
-            border-top: 2px solid rgba(255, 255, 255, 0.2);
             width: 200px;
-            padding-top: 10px;
-            margin: 20px auto;
+            margin: 0 auto;
             color: rgba(255, 255, 255, 0.7);
+            background: linear-gradient(45deg, #f21616, #7B61FF);
+            
+        }
+        
+        .signature-image {
+            display: block;
+            max-width: 120px;
+            height: auto;
+            margin-left: 40px;
+            filter: brightness(150%) contrast(120%);
+        }
+        
+        .signature-line {
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
         }
 
         .date, .issued-by {
@@ -135,7 +147,7 @@
         <div class="geometric-shape shape-2"></div>
         <div class="grid-overlay"></div>
         
-        <img src="" class="logo" alt="Literacy Team Logo">
+        <img src="../static/logo.png" class="logo" alt="Literacy Team Logo">
         
         <p class="certificate-header">Certificate of Achievement</p>
         <h1 class="certificate-title">This is to certify that</h1>
@@ -147,17 +159,19 @@
         
         <p class="certificate-body">
             {{ name }} has started <span>{{ started_at }}</span> to <span>{{ ended_at }}</span>. 
-            During this period, the participant attempted <span>{{ additionol_testseries_attempted }}</span> test series, 
+            During this period, the participant attempted <span>{{ additional_testseries_attempted }}</span> test series, 
             battled in <span>{{ competition_battled }}</span> competitions, and won <span>{{ competition_won }}</span> competitions.
         </p>
 
         <div class="certificate-footer">
             <div class="date">Date: <span>{{ ended_at }}</span></div>
+            <div class="signature">
+                <img src="../static/authorizedSign.png" alt="Authorized Signature" class="signature-image">
+                <div class="signature-line">
+                    Authorized Signature
+                </div>
+            </div>
             <div class="issued-by">Issued by: <span>Literacy Team</span></div>
-        </div>
-        
-        <div class="signature">
-            Authorized Signature
         </div>
     </div>
 </body>
