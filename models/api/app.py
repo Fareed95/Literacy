@@ -77,79 +77,85 @@ CORS(app, origins=[
 '''
 API BUILDING
 '''
-
 @app.route("/generate-roadmap-all", methods=["POST"])
 def generate_roadmap_all():
     """
-    Generate a full roadmap with all components and update the roadmap_json column for the given ID (if provided).
-    If no ID is provided, create a new roadmap entry.
+    Generate a full roadmap using the existing roadmap data stored in the roadmap_first_component column.
     """
     try:
         data = request.get_json()
-        input_value = data.get('input_value')
-        email = data.get('email')
-        roadmap_id = data.get('id')  # Optional: ID of the roadmap to update
+        roadmap_id = data.get('id')  # ID of the roadmap to update
 
-        if not input_value or not email:
-            return jsonify({"error": "input_value and email are required"}), 400
+        if not roadmap_id:
+            return jsonify({"error": "roadmap_id is required"}), 400
 
-        # Extract the main topic name
-        extractor = extraction(input_value)
-
-        # Generate the full roadmap
-        result = roadmap(input_value=input_value)  # Directly call the roadmap function
-        result_json = json.loads(result)  # Parse the JSON string into a Python object
-        length_json = len(result_json)
-
-        # Process each component to fetch YouTube videos
-        for i in range(length_json):
-            # Get YouTube search query for the component
-            query = search_query(input_value=result_json[i]['name'])
-            search_results = executor.submit(youtube_search, query)
-            search_results = search_results.result()
-
-            # Get the list of video URLs for the component
-            best_videos = youtube_filteration_best(main_topic=extractor, sub_topic=result_json[i]['name'], json_field=search_results)
-
-            # Add videos to the component
-            result_json[i]['videos'] = best_videos if best_videos else []
-
-        # Fetch PDFs for the overall roadmap topic
-        pdf_result = executor.submit(search_and_download_pdf, input_value)
-        pdf_result = pdf_result.result()
-        if "error" in pdf_result:
-            pdf_links = []
-        else:
-            pdf_links = pdf_result["links"]
-
-        # Prepare the final response
-        final_response = {
-            "roadmap_name": extractor,
-            "roadmap_components": result_json,
-            "pdf_links": pdf_links,
-            "total_components": length_json
-        }
-
-        # Convert final response to string for storage
-        roadmap_json_str = json.dumps(final_response)
-
-        # Save or update the roadmap in the database
+        # Fetch the existing roadmap data from the database
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
 
-            # Get user ID from email
-            cursor.execute("SELECT id FROM api_user WHERE email = %s;", (email,))
-            user_id = cursor.fetchone()
-            if not user_id:
-                return jsonify({"error": "User not found"}), 404
-
+            # Fetch the roadmap_first_component and roadmap_name for the given roadmap_id
+            # Fetch the roadmap_first_component and roadmap_name for the given roadmap_id
             cursor.execute(
-                    "UPDATE roadmap SET roadmap_json = %s WHERE id = %s AND user_id = %s RETURNING id;",
-                    (roadmap_json_str, roadmap_id, user_id[0]))
+                "SELECT roadmap_first_component, name FROM roadmap WHERE id = %s;",
+                (roadmap_id,)
+            )
+            roadmap_data = cursor.fetchone()
+
+            if not roadmap_data:
+                return jsonify({"error": "Roadmap not found"}), 404
+
+            roadmap_first_component_str, roadmap_name = roadmap_data  # Unpack tuple
+            roadmap_first_component = json.loads(roadmap_first_component_str)  # Convert string to JSON
+
+            # Extract the main topic name from the roadmap_first_component
+            extractor = roadmap_first_component.get("roadmap_name", "")
+            print(extractor)
+
+            # Generate the full roadmap using the existing roadmap_first_component
+            result_json = roadmap_first_component.get("roadmap", [])
+            print(result_json)  # Use the existing roadmap data
+            length_json = len(result_json)
+
+            # Process each component to fetch YouTube videos
+            for i in range(length_json):
+                # Get YouTube search query for the component
+                query = search_query(input_value=result_json[i]['name'])
+                search_results = executor.submit(youtube_search, query)
+                search_results = search_results.result()
+
+                # Get the list of video URLs for the component
+                best_videos = youtube_filteration_best(main_topic=extractor, sub_topic=result_json[i]['name'], json_field=search_results)
+
+                # Add videos to the component
+                result_json[i]['videos'] = best_videos if best_videos else []
+
+            # Fetch PDFs for the overall roadmap topic
+            pdf_result = executor.submit(search_and_download_pdf, roadmap_name)
+            pdf_result = pdf_result.result()
+            if "error" in pdf_result:
+                pdf_links = []
+            else:
+                pdf_links = pdf_result["links"]
+
+            # Prepare the final response
+            final_response = {
+                "roadmap_name": extractor,
+                "roadmap_components": result_json,
+                "pdf_links": pdf_links,
+                "total_components": length_json
+            }
+
+            # Convert final response to string for storage
+            roadmap_json_str = json.dumps(final_response)
+
+            # Update the roadmap_json column in the database
+            cursor.execute(
+                "UPDATE roadmap SET roadmap_json = %s WHERE id = %s RETURNING id;",
+                (roadmap_json_str, roadmap_id))
             updated_roadmap_id = cursor.fetchone()
             roadmap_id = updated_roadmap_id[0]
-           
+
             conn.commit()
             cursor.close()
             conn.close()
@@ -230,7 +236,7 @@ def generate_roadmap_first_component():
             # Insert the first component's data into the database
             cursor.execute(
                 "INSERT INTO roadmap (name, roadmap_json, roadmap_first_component, user_id) VALUES (%s, %s, %s, %s) RETURNING id;",
-                (extractor, json.dumps({}), json.dumps(first_component_response["first_component"]), user_id[0])
+                (extractor, json.dumps({}), json.dumps(first_component_response), user_id[0])
             )
             roadmap_id = cursor.fetchone()[0]  # Fetch the ID of the newly created roadmap
             conn.commit()
