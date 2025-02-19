@@ -1,16 +1,29 @@
 'use client'
 import React, { useState } from 'react'
-import { FaGithub, FaLinkedin, FaEnvelope, FaArrowDown } from 'react-icons/fa'
+import { FaGithub, FaLinkedin, FaEnvelope, FaArrowDown, FaCode, FaGraduationCap, FaAward, FaProjectDiagram, FaUsers } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 
-// Variant for fade-in and slide-up animations
 const fadeVariant = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
 };
 
+const containerVariant = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+};
+
+const itemVariant = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
+
 function Portfolio() {
-  // Personal information and sample data (can be replaced with API calls)
   const [personalInfo] = useState({
     name: "John Doe",
     title: "Full Stack Developer",
@@ -71,22 +84,61 @@ function Portfolio() {
     }
   ])
 
+  const [showJobModal, setShowJobModal] = useState(false);
+  const [jobApplication, setJobApplication] = useState({
+    name: '',
+    email: '',
+    position: '',
+    experience: '',
+    portfolio: '',
+    message: ''
+  });
+
+  const positions = [
+    "Frontend Developer",
+    "Backend Developer",
+    "Full Stack Developer",
+    "UI/UX Designer",
+    "DevOps Engineer",
+    "Mobile Developer"
+  ];
+
+  const handleJobApplication = (e) => {
+    e.preventDefault();
+    // Handle job application submission here
+    console.log('Job Application:', jobApplication);
+    setShowJobModal(false);
+    // Reset form
+    setJobApplication({
+      name: '',
+      email: '',
+      position: '',
+      experience: '',
+      portfolio: '',
+      message: ''
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      
+    <div className="min-h-screen bg-neutral-950 text-white overflow-x-hidden">
       {/* Hero Section */}
       <motion.section 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2 }}
-        className="relative overflow-hidden"
+        className="relative min-h-screen flex items-center justify-center overflow-hidden"
       >
-        <div className="container mx-auto px-4 py-32 relative z-10 text-center">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-electric-blue/20 via-transparent to-neon-cyan/20 opacity-30" />
+          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10 text-center">
           <motion.h1 
             variants={fadeVariant}
             initial="hidden"
             animate="visible"
-            className="text-7xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text"
+            className="text-7xl font-bold mb-4 bg-gradient-to-r from-electric-blue to-neon-cyan text-transparent bg-clip-text"
           >
             {personalInfo.name}
           </motion.h1>
@@ -94,7 +146,7 @@ function Portfolio() {
             variants={fadeVariant}
             initial="hidden"
             animate="visible"
-            className="text-3xl text-blue-200 mb-8"
+            className="text-3xl text-soft-purple mb-8"
           >
             {personalInfo.title}
           </motion.h2>
@@ -104,206 +156,446 @@ function Portfolio() {
             animate="visible"
             className="flex justify-center space-x-8 mb-12"
           >
-            <a href={personalInfo.github} className="text-3xl text-cyan-400 hover:text-blue-400 transition-transform hover:scale-110">
+            <motion.a 
+              whileHover={{ scale: 1.1, y: -5 }}
+              href={personalInfo.github} 
+              className="text-3xl text-electric-blue hover:text-neon-cyan transition-colors"
+            >
               <FaGithub />
-            </a>
-            <a href={personalInfo.linkedin} className="text-3xl text-cyan-400 hover:text-blue-400 transition-transform hover:scale-110">
+            </motion.a>
+            <motion.a 
+              whileHover={{ scale: 1.1, y: -5 }}
+              href={personalInfo.linkedin} 
+              className="text-3xl text-electric-blue hover:text-neon-cyan transition-colors"
+            >
               <FaLinkedin />
-            </a>
-            <a href={`mailto:${personalInfo.email}`} className="text-3xl text-cyan-400 hover:text-blue-400 transition-transform hover:scale-110">
+            </motion.a>
+            <motion.a 
+              whileHover={{ scale: 1.1, y: -5 }}
+              href={`mailto:${personalInfo.email}`} 
+              className="text-3xl text-electric-blue hover:text-neon-cyan transition-colors"
+            >
               <FaEnvelope />
-            </a>
+            </motion.a>
           </motion.div>
           <motion.div 
-            variants={fadeVariant}
-            initial="hidden"
-            animate="visible"
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
             className="flex justify-center"
           >
-            <FaArrowDown className="w-6 h-6 text-blue-200 animate-bounce" />
+            <FaArrowDown className="w-6 h-6 text-neon-cyan" />
           </motion.div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900 via-transparent to-blue-900 transform -skew-y-6"></div>
       </motion.section>
       
-      <div className="container mx-auto px-4">
-    {/* About Section – Offset Grid */}
-    <section className="my-32">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        <div className="bg-[#02577a] p-8 rounded-lg transform md:translate-y-12">
-          <h2 className="text-4xl font-bold mb-6 text-[#02a9f7]">
-            About Me
-          </h2>
-          <p className="text-white leading-relaxed text-lg">
-            {personalInfo.about}
-          </p>
-        </div>
-        <div className="bg-[#02577a] p-8 rounded-lg transform md:-translate-y-12">
-          <h2 className="text-4xl font-bold mb-6 text-[#02a9f7]">
-            Quick Facts
-          </h2>
-          <ul className="space-y-4 text-white">
-            <li>🌟 5+ Years Experience</li>
-            <li>🎓 Master's in Computer Science</li>
-            <li>🌍 Remote Work Enthusiast</li>
-            <li>💡 Problem Solver</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    {/* Skills Section – Hexagonal-like Grid */}
-    <section className="my-32">
-      <h2 className="text-4xl font-bold text-center mb-16 text-[#02a9f7]">
-        Tech Stack
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {skills.map((skillGroup, index) => (
-          <div
-            key={index}
-            className="bg-[#02577a] p-8 rounded-lg transform hover:scale-105 transition-transform"
-          >
-            <h3 className="text-2xl font-semibold mb-6 text-[#89d6fb]">
-              {skillGroup.category}
-            </h3>
-            <div className="flex flex-wrap gap-3">
-              {skillGroup.techs.map((tech, i) => (
-                <span
-                  key={i}
-                  className="px-4 py-2 bg-black/30 rounded-full text-white text-sm"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    {/* Education & Certificates – Split Layout */}
-    <section className="my-32">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <div>
-          <h2 className="text-4xl font-bold mb-8 text-[#02a9f7]">
-            Education
-          </h2>
-          <div className="space-y-6">
-            {education.map((edu, index) => (
-              <div
-                key={index}
-                className="bg-[#02577a] p-6 rounded-lg border-l-4 border-[#89d6fb]"
-              >
-                <h3 className="text-xl font-semibold text-[#89d6fb]">
-                  {edu.degree}
-                </h3>
-                <p className="text-[#d4f0fc] mt-2">{edu.school}</p>
-                <p className="text-white mt-1">{edu.year}</p>
-                <p className="text-white/80 mt-2">{edu.description}</p>
+      <div className="container mx-auto px-4 py-20">
+        {/* About Section */}
+        <motion.section 
+          variants={containerVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="mb-32"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <motion.div 
+              variants={itemVariant}
+              className="glass p-8 rounded-2xl transform md:translate-y-12"
+            >
+              <div className="flex items-center space-x-4 mb-6">
+                <FaCode className="text-3xl text-electric-blue" />
+                <h2 className="text-4xl font-bold text-electric-blue">
+                  About Me
+                </h2>
               </div>
+              <p className="text-neon-cyan leading-relaxed text-lg">
+                {personalInfo.about}
+              </p>
+            </motion.div>
+            <motion.div 
+              variants={itemVariant}
+              className="glass p-8 rounded-2xl transform md:-translate-y-12"
+            >
+              <div className="flex items-center space-x-4 mb-6">
+                <FaGraduationCap className="text-3xl text-electric-blue" />
+                <h2 className="text-4xl font-bold text-electric-blue">
+                  Quick Facts
+                </h2>
+              </div>
+              <ul className="space-y-4 text-neon-cyan">
+                <li className="flex items-center space-x-3">
+                  <span className="text-2xl">🌟</span>
+                  <span>5+ Years Experience</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <span className="text-2xl">🎓</span>
+                  <span>Master's in Computer Science</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <span className="text-2xl">🌍</span>
+                  <span>Remote Work Enthusiast</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <span className="text-2xl">💡</span>
+                  <span>Problem Solver</span>
+                </li>
+              </ul>
+            </motion.div>
+          </div>
+        </motion.section>
+
+        {/* Skills Section */}
+        <motion.section 
+          variants={containerVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="mb-32"
+        >
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-electric-blue inline-flex items-center space-x-4">
+              <FaCode />
+              <span>Tech Stack</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {skills.map((skillGroup, index) => (
+              <motion.div
+                key={index}
+                variants={itemVariant}
+                className="glass p-8 rounded-2xl hover-glow"
+              >
+                <h3 className="text-2xl font-semibold text-electric-blue mb-6">
+                  {skillGroup.category}
+                </h3>
+                <div className="flex flex-wrap gap-3">
+                  {skillGroup.techs.map((tech, i) => (
+                    <span
+                      key={i}
+                      className="px-4 py-2 glass rounded-full text-neon-cyan text-sm"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
             ))}
           </div>
-        </div>
-        <div>
-          <h2 className="text-4xl font-bold mb-8 text-[#02a9f7]">
-            Certificates
-          </h2>
-          <div className="space-y-6">
-            {certificates.map((cert, index) => (
-              <div
-                key={index}
-                className="bg-[#02577a] p-6 rounded-lg border-r-4 border-[#89d6fb]"
-              >
-                <h3 className="text-xl font-semibold text-[#89d6fb]">
-                  {cert.name}
-                </h3>
-                <p className="text-[#d4f0fc] mt-2">{cert.issuer}</p>
-                <p className="text-white mt-1">{cert.year}</p>
-                <p className="text-white/80 mt-2">
-                  Credential: {cert.credential}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
+        </motion.section>
 
-    {/* Projects – Alternating Layout */}
-    <section className="my-32">
-      <h2 className="text-4xl font-bold text-center mb-16 text-[#02a9f7]">
-        Projects
-      </h2>
-      <div className="space-y-12">
-        {projects.map((project, index) => (
-          <div
-            key={index}
-            className={`grid grid-cols-1 md:grid-cols-2 gap-8 items-center ${
-              index % 2 === 0 ? "" : "md:flex-row-reverse"
-            }`}
-          >
-            <div className="bg-[#02577a] p-8 rounded-lg">
-              <h3 className="text-2xl font-semibold text-[#89d6fb]">
-                {project.title}
-              </h3>
-              <p className="text-white mt-4">{project.description}</p>
-              <div className="flex flex-wrap gap-2 mt-6">
-                {project.tech.map((tech, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 bg-black/30 rounded-full text-sm text-white"
+        {/* Education & Certificates */}
+        <motion.section 
+          variants={containerVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="mb-32"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div>
+              <div className="flex items-center space-x-4 mb-8">
+                <FaGraduationCap className="text-3xl text-electric-blue" />
+                <h2 className="text-4xl font-bold text-electric-blue">
+                  Education
+                </h2>
+              </div>
+              <div className="space-y-6">
+                {education.map((edu, index) => (
+                  <motion.div
+                    key={index}
+                    variants={itemVariant}
+                    className="glass p-6 rounded-2xl border-l-4 border-electric-blue hover-glow"
                   >
-                    {tech}
-                  </span>
+                    <h3 className="text-xl font-semibold text-electric-blue">
+                      {edu.degree}
+                    </h3>
+                    <p className="text-neon-cyan mt-2">{edu.school}</p>
+                    <p className="text-soft-purple mt-1">{edu.year}</p>
+                    <p className="text-foreground/60 mt-2">{edu.description}</p>
+                  </motion.div>
                 ))}
               </div>
             </div>
-            <div
-              className={`bg-[#02577a]/50 p-8 rounded-lg flex justify-center items-center ${
-                index % 2 === 0 ? "md:translate-y-8" : "md:-translate-y-8"
-              }`}
-            >
-              <a
-                href={project.link}
-                className="text-[#89d6fb] hover:text-[#02a9f7] text-xl font-semibold transition-all hover:scale-105"
-              >
-                View Project →
-              </a>
+            <div>
+              <div className="flex items-center space-x-4 mb-8">
+                <FaAward className="text-3xl text-electric-blue" />
+                <h2 className="text-4xl font-bold text-electric-blue">
+                  Certificates
+                </h2>
+              </div>
+              <div className="space-y-6">
+                {certificates.map((cert, index) => (
+                  <motion.div
+                    key={index}
+                    variants={itemVariant}
+                    className="glass p-6 rounded-2xl border-r-4 border-neon-cyan hover-glow"
+                  >
+                    <h3 className="text-xl font-semibold text-electric-blue">
+                      {cert.name}
+                    </h3>
+                    <p className="text-neon-cyan mt-2">{cert.issuer}</p>
+                    <p className="text-soft-purple mt-1">{cert.year}</p>
+                    <p className="text-foreground/60 mt-2">
+                      Credential: {cert.credential}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-    </section>
+        </motion.section>
 
-    {/* Download Resume Section – Unique Skewed Gradient Card */}
-    <section className="my-32">
-      <div className="relative bg-[#02577a] rounded-lg overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#89d6fb] to-[#02a9f7] opacity-50 transform -skew-y-3"></div>
-        <div className="relative px-8 py-16 flex flex-col items-center">
-          <motion.h2
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl font-bold text-[#02a9f7] drop-shadow-lg mb-6"
-          >
-            Download My Resume
-          </motion.h2>
-          <motion.a
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            href="/resume.pdf"
-            download
-            className="bg-[#89d6fb] text-black font-semibold px-8 py-4 rounded-full shadow-lg transition-all hover:shadow-2xl"
-          >
-            Click Here to Download
-          </motion.a>
-        </div>
-      </div>
-    </section>
-  </div>
-</div>
+        {/* Projects */}
+        <motion.section 
+          variants={containerVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="mb-32"
+        >
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-electric-blue inline-flex items-center space-x-4">
+              <FaProjectDiagram />
+              <span>Projects</span>
+            </h2>
+          </div>
+          <div className="space-y-12">
+            {projects.map((project, index) => (
+              <motion.div
+                key={index}
+                variants={itemVariant}
+                className={`grid grid-cols-1 md:grid-cols-2 gap-8 items-center ${
+                  index % 2 === 0 ? "" : "md:flex-row-reverse"
+                }`}
+              >
+                <div className="glass p-8 rounded-2xl hover-glow">
+                  <h3 className="text-2xl font-semibold text-electric-blue">
+                    {project.title}
+                  </h3>
+                  <p className="text-neon-cyan mt-4">{project.description}</p>
+                  <div className="flex flex-wrap gap-2 mt-6">
+                    {project.tech.map((tech, i) => (
+                      <span
+                        key={i}
+                        className="px-3 py-1 glass rounded-full text-sm text-soft-purple"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className={`glass p-8 rounded-2xl flex justify-center items-center ${
+                    index % 2 === 0 ? "md:translate-y-8" : "md:-translate-y-8"
+                  }`}
+                >
+                  <a
+                    href={project.link}
+                    className="text-electric-blue hover:text-neon-cyan text-xl font-semibold transition-all group"
+                  >
+                    View Project 
+                    <span className="inline-block transition-transform group-hover:translate-x-2">→</span>
+                  </a>
+                </motion.div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
 
-    
+        {/* Job Application Section */}
+        <motion.section 
+          variants={containerVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="mb-32"
+        >
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-electric-blue inline-flex items-center space-x-4">
+              <FaUsers className="mr-4" />
+              <span>Work With Us</span>
+            </h2>
+            <p className="text-neon-cyan mt-4">Join our team and be part of something amazing</p>
+          </div>
+
+          <motion.div
+            variants={itemVariant}
+            className="glass p-8 rounded-2xl relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-96 h-96 bg-electric-blue/5 rounded-full -mr-48 -mt-48" />
+            <div className="relative z-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h3 className="text-2xl font-semibold text-electric-blue mb-4">Open Positions</h3>
+                  <div className="space-y-3">
+                    {positions.map((position, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="glass p-4 rounded-xl flex items-center justify-between hover-glow cursor-pointer"
+                        onClick={() => {
+                          setJobApplication(prev => ({ ...prev, position }));
+                          setShowJobModal(true);
+                        }}
+                      >
+                        <span className="text-neon-cyan">{position}</span>
+                        <span className="text-electric-blue">→</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-center md:text-left">
+                  <h3 className="text-2xl font-semibold text-electric-blue mb-4">Why Join Us?</h3>
+                  <ul className="space-y-4 text-neon-cyan">
+                    <li className="flex items-center space-x-3">
+                      <span className="text-2xl">🚀</span>
+                      <span>Exciting Projects & Innovation</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <span className="text-2xl">💡</span>
+                      <span>Learning & Growth Opportunities</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <span className="text-2xl">🌟</span>
+                      <span>Competitive Benefits</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <span className="text-2xl">👥</span>
+                      <span>Great Team Culture</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Job Application Modal */}
+          {showJobModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="glass p-8 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-2xl font-semibold text-electric-blue">Apply for {jobApplication.position}</h3>
+                  <button
+                    onClick={() => setShowJobModal(false)}
+                    className="text-neon-cyan hover:text-electric-blue"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <form onSubmit={handleJobApplication} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-neon-cyan mb-2">Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={jobApplication.name}
+                        onChange={(e) => setJobApplication(prev => ({ ...prev, name: e.target.value }))}
+                        className="w-full glass p-3 rounded-xl text-electric-blue focus:ring-2 focus:ring-electric-blue/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-neon-cyan mb-2">Email</label>
+                      <input
+                        type="email"
+                        required
+                        value={jobApplication.email}
+                        onChange={(e) => setJobApplication(prev => ({ ...prev, email: e.target.value }))}
+                        className="w-full glass p-3 rounded-xl text-electric-blue focus:ring-2 focus:ring-electric-blue/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-neon-cyan mb-2">Years of Experience</label>
+                    <input
+                      type="text"
+                      required
+                      value={jobApplication.experience}
+                      onChange={(e) => setJobApplication(prev => ({ ...prev, experience: e.target.value }))}
+                      className="w-full glass p-3 rounded-xl text-electric-blue focus:ring-2 focus:ring-electric-blue/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-neon-cyan mb-2">Portfolio/GitHub URL</label>
+                    <input
+                      type="url"
+                      value={jobApplication.portfolio}
+                      onChange={(e) => setJobApplication(prev => ({ ...prev, portfolio: e.target.value }))}
+                      className="w-full glass p-3 rounded-xl text-electric-blue focus:ring-2 focus:ring-electric-blue/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-neon-cyan mb-2">Why do you want to join us?</label>
+                    <textarea
+                      required
+                      value={jobApplication.message}
+                      onChange={(e) => setJobApplication(prev => ({ ...prev, message: e.target.value }))}
+                      rows="4"
+                      className="w-full glass p-3 rounded-xl text-electric-blue focus:ring-2 focus:ring-electric-blue/50"
+                    />
+                  </div>
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="submit"
+                    className="neon-btn w-full"
+                  >
+                    Submit Application
+                  </motion.button>
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
+        </motion.section>
+
+        {/* Download Resume */}
+        <motion.section 
+          variants={containerVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="mb-32"
+        >
+          <div className="relative glass rounded-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-electric-blue to-neon-cyan opacity-20" />
+            <div className="relative px-8 py-16 flex flex-col items-center">
+              <motion.h2
+                variants={itemVariant}
+                className="text-4xl font-bold text-electric-blue mb-6"
+              >
+                Download My Resume
+              </motion.h2>
+              <motion.a
+                variants={itemVariant}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                href="/resume.pdf"
+                download
+                className="neon-btn"
+              >
+                Download CV
+              </motion.a>
+            </div>
+          </div>
+        </motion.section>
+      </div>
+    </div>
   )
 }
 

@@ -2,9 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { Clock, PlayIcon, FileText, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Clock, FileText, ArrowRight, BookOpen, Award, BarChart } from 'lucide-react';
 import { useRoadmap } from '@/app/context/RoadmapContext';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+
+const fadeIn = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 }
+};
 
 export default function Home() {
   const { roadmap } = useRoadmap();
@@ -14,10 +21,10 @@ export default function Home() {
   const [currentComponentIndex, setCurrentComponentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [roadmapId, setRoadmapId] = useState(null);  // Store roadmap_id
-  const [isCompleted, setIsCompleted] = useState(null); // Store is_completed
+  const [roadmapId, setRoadmapId] = useState(null);
+  const [isCompleted, setIsCompleted] = useState(null);
   const router = useRouter();
-  const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER
+  const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER;
 
   useEffect(() => {
     if (roadmap?.roadmap_id) {
@@ -128,125 +135,235 @@ export default function Home() {
     checkQuizCompletion();
   }, [quizAnswers]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div className="text-red-500 text-center py-8">{error}</div>;
-  if (!componentData) return <div>No component data available.</div>;
+  if (isLoading) return (
+    <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        className="w-16 h-16 border-4 border-electric-blue border-t-transparent rounded-full"
+      />
+    </div>
+  );
+
+  if (error) return (
+    <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+      <motion.div 
+        {...fadeIn}
+        className="glass p-8 rounded-2xl text-center max-w-md mx-4"
+      >
+        <div className="text-red-500 text-6xl mb-4">⚠️</div>
+        <h2 className="text-2xl font-bold text-electric-blue mb-4">Error</h2>
+        <p className="text-neon-cyan mb-6">{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="neon-btn"
+        >
+          Try Again
+        </button>
+      </motion.div>
+    </div>
+  );
+
+  if (!componentData) return (
+    <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+      <motion.div 
+        {...fadeIn}
+        className="glass p-8 rounded-2xl text-center max-w-md mx-4"
+      >
+        <BookOpen className="w-16 h-16 text-electric-blue mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-electric-blue mb-4">No Content Available</h2>
+        <p className="text-neon-cyan mb-6">Please select a learning path to begin.</p>
+        <button 
+          onClick={() => router.push('/')} 
+          className="neon-btn"
+        >
+          Go to Dashboard
+        </button>
+      </motion.div>
+    </div>
+  );
 
   return (
-    <div className="bg-black text-cyan-300 min-h-screen flex flex-col items-center p-4 overflow-hidden">
+    <div className="bg-neutral-950 text-white min-h-screen flex flex-col items-center p-4 overflow-hidden">
       <Head>
         <title>{componentData.component.name}</title>
       </Head>
 
-      <div className="w-full max-w-7xl bg-neutral-900 border border-cyan-800/30 rounded-2xl shadow-2xl shadow-cyan-500/10 p-6 space-y-6 relative">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-transparent via-cyan-900/10 to-transparent opacity-50 blur-3xl"></div>
+      <motion.div 
+        {...fadeIn}
+        className="w-full max-w-7xl glass border border-soft-purple/20 rounded-2xl shadow-2xl p-6 space-y-6"
+      >
+        {/* Progress Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-electric-blue">{componentData.component.name}</h1>
+            <div className="flex items-center space-x-2 mt-2">
+              <BarChart className="w-4 h-4 text-neon-cyan" />
+              <span className="text-neon-cyan">
+                Progress: {Math.round((currentComponentIndex / roadmap.total_components) * 100)}%
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <p className="text-sm text-neon-cyan">Component</p>
+              <p className="text-lg font-bold text-electric-blue">
+                {currentComponentIndex + 1} / {roadmap.total_components}
+              </p>
+            </div>
+            <Award className="w-8 h-8 text-electric-blue" />
+          </div>
         </div>
 
         {/* Video Section */}
-        <div className="relative z-10 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {componentData.component.videos.map((video, index) => (
-              <div key={index} className="w-full aspect-video rounded-xl overflow-hidden border-2 border-cyan-700/50 shadow-lg shadow-cyan-500/20">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src={video}
-                  title={`${componentData.component.name} Video ${index + 1}`}
-                  frameBorder="0"
-                  className="transform transition-all hover:scale-[1.02]"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
-            ))}
-          </div>
-        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {componentData.component.videos.map((video, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.1 }}
+              className="glass rounded-xl overflow-hidden hover-glow"
+            >
+              <iframe
+                width="100%"
+                height="200"
+                src={video}
+                title={`${componentData.component.name} Video ${index + 1}`}
+                frameBorder="0"
+                className="transform transition-all hover:scale-[1.02]"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Description Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="glass p-6 rounded-xl border border-soft-purple/20"
+        >
+          <h2 className="text-xl font-bold text-electric-blue mb-4">Overview</h2>
+          <p className="text-neon-cyan">{componentData.component.description}</p>
+        </motion.div>
 
         {/* Supplementary Materials Section */}
-        <div className="mb-6 z-10 relative">
-          <div className="flex items-center mb-4 space-x-3">
-            <FileText className="text-cyan-500" />
-            <h3 className="text-lg font-semibold">Supplementary Materials</h3>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-4"
+        >
+          <div className="flex items-center space-x-3 mb-4">
+            <FileText className="text-electric-blue" />
+            <h3 className="text-lg font-semibold text-electric-blue">Learning Materials</h3>
           </div>
-          <div className="w-full bg-neutral-800 border border-cyan-800/30 rounded-xl p-4">
+          <div className="glass p-6 rounded-xl border border-soft-purple/20">
             <iframe 
               src={componentData.component.document} 
               width="100%" 
               height="600px" 
-              className="rounded-lg border border-cyan-700/30"
+              className="rounded-lg mb-4"
               title="PDF Viewer"
-            ></iframe>
-            <a
+            />
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               href={componentData.component.document}
               download
-              className="mt-4 inline-block bg-cyan-600 hover:bg-cyan-700 text-black font-bold py-2 px-4 rounded-md transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
+              className="neon-btn inline-flex items-center space-x-2"
             >
               <FileText size={20} />
               <span>Download PDF</span>
-            </a>
+            </motion.a>
           </div>
-        </div>
-
-        {/* Description Section */}
-        <div className="mb-6 z-10 relative bg-neutral-800/50 rounded-xl p-4 border border-cyan-800/30">
-          <p className="text-cyan-300 italic">{componentData.component.description}</p>
-        </div>
+        </motion.div>
 
         {/* Quiz Section */}
-        <div className="z-10 relative">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="space-y-4"
+        >
           <div className="flex items-center space-x-3 mb-4">
-            <Clock className="text-cyan-500" />
-            <h2 className="text-xl font-bold">Knowledge Checkpoint</h2>
+            <Clock className="text-electric-blue" />
+            <h2 className="text-xl font-semibold text-electric-blue">Knowledge Check</h2>
           </div>
-          <div className="bg-neutral-800/50 rounded-xl p-4 border border-cyan-800/30">
+          <div className="glass p-6 rounded-xl border border-soft-purple/20">
             {componentData.component.test_series.map((question, index) => (
-              <div key={index} className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">{question.question}</h3>
-                <div className="space-y-2">
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="mb-6"
+              >
+                <h3 className="text-lg font-semibold text-electric-blue mb-4">{question.question}</h3>
+                <div className="space-y-3">
                   {question.options.map((option, optionIndex) => (
-                    <label key={optionIndex} className="flex items-center space-x-2">
+                    <label
+                      key={optionIndex}
+                      className="flex items-center space-x-3 p-3 glass rounded-lg cursor-pointer transition-all hover:bg-deep-indigo/20"
+                    >
                       <input
                         type="radio"
                         name={`question-${index}`}
                         value={option}
                         onChange={() => handleQuizAnswer(index, option)}
-                        className="form-radio text-cyan-500"
+                        className="form-radio text-electric-blue"
                       />
-                      <span>{option}</span>
+                      <span className="text-neon-cyan">{option}</span>
                     </label>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             ))}
-            {quizCompleted && componentData?.component?.test_series && (
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2">Quiz Results</h3>
+
+            {quizCompleted && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-8 glass p-6 rounded-xl"
+              >
+                <h3 className="text-xl font-bold text-electric-blue mb-4">Quiz Results</h3>
                 {componentData.component.test_series.map((question, index) => (
                   <div key={index} className="mb-4">
-                    <p className="font-semibold">{question.question}</p>
-                    <p className={quizAnswers[index] === question.answer ? "text-green-500" : "text-red-500"}>
+                    <p className="font-semibold text-neon-cyan">{question.question}</p>
+                    <p className={`mt-2 ${
+                      quizAnswers[index] === question.answer 
+                        ? 'text-green-500' 
+                        : 'text-red-500'
+                    }`}>
                       Your answer: {quizAnswers[index]}
                       {quizAnswers[index] === question.answer ? " ✅" : " ❌"}
                     </p>
                   </div>
                 ))}
-              </div>
+              </motion.div>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Next Component Button */}
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={handleNextComponent}
-          className="w-full bg-cyan-600 text-black font-bold py-3 px-6 rounded-xl 
-            hover:bg-cyan-500 transition-all 
-            flex items-center justify-center space-x-2"
+          className="neon-btn w-full flex items-center justify-center space-x-2"
         >
           <span>Next Component</span>
           <ArrowRight />
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
     </div>
   );
 }
