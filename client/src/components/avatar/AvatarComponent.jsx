@@ -1,0 +1,284 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import gsap from 'gsap';
+import { motion } from 'framer-motion';
+
+const AvatarComponent = ({
+  isExpanded,
+  isListening,
+  currentLanguage,
+  response
+}) => {
+  const containerRef = useRef(null);
+  const sceneRef = useRef(null);
+  const cameraRef = useRef(null);
+  const rendererRef = useRef(null);
+  const avatarRef = useRef(null);
+  const mixerRef = useRef(null);
+  const controlsRef = useRef(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // Initialize Three.js scene
+    const initScene = () => {
+      // Scene setup
+      sceneRef.current = new THREE.Scene();
+      sceneRef.current.background = new THREE.Color(0x000000);
+      sceneRef.current.fog = new THREE.Fog(0x000000, 1, 10);
+
+      // Camera setup
+      const aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
+      cameraRef.current = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+      cameraRef.current.position.set(0, 0.5, 2.5); // Adjusted for better centering
+      cameraRef.current.lookAt(0, 0.5, 0);
+
+      // Renderer setup
+      rendererRef.current = new THREE.WebGLRenderer({ 
+        antialias: true, 
+        alpha: true,
+        powerPreference: "high-performance"
+      });
+      rendererRef.current.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+      rendererRef.current.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      rendererRef.current.shadowMap.enabled = true;
+      rendererRef.current.shadowMap.type = THREE.PCFSoftShadowMap;
+      rendererRef.current.outputEncoding = THREE.sRGBEncoding;
+      containerRef.current.appendChild(rendererRef.current.domElement);
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      sceneRef.current.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(2, 2, 2);
+      directionalLight.castShadow = true;
+      directionalLight.shadow.mapSize.width = 2048;
+      directionalLight.shadow.mapSize.height = 2048;
+      sceneRef.current.add(directionalLight);
+
+      const fillLight = new THREE.DirectionalLight(0x0A84FF, 0.3); // Electric blue fill light
+      fillLight.position.set(-2, 0, -2);
+      sceneRef.current.add(fillLight);
+
+      // Controls
+      controlsRef.current = new OrbitControls(cameraRef.current, rendererRef.current.domElement);
+      controlsRef.current.enableDamping = true;
+      controlsRef.current.dampingFactor = 0.05;
+      controlsRef.current.enableZoom = false;
+      controlsRef.current.minPolarAngle = Math.PI / 2.5; // Adjusted to limit vertical rotation
+      controlsRef.current.maxPolarAngle = Math.PI / 1.8;
+      controlsRef.current.enablePan = false;
+      controlsRef.current.target.set(0, 0.5, 0); // Set orbit target to match camera lookAt
+
+      // Load Avatar Model
+      const loadingManager = new THREE.LoadingManager();
+      
+      loadingManager.onProgress = (url, loaded, total) => {
+        console.log(`Loading model... ${Math.round((loaded / total) * 100)}%`);
+      };
+
+      const loader = new GLTFLoader(loadingManager);
+      
+      loader.load('/models/model.glb', 
+        // onLoad callback
+        (gltf) => {
+          avatarRef.current = gltf.scene;
+          
+          // Apply shadows to all meshes
+          avatarRef.current.traverse((child) => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+              
+              // Improve material quality
+              if (child.material) {
+                child.material.envMapIntensity = 1;
+                child.material.needsUpdate = true;
+              }
+            }
+          });
+
+          // Center the model
+          const box = new THREE.Box3().setFromObject(avatarRef.current);
+          const center = box.getCenter(new THREE.Vector3());
+          const size = box.getSize(new THREE.Vector3());
+          
+          // Calculate scale to fit the model in view
+          const maxDim = Math.max(size.x, size.y, size.z);
+          const scale = 1.5 / maxDim;
+          avatarRef.current.scale.setScalar(scale);
+
+          // Position model at center
+          avatarRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+          avatarRef.current.position.y += 0.5; // Slight vertical adjustment
+          
+          sceneRef.current.add(avatarRef.current);
+
+          // Animation mixer setup
+          if (gltf.animations.length) {
+            mixerRef.current = new THREE.AnimationMixer(avatarRef.current);
+            const idleAction = mixerRef.current.clipAction(gltf.animations[0]);
+            idleAction.play();
+          }
+
+          // Initial animation
+          gsap.from(avatarRef.current.position, {
+            y: avatarRef.current.position.y - 1,
+            duration: 1.5,
+            ease: "power3.out"
+          });
+
+          // Rotate model to face camera
+          avatarRef.current.rotation.y = Math.PI;
+        },
+        // onProgress callback
+        (xhr) => {
+          console.log(`Loading model: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+        },
+        // onError callback
+        (error) => {
+          console.error('Error loading model:', error);
+        }
+      );
+    };
+
+    // Animation loop
+    const animate = () => {
+      requestAnimationFrame(animate);
+
+      if (controlsRef.current) {
+        controlsRef.current.update();
+      }
+
+      if (mixerRef.current) {
+        mixerRef.current.update(0.016); // ~60fps
+      }
+
+      if (rendererRef.current && sceneRef.current && cameraRef.current) {
+        rendererRef.current.render(sceneRef.current, cameraRef.current);
+      }
+    };
+
+    // Handle window resize
+    const handleResize = () => {
+      if (!containerRef.current || !cameraRef.current || !rendererRef.current) return;
+
+      const width = containerRef.current.clientWidth;
+      const height = containerRef.current.clientHeight;
+
+      cameraRef.current.aspect = width / height;
+      cameraRef.current.updateProjectionMatrix();
+
+      rendererRef.current.setSize(width, height);
+    };
+
+    // Initialize
+    initScene();
+    animate();
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      
+      if (rendererRef.current && containerRef.current) {
+        containerRef.current.removeChild(rendererRef.current.domElement);
+      }
+
+      if (mixerRef.current) {
+        mixerRef.current.stopAllAction();
+      }
+    };
+  }, []);
+
+  // Handle lip-sync animation
+  useEffect(() => {
+    if (!avatarRef.current || !response) return;
+
+    // Animate mouth based on response
+    const animateMouth = () => {
+      if (!avatarRef.current.morphTargetDictionary) return;
+
+      const mouthIndex = avatarRef.current.morphTargetDictionary.mouth_open;
+      if (typeof mouthIndex === 'undefined') return;
+
+      gsap.to(avatarRef.current.morphTargetInfluences, {
+        [mouthIndex]: 1,
+        duration: 0.1,
+        yoyo: true,
+        repeat: -1,
+        ease: "power1.inOut"
+      });
+    };
+
+    animateMouth();
+  }, [response]);
+
+  // Handle listening state
+  useEffect(() => {
+    if (!avatarRef.current) return;
+
+    if (isListening) {
+      // Animate avatar to show it's listening
+      gsap.to(avatarRef.current.rotation, {
+        y: avatarRef.current.rotation.y + 0.1,
+        duration: 0.5,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+      });
+    } else {
+      // Reset animation
+      gsap.to(avatarRef.current.rotation, {
+        y: 0,
+        duration: 0.5
+      });
+    }
+  }, [isListening]);
+
+  return (
+    <div className="relative w-full h-full">
+      <div
+        ref={containerRef}
+        className="w-full h-full rounded-xl overflow-hidden"
+      />
+      
+      {/* Loading indicator */}
+      {!avatarRef.current && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded-xl">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-electric-blue border-t-transparent mb-4"></div>
+            <p className="text-electric-blue">Loading Avatar...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Language indicator */}
+      <div className="absolute top-4 left-4 glass px-3 py-1 rounded-full text-sm">
+        {currentLanguage === 'en' ? '🇺🇸 English' : '🌐 Other'}
+      </div>
+
+      {/* Listening indicator */}
+      {isListening && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 glass px-4 py-2 rounded-full"
+        >
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-electric-blue rounded-full animate-pulse" />
+            <span className="text-neon-cyan">Listening...</span>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+export default AvatarComponent; 

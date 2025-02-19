@@ -16,7 +16,7 @@
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-toast": "^1.2.2",
     "@react-spring/web": "^9.7.5",
-    "@react-three/drei": "^9.121.4",
+    "@react-three/drei": "^9.121.5",
     "@react-three/fiber": "^8.17.14",
     "@splinetool/react-spline": "^4.0.0",
     "@splinetool/viewer": "^1.9.59",
