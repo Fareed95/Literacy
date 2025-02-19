@@ -11,6 +11,7 @@ export const RoadmapProvider = ({ children }) => {
   const [roadmap, setRoadmap] = useState({
     roadmap_id: null,
     total_components: null,
+    first_component: null,
   });
 
   return (

@@ -31,6 +31,7 @@ export default function Home() {
       console.log(roadmap);
       setRoadmapId(roadmap.roadmap_id);
       fetchRoadmapData(roadmap.roadmap_id);
+      console.log("data",roadmap.first_component);
     } else {
       console.log('No roadmap ID found');
       router.push('/');
@@ -47,7 +48,7 @@ export default function Home() {
       console.log("checking here", data.is_completed);
       setIsCompleted(data.is_completed); // Store is_completed value
       fetchComponentData(roadmapId, data.is_completed);
-      console.log(isCompleted);
+      // console.log("is completed",);
     } catch (error) {
       console.error("Error fetching roadmap data:", error);
       setError("Failed to fetch roadmap data. Please try again.");
@@ -55,29 +56,39 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    console.log("Updated isCompleted:", isCompleted);
+  }, [isCompleted]);
+
   const fetchComponentData = async (roadmapId, componentNumber) => {
-    try {
-      const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}/component`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ component_number: componentNumber }),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log(data);
-      setComponentData(data);
-      setError(null);
-    } catch (error) {
-      console.error("Error fetching component data:", error);
-      setError("Failed to fetch component data. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (componentNumber === 0 ) {
+      setComponentData(roadmap.first_component);
     }
-  };
+    else {
+      try {
+        const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}/component`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ component_number: componentNumber }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("the data is ",data);
+        setComponentData(data);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching component data:", error);
+        setError("Failed to fetch component data. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    }
+   
 
   const handleNextComponent = async () => {
     if (currentComponentIndex + 1 < roadmap.total_components) {

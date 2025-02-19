@@ -8,9 +8,11 @@ import { buttons } from "@/components/Button";
 
 function Timeline_roadmap_function({ roadmapData }) {
   const router = useRouter();
-  const { setRoadmap } = useRoadmap();  // Get the setRoadmap function from context
+  const { setRoadmap } = useRoadmap(); 
+  
+  console.log("Timeline",roadmapData.first_component);// Get the setRoadmap function from context
 
-  if (!roadmapData || !roadmapData.roadmap_name || !roadmapData.roadmap_components) {
+  if (!roadmapData ) {
     return (
       <div className="text-neutral-800 dark:text-neutral-200 text-center py-8">
         No roadmap data available. Please try again.
@@ -18,7 +20,7 @@ function Timeline_roadmap_function({ roadmapData }) {
     );
   }
 
-  const timelineData = roadmapData.roadmap_components.map((component, index) => ({
+  const timelineData = roadmapData.roadmap.map((component, index) => ({
     id: index + 1,
     title: component.name,
     content: (
@@ -37,8 +39,12 @@ function Timeline_roadmap_function({ roadmapData }) {
     // Set the roadmap data in context
     setRoadmap({
       roadmap_id: roadmapData.roadmap_id, // Send the roadmap id
-      total_components: roadmapData.total_components,  // Send the total components count
+      total_components: roadmapData.total_components,
+      first_component:roadmapData.first_component  // Send the total components count
     });
+  
+  
+
     router.push('/Learning');  // Navigate to the Learning page
   };
 

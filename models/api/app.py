@@ -194,6 +194,7 @@ def generate_roadmap_first_component():
         # Generate the roadmap (only the first component)
         result = roadmap(input_value=input_value)
         result_json = json.loads(result)
+        lenght = len(result_json)
         first_name = result_json[0]['name']
         description = result_json[0]['description']
         document = result_json[0]['document']
@@ -212,6 +213,7 @@ def generate_roadmap_first_component():
 
         # Prepare the response for the first component
         first_component_response = {
+            "total_components": lenght,
             "roadmap_name": extractor,
             "roadmap": result_json,
             "first_component": {

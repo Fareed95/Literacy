@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from testimonials.serializers import TestimonialSerializer
 from certificate.serializers import CertificateSerializer
+from portfolio.serializers import UserDetailsSerializer
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -15,6 +16,7 @@ class StudentSerializer(serializers.ModelSerializer):
     otp = serializers.CharField(write_only=True, required=False)
     testimonial = TestimonialSerializer(many=True, read_only=True)
     certificate = CertificateSerializer(many=True, read_only=True)
+    # userdetails = UserDetailsSerializer(many=False,read_only=True)
     class Meta:
         model = User
         fields = [
@@ -25,7 +27,7 @@ class StudentSerializer(serializers.ModelSerializer):
             'confirm_password',
             'otp',
             'is_staff',
-            'is_company'
+            'is_company',
             'testimonial',
             'certificate',
             ]
@@ -50,6 +52,14 @@ class StudentSerializer(serializers.ModelSerializer):
         user = User(**validated_data)
         user.set_password(password)
         user.save()
+
+        if user.is_company == False:
+            from portfolio.models import UserDetails
+            UserDetails.objects.create(
+                user=user,
+                name=user.name,
+                email=user.email,
+            )
 
         html_message = render_to_string('emails/registeration_otp.html', {'otp': otp})
         plain_message = strip_tags(html_message)

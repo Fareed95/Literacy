@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PlaceholdersAndVanishInput } from "./ui/placeholders-and-vanish-input";
 import { useUserContext } from "@/app/context/Userinfo";
 import Timeline_roadmap_function from "./Timeline_roadmap";
@@ -38,7 +38,7 @@ function MainInput() {
 
     while (attempts < MAX_RETRIES && !success) {
       try {
-        const response = await fetch(`${MODEL_API_SERVER}/generate-roadmap`, {
+        const response = await fetch(`${MODEL_API_SERVER}/generate-roadmap-first-component`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -57,6 +57,7 @@ function MainInput() {
         } else {
           const data = await response.json();
           setRoadmapData(data);
+          console.log("Roadmap data loaded successfully:", data);
           success = true;
         }
       } catch (error) {
@@ -71,6 +72,33 @@ function MainInput() {
     setLoading(false);
   };
 
+  // Make POST request when roadmapData is updated and has a valid roadmap_id
+  useEffect(() => {
+    if (roadmapData?.roadmap_id) {
+      console.log("Sending request to generate-roadmap-all for roadmap_id:", roadmapData.roadmap_id);
+      fetch(`${MODEL_API_SERVER}/generate-roadmap-all`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: roadmapData.roadmap_id }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log("Roadmap all generated successfully:", data);
+        })
+        .catch((error) => {
+          console.error("Error generating full roadmap:", error);
+        });
+    }
+  }, [roadmapData]); // Runs only when roadmapData changes
+
+  
   return (
     <div className="flex flex-col justify-start items-center px-4">
       <h2 className="mb-8 text-xl text-center sm:text-5xl glass p-8 rounded-2xl backdrop-blur-md">
