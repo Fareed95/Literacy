@@ -176,6 +176,8 @@ export default function Home() {
           <PrevCources />
         </motion.section>
 
+  
+
         <motion.section 
           className="mt-20"
           initial={{ opacity: 0, y: 20 }}

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { FaUsers, FaGraduationCap, FaLightbulb, FaChartLine } from 'react-icons/fa';
 import NitinImage from '../../../../public/Nitin.jpg';
 import FareedImage from '../../../../public/Fareed.jpg';
-
+import RouteNavigator from '@/components/RouteNavigator';
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
     {/* Enhanced gradient background */}
@@ -126,6 +126,15 @@ export default function AboutPage() {
           </p>
         </motion.div>
       </section>
+
+      <motion.section 
+          className="mt-20 px-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 1.1 }}
+        >
+          <RouteNavigator />
+        </motion.section>
 
       {/* Features Section */}
       <section className="container mx-auto px-4 py-16">
