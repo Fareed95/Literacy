@@ -31,3 +31,13 @@ class Internship(models.Model):
     application_deadline = models.DateField()  # Last Date to Apply
     posted_at = models.DateTimeField(auto_now_add=True)  # Auto Timestamp
 
+
+
+class StudentsRegistered(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='internships_registered')
+    internship = models.ForeignKey(Internship, on_delete=models.CASCADE, related_name='students_registered')
+    registered_at = models.DateTimeField(auto_now_add=True)
+    is_selected = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ['user', 'internship']

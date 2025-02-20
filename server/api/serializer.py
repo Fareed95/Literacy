@@ -8,13 +8,14 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from testimonials.serializers import TestimonialSerializer
 from portfolio.serializers import UserDetailsSerializer
-
+from company.serializers import StudentsRegisteredSerializer
 
 class StudentSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
     otp = serializers.CharField(write_only=True, required=False)
     testimonial = TestimonialSerializer(many=True, read_only=True)
-    userdetails = UserDetailsSerializer(many=False,read_only=True)
+    userdetails = UserDetailsSerializer(many=True,read_only=True)
+    internships_registered = StudentsRegisteredSerializer(many=True, read_only=True)
     class Meta:
         model = User
         fields = [
@@ -27,7 +28,8 @@ class StudentSerializer(serializers.ModelSerializer):
             'is_staff',
             'is_company',
             'testimonial',
-            'userdetails'
+            'userdetails',
+            'internships_registered'
             ]
         extra_kwargs = {
             'password': {'write_only': True},

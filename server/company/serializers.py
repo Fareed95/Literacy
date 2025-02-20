@@ -1,24 +1,22 @@
 from rest_framework import serializers
-from .models import Company, Internship
+from .models import Company, Internship,StudentsRegistered
 
-class CompanySerializer(serializers.ModelSerializer):
+
+class StudentsRegisteredSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Company
+        model = StudentsRegistered
         fields = [
             'id',
-            'name',
-            'description',
-            'logo',
-            'website',
-            'location',
-            'industry',
-            'founded_at',
-            'contact_email',
-            'contact_phone',  
+            'user',
+            'internship',
+            'registered_at',
+            'is_selected',
         ]
 
 
 class InternshipSerializer(serializers.ModelSerializer):
+    students_registered = StudentsRegisteredSerializer(many=True, read_only=True)
+
     class Meta:
         model = Internship
         fields = [
@@ -33,4 +31,23 @@ class InternshipSerializer(serializers.ModelSerializer):
             'openings',
             'application_deadline',
             'posted_at',
+            'students_registered',
+        ]
+
+class CompanySerializer(serializers.ModelSerializer):
+    internships = InternshipSerializer(many=True, read_only=True)
+    class Meta:
+        model = Company
+        fields = [
+            'id',
+            'name',
+            'description',
+            'logo',
+            'website',
+            'location',
+            'industry',
+            'founded_at',
+            'contact_email',
+            'contact_phone',  
+            'internships',
         ]
