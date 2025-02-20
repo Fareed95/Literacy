@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CompanyView, InternshipView
+from .views import CompanyView, InternshipView,ApplyForInternshipView
 
 urlpatterns = [
     # Company URLs
@@ -9,4 +9,5 @@ urlpatterns = [
     # Internship URLs
     path('internships/', InternshipView.as_view(), name='internship-list'),
     path('internships/<int:internship_id>/', InternshipView.as_view(), name='internship-detail'),
+    path('apply/', ApplyForInternshipView.as_view(), name='apply-for-internship'),
 ]
