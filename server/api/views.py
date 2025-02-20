@@ -192,8 +192,7 @@ class OAuthLoginView(APIView):
                 user = User.objects.create(email=email, name=name, is_company=True,password=get_random_string(8),)
                 user_details = Company.objects.create(
                 user=user,
-                name=name,
-                contact_email=email,
+                name=name
             )
             else:
                 user = User.objects.create(email=email, name=name,password=get_random_string(8),)

@@ -14,8 +14,7 @@ class Company(models.Model):
         ('Education', 'Education'),
         ('Other', 'Other')
     ], default='Other')
-    founded_at = models.DateField(null=True, blank=True)  # Founding Date
-    contact_email = models.EmailField()  # HR Contact Email
+    founded_at = models.DateField(null=True, blank=True)  # Founding Date# HR Contact Email
     contact_phone = models.CharField(max_length=15, null=True, blank=True)
     user =  models.ForeignKey(User, on_delete=models.CASCADE, related_name='companies',null=True,blank=True)
 
