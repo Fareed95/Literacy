@@ -4,7 +4,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 
 from .models import Company, Internship, StudentsRegistered
-from .serializers import CompanySerializer, InternshipSerializer, StudentsRegisteredSerializer
+from .serializers import CompanyProfileSerializer, InternshipSerializer, StudentsRegisteredSerializer
 
 
 # 🚀 Company Views
@@ -14,16 +14,16 @@ class CompanyView(APIView):
     def get(self, request, company_id=None):
         if company_id:
             company = get_object_or_404(Company, id=company_id)
-            serializer = CompanySerializer(company)
+            serializer = CompanyProfileSerializer(company)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         companies = Company.objects.all()
-        serializer = CompanySerializer(companies, many=True)
+        serializer = CompanyProfileSerializer(companies, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # POST: Create a new company
     def post(self, request):
-        serializer = CompanySerializer(data=request.data)
+        serializer = CompanyProfileSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -32,7 +32,7 @@ class CompanyView(APIView):
     # PATCH: Update an existing company by ID
     def patch(self, request, company_id=None):
         company = get_object_or_404(Company, id=company_id)
-        serializer = CompanySerializer(company, data=request.data, partial=True)
+        serializer = CompanyProfileSerializer(company, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

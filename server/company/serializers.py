@@ -3,14 +3,20 @@ from .models import Company, Internship,StudentsRegistered
 
 
 class StudentsRegisteredSerializer(serializers.ModelSerializer):
+    internship_name = serializers.EmailField(source='internship.title', read_only=True)
+    user_name = serializers.EmailField(source='user.name', read_only=True)
+    company_name = serializers.EmailField(source='internship.company.name', read_only=True)
     class Meta:
         model = StudentsRegistered
         fields = [
             'id',
             'user',
+            'user_name',
             'internship',
+            'internship_name',
             'registered_at',
             'is_selected',
+            'company_name',
         ]
 
 
@@ -34,12 +40,15 @@ class InternshipSerializer(serializers.ModelSerializer):
             'students_registered',
         ]
 
-class CompanySerializer(serializers.ModelSerializer):
+class CompanyProfileSerializer(serializers.ModelSerializer):
     internships = InternshipSerializer(many=True, read_only=True)
+    user_email = serializers.EmailField(source='user.email', read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(source='user', read_only=True)
     class Meta:
         model = Company
         fields = [
-            'user',
+            'user_email',
+            'user_id',
             'id',
             'name',
             'description',
@@ -48,7 +57,6 @@ class CompanySerializer(serializers.ModelSerializer):
             'location',
             'industry',
             'founded_at',
-            'contact_email',
             'contact_phone',  
             'internships',
         ]
