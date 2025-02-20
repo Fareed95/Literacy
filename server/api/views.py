@@ -14,7 +14,7 @@ from django.core.cache import cache
 import ssl
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-# Disable SSL verification
+
 ssl._create_default_https_context = ssl._create_unverified_context
 class RegisterView(APIView):
     @csrf_exempt
@@ -176,6 +176,7 @@ class OAuthLoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
         name = request.data.get('name')
+        is_company = request.data.get('is_company')
 
         if not email or not name:
             return Response({"error": "Email and name are required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -184,8 +185,12 @@ class OAuthLoginView(APIView):
 
         if not user:
             # Create a new user if the email does not exist in the database
-            user = User.objects.create_user(email=email, name=name, password=None)
-            user.is_active = True  # Ensure the user is marked as active
+
+            if is_company:
+                user = User.objects.create_company(email=email, name=name, password=None, is_company=True)
+            else:
+                user = User.objects.create_user(email=email, name=name, password=None)
+            user.is_active = True  
             user.save()
 
             html_message = render_to_string('emails/welcome.html', { 'name': user.name})
