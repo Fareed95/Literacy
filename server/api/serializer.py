@@ -8,7 +8,8 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from testimonials.serializers import TestimonialSerializer
 from portfolio.serializers import UserDetailsSerializer
-from company.serializers import StudentsRegisteredSerializer
+from company.serializers import StudentsRegisteredSerializer, CompanySerializer
+# from company.models import Company
 
 class StudentSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
@@ -59,6 +60,7 @@ class StudentSerializer(serializers.ModelSerializer):
                 user=user,
                 name=user.name,
                 email=user.email,
+
             )
 
         html_message = render_to_string('emails/registeration_otp.html', {'otp': otp})
@@ -82,6 +84,7 @@ class CompanySerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
     otp = serializers.CharField(write_only=True, required=False)
     testimonial = TestimonialSerializer(many=True, read_only=True)
+    companies = CompanySerializer(read_only=True)
     class Meta:
         model = User
         fields = [
@@ -94,6 +97,7 @@ class CompanySerializer(serializers.ModelSerializer):
             'is_staff',
             'testimonial',
             'is_company',
+            'companies'
             ]
         extra_kwargs = {
             'password': {'write_only': True},
@@ -122,6 +126,7 @@ class CompanySerializer(serializers.ModelSerializer):
             Company.objects.create(
                 name=user.name,  # Use the user's name as the company name by default
                 contact_email=user.email,
+                user =user
             )
         html_message = render_to_string('emails/registeration_otp.html', {'otp': otp})
         plain_message = strip_tags(html_message)

@@ -7,7 +7,7 @@ from django.utils import timezone
 class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=254, unique=True)
-    password = models.CharField(max_length=500, )  # Consider using Django's built-in password hashing
+    password = models.CharField(max_length=500)  # Consider using Django's built-in password hashing
     otp = models.CharField(max_length=6, blank=True, null=True)
     otp_expiration = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)  # Default to True for active users

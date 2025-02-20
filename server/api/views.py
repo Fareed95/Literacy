@@ -14,6 +14,8 @@ from django.core.cache import cache
 import ssl
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from portfolio.models import UserDetails
+from company.models import Company
 
 ssl._create_default_https_context = ssl._create_unverified_context
 class RegisterView(APIView):
@@ -187,11 +189,23 @@ class OAuthLoginView(APIView):
             # Create a new user if the email does not exist in the database
 
             if is_company:
-                user = User.objects.create_company(email=email, name=name, password=None, is_company=True)
+                user = User.objects.create(email=email, name=name, is_company=True,password=get_random_string(8),)
+                user_details = Company.objects.create(
+                user=user,
+                name=name,
+                contact_email=email,
+            )
             else:
-                user = User.objects.create_user(email=email, name=name, password=None)
+                user = User.objects.create(email=email, name=name,password=get_random_string(8),)
+                user_details = UserDetails.objects.create(
+                user=user,
+                name=name,
+                email=email,
+            )
             user.is_active = True  
             user.save()
+            
+            user_details.save()
 
             html_message = render_to_string('emails/welcome.html', { 'name': user.name})
             plain_message = strip_tags(html_message)
