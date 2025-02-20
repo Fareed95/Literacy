@@ -17,6 +17,7 @@ from django.http import HttpResponse
 from django.core.mail import EmailMessage
 from django.utils.html import strip_tags
 import tempfile
+from django.shortcuts import get_object_or_404
 
 class CertificateView(APIView):
     def get(self, request):
@@ -50,6 +51,7 @@ class CertificateView(APIView):
                 # Render the cool GenZ email template
                 html_message = render_to_string('email_certificate.html', {'name': certificate.user.name})
                 plain_message = strip_tags(html_message)
+                 
 
                 # Send email with PDF attachment
                 email = EmailMessage(

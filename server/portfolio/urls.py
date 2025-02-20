@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     UserDetailsByEmailAPIView, ToolnameAPIView, ToolsAPIView,
-    ToolComponentsAPIView, EducationAPIView, CertificateAPIView,
+    ToolComponentsAPIView, EducationAPIView,
     ProjectAPIView, LinkAPIView
 )
 
@@ -17,7 +17,6 @@ urlpatterns = [
 
     # Education, Certificates, Projects, and Links
     path('education/', EducationAPIView.as_view(), name='education'),
-    path('certificates/', CertificateAPIView.as_view(), name='certificates'),
     path('projects/', ProjectAPIView.as_view(), name='projects'),
     path('links/', LinkAPIView.as_view(), name='links'),
 ]

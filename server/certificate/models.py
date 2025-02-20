@@ -1,5 +1,5 @@
 from django.db import models
-from api.models import User
+from portfolio.models import UserDetails
 
 # Create your models here.
 class Certificate(models.Model):
@@ -9,6 +9,6 @@ class Certificate(models.Model):
     additionol_testseries_attempted = models.IntegerField(null=True, blank=True)
     competition_battled = models.IntegerField(null=True, blank=True)
     competition_won = models.IntegerField(null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='certificate')
+    user = models.ForeignKey(UserDetails, on_delete=models.CASCADE, related_name='certificate')
 
 

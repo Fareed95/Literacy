@@ -44,11 +44,7 @@ class Education(models.Model):
 '''
 Certificates of the user
 '''
-
-class Certificate(models.Model):
-    user = models.ForeignKey(UserDetails, on_delete=models.CASCADE,related_name='certificate', null=True,blank=True)
-    name = models.CharField(max_length=50,null=True,blank=True)
-    gained_on = models.DateField(null=True,blank=True)
+# Directly using the Certificate model from certificate app
 
 '''
 Projects of the user

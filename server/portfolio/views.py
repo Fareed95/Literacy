@@ -2,10 +2,10 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from .models import UserDetails, Toolname, Tools, ToolComponents, Education, Certificate, Project, Link
+from .models import UserDetails, Toolname, Tools, ToolComponents, Education,  Project, Link
 from .serializers import (
     UserDetailsSerializer, ToolnameSerializer, ToolsSerializer, 
-    ToolComponentsSerializer, EducationSerializer, CertificateSerializer, 
+    ToolComponentsSerializer, EducationSerializer, 
     ProjectSerializer, LinkSerializer
 )
 
@@ -87,20 +87,6 @@ class EducationAPIView(APIView):
 
     def post(self, request):
         serializer = EducationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# Certificate API
-class CertificateAPIView(APIView):
-    def get(self, request):
-        certificates = Certificate.objects.all()
-        serializer = CertificateSerializer(certificates, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = CertificateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

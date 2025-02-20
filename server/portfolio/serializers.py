@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from . models import UserDetails,Toolname,Tools,ToolComponents,Education,Certificate,Project,Link
+from . models import UserDetails,Toolname,Tools,ToolComponents,Education,Project,Link
 # from api.models import User
 # from api.serializers import UserSerializer
-
+from certificate.serializers import CertificateSerializer
 
 
 
@@ -33,13 +33,6 @@ class EducationSerializer(serializers.ModelSerializer):
         model = Education
         fields = ['id','user','degree','field_of_study','University','location','start_date','end_date','current_grade']
 
-class CertificateSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Certificate
-        fields = ['id','user','name','gained_on']
-
-
 class LinkSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -60,6 +53,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     education = EducationSerializer(many=True, read_only=True)
     certificate = CertificateSerializer(many=True, read_only=True)
     project = ProjectSerializer(many=True, read_only=True)
+    certificate = CertificateSerializer(many=True, read_only=True)
     class Meta:
         model = UserDetails
         fields = ['id','name','email','phone_number','about','toolname','education','certificate','project']
