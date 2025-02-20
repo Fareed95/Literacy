@@ -18,8 +18,13 @@ const Page = () => {
   const { data: session, status } = useSession();
   const [userType, setUserType] = useState(null); // 'student' or 'organization'
   const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: '',
+    is_company: false,
+    companyName: '', // Only for organizations
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,6 +34,14 @@ const Page = () => {
       router.push('/');
     }
   }, [session, router]);
+
+  useEffect(() => {
+    // Update is_company when userType changes
+    setFormData(prev => ({
+      ...prev,
+      is_company: userType === 'organization'
+    }));
+  }, [userType]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,46 +54,55 @@ const Page = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
 
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      // First, validate with your backend
-      const response = await fetch('/api/auth/login', {
+      // Send registration data to your backend
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
           email: formData.email,
           password: formData.password,
-          userType: userType, // 'student' or 'organization'
+          is_company: formData.is_company,
+          companyName: formData.is_company ? formData.companyName : undefined,
+          userType: userType,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || 'Registration failed');
       }
 
-      // If backend validation is successful, proceed with NextAuth signin
+      // If registration is successful, sign in the user
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
         userType: userType,
         redirect: false,
       });
-      
+
       if (result?.error) {
-        setError(result.error);
-      } else {
-        // Redirect based on user type
-        router.push(userType === 'organization' ? '/organization/dashboard' : '/');
+        throw new Error(result.error);
       }
+
+      // Redirect based on user type
+      router.push(userType === 'organization' ? '/organization/dashboard' : '/');
     } catch (error) {
-      console.error('Login error:', error);
-      setError(error.message || 'Login failed');
+      console.error('Registration error:', error);
+      setError(error.message || 'Registration failed');
     } finally {
       setIsLoading(false);
     }
@@ -163,7 +185,7 @@ const Page = () => {
         >
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold text-electric-blue">
-              {userType === 'student' ? 'Student Login' : 'Organization Login'}
+              {userType === 'student' ? 'Student Registration' : 'Organization Registration'}
             </h1>
             <button
               onClick={() => setUserType(null)}
@@ -173,7 +195,61 @@ const Page = () => {
             </button>
           </div>
           
+          {error && (
+            <div className="mb-4 p-3 rounded-lg bg-red-500/20 text-red-500 text-sm">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+            {userType === 'organization' ? (
+              <div>
+                <label htmlFor="companyName" className="block text-sm font-medium text-neon-cyan mb-1">
+                  Organization Name
+                </label>
+                <input
+                  type="text"
+                  id="companyName"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleInputChange}
+                  className="w-full glass px-4 py-2 rounded-lg border border-electric-blue/30 focus:border-electric-blue focus:outline-none bg-transparent text-white"
+                  required
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-medium text-neon-cyan mb-1">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    className="w-full glass px-4 py-2 rounded-lg border border-electric-blue/30 focus:border-electric-blue focus:outline-none bg-transparent text-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-neon-cyan mb-1">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    className="w-full glass px-4 py-2 rounded-lg border border-electric-blue/30 focus:border-electric-blue focus:outline-none bg-transparent text-white"
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-neon-cyan mb-1">
                 Email
@@ -188,7 +264,7 @@ const Page = () => {
                 required
               />
             </div>
-            
+
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-neon-cyan mb-1">
                 Password
@@ -204,12 +280,27 @@ const Page = () => {
               />
             </div>
 
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-neon-cyan mb-1">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                className="w-full glass px-4 py-2 rounded-lg border border-electric-blue/30 focus:border-electric-blue focus:outline-none bg-transparent text-white"
+                required
+              />
+            </div>
+            
             <button
               type="submit"
               className="w-full neon-btn py-2 rounded-lg font-medium"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 
@@ -268,9 +359,9 @@ const Page = () => {
 
           <div className="mt-8 text-center">
             <p className="text-neon-cyan">
-              Don't have an account?{' '}
-              <button onClick={() => router.push('/Register')} className="text-electric-blue hover:underline">
-                Register
+              Already have an account?{' '}
+              <button onClick={() => router.push('/Login')} className="text-electric-blue hover:underline">
+                Login
               </button>
             </p>
           </div>
