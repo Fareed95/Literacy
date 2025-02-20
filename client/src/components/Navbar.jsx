@@ -22,7 +22,6 @@ function Navbar() {
 
   const menuItems = [
     { label: "Home", href: "/" },
-    { label: "Events", href: "/Events" },
     { label: "Gallery", href: "/Gallery" },
     { label: "About", href: "/About" },
     { label: "Lobby", href: "/Lobby" },
