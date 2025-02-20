@@ -161,4 +161,4 @@ const VoiceControls = ({
   );
 };
 
-export default VoiceControls; 
+export default VoiceControls;

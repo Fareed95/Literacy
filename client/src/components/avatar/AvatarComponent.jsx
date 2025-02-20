@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -20,73 +20,103 @@ const AvatarComponent = ({
   const avatarRef = useRef(null);
   const mixerRef = useRef(null);
   const controlsRef = useRef(null);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingError, setLoadingError] = useState(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
+    let mounted = true;
+
     // Initialize Three.js scene
-    const initScene = () => {
-      // Scene setup
-      sceneRef.current = new THREE.Scene();
-      sceneRef.current.background = new THREE.Color(0x000000);
-      sceneRef.current.fog = new THREE.Fog(0x000000, 1, 10);
+    const initScene = async () => {
+      try {
+        // Scene setup
+        sceneRef.current = new THREE.Scene();
+        sceneRef.current.background = new THREE.Color(0x000000);
+        sceneRef.current.fog = new THREE.Fog(0x000000, 1, 10);
 
-      // Camera setup
-      const aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
-      cameraRef.current = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-      cameraRef.current.position.set(0, 0.5, 2.5); // Adjusted for better centering
-      cameraRef.current.lookAt(0, 0.5, 0);
+        // Camera setup
+        const aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
+        cameraRef.current = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+        cameraRef.current.position.set(0, 0.5, 2.5); // Adjusted for better centering
+        cameraRef.current.lookAt(0, 0.5, 0);
 
-      // Renderer setup
-      rendererRef.current = new THREE.WebGLRenderer({ 
-        antialias: true, 
-        alpha: true,
-        powerPreference: "high-performance"
-      });
-      rendererRef.current.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-      rendererRef.current.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      rendererRef.current.shadowMap.enabled = true;
-      rendererRef.current.shadowMap.type = THREE.PCFSoftShadowMap;
-      rendererRef.current.outputEncoding = THREE.sRGBEncoding;
-      containerRef.current.appendChild(rendererRef.current.domElement);
+        // Renderer setup
+        rendererRef.current = new THREE.WebGLRenderer({ 
+          antialias: true, 
+          alpha: true,
+          powerPreference: "high-performance"
+        });
+        rendererRef.current.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+        rendererRef.current.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        rendererRef.current.shadowMap.enabled = true;
+        rendererRef.current.shadowMap.type = THREE.PCFSoftShadowMap;
+        rendererRef.current.outputColorSpace = THREE.SRGBColorSpace;
+        containerRef.current.appendChild(rendererRef.current.domElement);
 
-      // Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-      sceneRef.current.add(ambientLight);
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        sceneRef.current.add(ambientLight);
 
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(2, 2, 2);
-      directionalLight.castShadow = true;
-      directionalLight.shadow.mapSize.width = 2048;
-      directionalLight.shadow.mapSize.height = 2048;
-      sceneRef.current.add(directionalLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(2, 2, 2);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
+        sceneRef.current.add(directionalLight);
 
-      const fillLight = new THREE.DirectionalLight(0x0A84FF, 0.3); // Electric blue fill light
-      fillLight.position.set(-2, 0, -2);
-      sceneRef.current.add(fillLight);
+        const fillLight = new THREE.DirectionalLight(0x0A84FF, 0.3); // Electric blue fill light
+        fillLight.position.set(-2, 0, -2);
+        sceneRef.current.add(fillLight);
 
-      // Controls
-      controlsRef.current = new OrbitControls(cameraRef.current, rendererRef.current.domElement);
-      controlsRef.current.enableDamping = true;
-      controlsRef.current.dampingFactor = 0.05;
-      controlsRef.current.enableZoom = false;
-      controlsRef.current.minPolarAngle = Math.PI / 2.5; // Adjusted to limit vertical rotation
-      controlsRef.current.maxPolarAngle = Math.PI / 1.8;
-      controlsRef.current.enablePan = false;
-      controlsRef.current.target.set(0, 0.5, 0); // Set orbit target to match camera lookAt
+        // Controls
+        controlsRef.current = new OrbitControls(cameraRef.current, rendererRef.current.domElement);
+        controlsRef.current.enableDamping = true;
+        controlsRef.current.dampingFactor = 0.05;
+        controlsRef.current.enableZoom = false;
+        controlsRef.current.minPolarAngle = Math.PI / 2.5; // Adjusted to limit vertical rotation
+        controlsRef.current.maxPolarAngle = Math.PI / 1.8;
+        controlsRef.current.enablePan = false;
+        controlsRef.current.target.set(0, 0.5, 0); // Set orbit target to match camera lookAt
 
-      // Load Avatar Model
-      const loadingManager = new THREE.LoadingManager();
-      
-      loadingManager.onProgress = (url, loaded, total) => {
-        console.log(`Loading model... ${Math.round((loaded / total) * 100)}%`);
-      };
+        // Load Avatar Model
+        const loadingManager = new THREE.LoadingManager();
+        
+        loadingManager.onProgress = (url, loaded, total) => {
+          if (mounted) {
+            const progress = Math.round((loaded / total) * 100);
+            setLoadingProgress(progress);
+            console.log(`Loading model... ${progress}%`);
+          }
+        };
 
-      const loader = new GLTFLoader(loadingManager);
-      
-      loader.load('/models/model.glb', 
-        // onLoad callback
-        (gltf) => {
+        loadingManager.onError = (url) => {
+          if (mounted) {
+            setLoadingError(`Failed to load ${url}`);
+            console.error(`Error loading: ${url}`);
+          }
+        };
+
+        const loader = new GLTFLoader(loadingManager);
+        
+        try {
+          const gltf = await new Promise((resolve, reject) => {
+            loader.load(
+              '/models/model.glb',
+              resolve,
+              (xhr) => {
+                if (mounted) {
+                  const progress = Math.round((xhr.loaded / xhr.total) * 100);
+                  setLoadingProgress(progress);
+                }
+              },
+              reject
+            );
+          });
+
+          if (!mounted) return;
+
           avatarRef.current = gltf.scene;
           
           // Apply shadows to all meshes
@@ -135,16 +165,19 @@ const AvatarComponent = ({
 
           // Rotate model to face camera
           avatarRef.current.rotation.y = Math.PI;
-        },
-        // onProgress callback
-        (xhr) => {
-          console.log(`Loading model: ${(xhr.loaded / xhr.total * 100)}% loaded`);
-        },
-        // onError callback
-        (error) => {
-          console.error('Error loading model:', error);
+
+        } catch (error) {
+          if (mounted) {
+            setLoadingError('Failed to load the 3D model');
+            console.error('Error loading model:', error);
+          }
         }
-      );
+      } catch (error) {
+        if (mounted) {
+          setLoadingError('Failed to initialize 3D scene');
+          console.error('Error initializing scene:', error);
+        }
+      }
     };
 
     // Animation loop
@@ -185,6 +218,7 @@ const AvatarComponent = ({
 
     // Cleanup
     return () => {
+      mounted = false;
       window.removeEventListener('resize', handleResize);
       
       if (rendererRef.current && containerRef.current) {
@@ -250,11 +284,21 @@ const AvatarComponent = ({
       />
       
       {/* Loading indicator */}
-      {!avatarRef.current && (
+      {(!avatarRef.current || loadingProgress < 100) && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded-xl">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-electric-blue border-t-transparent mb-4"></div>
-            <p className="text-electric-blue">Loading Avatar...</p>
+            <p className="text-electric-blue">
+              {loadingError ? loadingError : `Loading Avatar... ${loadingProgress}%`}
+            </p>
+            {loadingError && (
+              <button 
+                onClick={() => window.location.reload()}
+                className="mt-4 neon-btn text-sm"
+              >
+                Retry
+              </button>
+            )}
           </div>
         </div>
       )}
