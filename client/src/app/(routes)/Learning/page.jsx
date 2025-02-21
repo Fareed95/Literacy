@@ -92,6 +92,7 @@ export default function Home() {
     if (isCompleted + 1 < roadmap.total_components) {
       try {
         const newCompletedIndex = currentComponentIndex + 1;
+        console.log("Updating completion status to:", newCompletedIndex);
         const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}/complete`, {
           method: 'PATCH',
           headers: {
