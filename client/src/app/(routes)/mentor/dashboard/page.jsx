@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import { mentorNavItems } from "../../routes";
 import MentorStats from "@/components/dashboard/mentor/MentorStats";
 import MenteeList from "@/components/dashboard/mentor/MenteeList";
 import SessionCalendar from "@/components/dashboard/mentor/SessionCalendar";
@@ -16,7 +14,7 @@ export default function MentorDashboard() {
   const { data: session } = useSession();
   const mentorName = session?.user?.name || "Mentor";
 
-  const tabs = [
+  const tabs = [  
     { id: "overview", label: "Overview" },
     { id: "mentees", label: "Mentees" },
     { id: "sessions", label: "Sessions" },
@@ -42,7 +40,7 @@ export default function MentorDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-black p-6">
+    <div className="min-h-screen bg-black p-6 mt-20">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="bg-neutral-glass border border-glass-border p-6 rounded-2xl backdrop-blur-md">

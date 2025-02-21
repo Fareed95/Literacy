@@ -1,4 +1,5 @@
 const BASE_URL = 'http://localhost:8000/api';
+const MAIN_URL = 'http://localhost:8000';
 
 export const API_ENDPOINTS = {
   // User Details

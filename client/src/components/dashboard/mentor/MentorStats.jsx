@@ -2,15 +2,10 @@
 
 import { motion } from "framer-motion";
 
-const StatCard = ({ title, value, icon, change }: {
-  title: string;
-  value: string | number;
-  icon?: React.ReactNode;
-  change?: { value: number; type: 'increase' | 'decrease' };
-}) => (
+const StatCard = ({ title, value, icon, change }) => (
   <div className="glass p-4 rounded-xl hover-glow">
     <div className="flex justify-between items-start">
-      <div>
+      <div>   
         <h3 className="text-sm text-neon-cyan font-medium">{title}</h3>
         <p className="text-2xl font-bold text-electric-blue mt-2">{value}</p>
       </div>
@@ -31,32 +26,32 @@ export default function MentorStats() {
     {
       title: "Active Mentees",
       value: 12,
-      change: { value: 8, type: 'increase' as const },
+      change: { value: 8, type: 'increase' },
     },
     {
       title: "Sessions This Month",
       value: 48,
-      change: { value: 12, type: 'increase' as const },
+      change: { value: 12, type: 'increase' },
     },
     {
       title: "Average Rating",
       value: "4.8/5",
-      change: { value: 0.2, type: 'increase' as const },
+      change: { value: 0.2, type: 'increase' },
     },
     {
       title: "Hours Mentored",
       value: 156,
-      change: { value: 15, type: 'increase' as const },
+      change: { value: 15, type: 'increase' },
     },
     {
       title: "Completion Rate",
       value: "94%",
-      change: { value: 2, type: 'increase' as const },
+      change: { value: 2, type: 'increase' },
     },
     {
       title: "Earnings This Month",
       value: "$2,400",
-      change: { value: 10, type: 'increase' as const },
+      change: { value: 10, type: 'increase' },
     },
   ];
 

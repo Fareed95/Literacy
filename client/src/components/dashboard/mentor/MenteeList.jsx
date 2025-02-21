@@ -2,16 +2,7 @@
 
 import { motion } from "framer-motion";
 
-interface Mentee {
-  id: string;
-  name: string;
-  progress: number;
-  lastSession: string;
-  nextSession: string;
-  status: 'active' | 'completed' | 'pending';
-}
-
-const MenteeCard = ({ mentee }: { mentee: Mentee }) => (
+const MenteeCard = ({ mentee }) => (
   <div className="glass p-4 rounded-xl hover-glow">
     <div className="flex justify-between items-start">
       <div>
@@ -44,7 +35,7 @@ const MenteeCard = ({ mentee }: { mentee: Mentee }) => (
 
 export default function MenteeList() {
   // Mock data - replace with actual data fetching
-  const mentees: Mentee[] = [
+  const mentees = [
     {
       id: '1',
       name: 'Alex Johnson',

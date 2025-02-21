@@ -1,18 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; 
 
-interface Session {
-  id: string;
-  mentee: string;
-  date: string;
-  time: string;
-  duration: string;
-  topic: string;
-  status: 'upcoming' | 'completed' | 'cancelled';
-}
-
-const SessionCard = ({ session }: { session: Session }) => (
+const SessionCard = ({ session }) => (
   <div className="glass p-4 rounded-xl hover-glow">
     <div className="flex justify-between items-start">
       <div>
@@ -49,7 +39,7 @@ const SessionCard = ({ session }: { session: Session }) => (
 
 export default function SessionCalendar() {
   // Mock data - replace with actual data fetching
-  const sessions: Session[] = [
+  const sessions = [
     {
       id: '1',
       mentee: 'Alex Johnson',
