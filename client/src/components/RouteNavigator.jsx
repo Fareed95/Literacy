@@ -8,6 +8,7 @@ const RouteNavigator = () => {
     { path: '/avatar', label: 'AI Avatar' },
     { path: '/quiz', label: 'Quiz' },
     { path: '/Learning', label: 'Learning' },
+    { path: '/userInfo', label: 'Profile' },
     { path: '/Lobby', label: 'Chat Lobby' },
     { path: '/Login', label: 'Login' },
     { path: '/portfolio', label: 'Portfolio' },
