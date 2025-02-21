@@ -4,8 +4,7 @@ import { motion } from 'framer-motion'
 import { useSession } from 'next-auth/react'
 import { usePortfolio } from '@/hooks/usePortfolio'
 import { useAuth } from '@/app/context/AuthContext'
-import { useRouter } from 'next/navigation'
-import SplashCursor from '@/components/splashCursor'
+import { useRouter, useParams } from 'next/navigation'
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -17,8 +16,13 @@ const HeroBackground = () => (
 );
 
 const Page = () => {
-  const { email } = useAuth();
-  const { portfolioData, updateUserDetails, loading, error } = usePortfolio(email);
+  const { email: authEmail } = useAuth();
+  const router = useRouter();
+  const params = useParams();
+  const viewedEmail = params.email;
+  const isOwner = authEmail === viewedEmail;
+  
+  const { portfolioData, updateUserDetails, loading, error } = usePortfolio(viewedEmail);
   const [isEditing, setIsEditing] = useState(false);
   const [userDetails, setUserDetails] = useState({
     name: '',
@@ -27,13 +31,6 @@ const Page = () => {
     location: '',
     website: '',
   });
-  const router = useRouter();
-
-  useEffect(() => {
-    if (email) {
-      router.replace(`/portfolio/${encodeURIComponent(email)}`);
-    }
-  }, [email, router]);
 
   useEffect(() => {
     if (portfolioData?.userDetails) {
@@ -67,8 +64,112 @@ const Page = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500">Error loading portfolio data</p>
+      <div className="min-h-screen relative">
+        <HeroBackground />
+        <div className="flex items-center justify-center min-h-screen">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass p-8 rounded-2xl text-center max-w-md mx-4"
+          >
+            <h2 className="text-2xl font-bold text-electric-blue mb-4">Portfolio Not Found</h2>
+            <p className="text-neon-cyan mb-6">
+              {isOwner 
+                ? "You haven't created your portfolio yet. Click below to get started!"
+                : "This user hasn't created their portfolio yet."}
+            </p>
+            {isOwner && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsEditing(true)}
+                className="neon-btn"
+              >
+                Create Portfolio
+              </motion.button>
+            )}
+          </motion.div>
+        </div>
+        {isOwner && isEditing && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="glass p-8 rounded-2xl max-w-2xl w-full mx-4"
+            >
+              <h2 className="text-2xl font-bold text-electric-blue mb-6">Create Your Portfolio</h2>
+              <form onSubmit={handleUpdateUserDetails} className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-neon-cyan block mb-2">Name</label>
+                    <input
+                      type="text"
+                      value={userDetails.name}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-neon-cyan block mb-2">Title</label>
+                    <input
+                      type="text"
+                      value={userDetails.title}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-neon-cyan block mb-2">Bio</label>
+                    <textarea
+                      value={userDetails.bio}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, bio: e.target.value }))}
+                      className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue h-32"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-neon-cyan block mb-2">Location</label>
+                    <input
+                      type="text"
+                      value={userDetails.location}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, location: e.target.value }))}
+                      className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-neon-cyan block mb-2">Website</label>
+                    <input
+                      type="url"
+                      value={userDetails.website}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, website: e.target.value }))}
+                      className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-4">
+                  <motion.button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="glass px-6 py-2 rounded-lg hover:bg-deep-indigo/20"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    type="submit"
+                    className="neon-btn"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Create Portfolio
+                  </motion.button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
       </div>
     );
   }
@@ -276,18 +377,20 @@ const Page = () => {
         </motion.section>
       </div>
 
-      {/* Edit Profile Button */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsEditing(true)}
-        className="fixed bottom-8 right-8 neon-btn"
-      >
-        Edit Profile
-      </motion.button>
+      {/* Edit Profile Button - Only show if user is the owner */}
+      {isOwner && (
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsEditing(true)}
+          className="fixed bottom-8 right-8 neon-btn"
+        >
+          Edit Profile
+        </motion.button>
+      )}
 
-      {/* Edit Modal */}
-      {isEditing && (
+      {/* Edit Modal - Only accessible to owner */}
+      {isOwner && isEditing && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
