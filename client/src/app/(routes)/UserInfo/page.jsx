@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-
+import PrevCources from '@/components/PrevCources';
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
     <div className="absolute inset-0 bg-gradient-to-b from-deep-indigo/20 via-soft-purple/10 to-electric-blue/5" />
@@ -210,6 +210,8 @@ const UserInfoPage = () => {
             Save Changes
           </motion.button>
         </motion.div>
+
+        <PrevCources />
       </div>
     </div>
   );
