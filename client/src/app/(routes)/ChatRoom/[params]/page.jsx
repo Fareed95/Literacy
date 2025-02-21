@@ -3,41 +3,7 @@ import Link from 'next/link';
 import React, { useEffect, useState, useRef } from 'react';
 import { useUserContext } from '@/app/context/Userinfo';
 import { useRouter, useParams } from 'next/navigation';
-import { Search, Menu, MoreVertical, MessageCircle, Send, Video, Users, ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
-
-const HeroBackground = () => (
-  <div className="absolute inset-0 -z-10 overflow-hidden">
-    <div className="absolute inset-0 bg-neutral-950" />
-    <div className="absolute inset-0 bg-grid-small-white/[0.05] -z-10" />
-    <div className="absolute inset-0 bg-dot-white/[0.05] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
-    <div className="absolute inset-0 bg-gradient-radial from-white/10 via-transparent to-transparent" />
-  </div>
-);
-
-const Message = ({ content, sender, timestamp, isCurrentUser }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}
-  >
-    <div className={`max-w-[70%] ${isCurrentUser ? 'order-2' : 'order-1'}`}>
-      <div className={`flex items-end space-x-2 ${isCurrentUser ? 'flex-row-reverse space-x-reverse' : 'flex-row'}`}>
-        <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-sm font-medium text-neutral-200">
-          {sender[0].toUpperCase()}
-        </div>
-        <div className={`px-4 py-2 rounded-xl ${
-          isCurrentUser 
-            ? 'bg-neutral-800 text-neutral-200' 
-            : 'bg-neutral-900/50 text-neutral-300'
-        }`}>
-          <p className="text-sm">{content}</p>
-          <p className="text-xs text-neutral-500 mt-1">{timestamp}</p>
-        </div>
-      </div>
-    </div>
-  </motion.div>
-);
+import { Search, Menu, MoreVertical, MessageCircle, Send, Video } from 'lucide-react';
 
 const Page = () => {
   const people = [
@@ -135,25 +101,12 @@ const Page = () => {
   if (!contextisLoggedIn || contextemail === '') {
     return (
       <div className="flex items-center justify-center min-h-screen bg-neutral-950">
-        <HeroBackground />
-        <motion.div 
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="glass p-8 rounded-2xl shadow-xl text-center max-w-md w-full mx-4"
-        >
-          <h1 className="text-3xl font-semibold text-electric-blue mb-4">Please Login First</h1>
-          <p className="text-neon-cyan mb-6">You need to be logged in to access the chat.</p>
-          <Link href="/login">
-            <motion.button 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="neon-btn w-full"
-            >
-              Go to Login
-            </motion.button>
+        <div className="bg-neutral-900 p-8 rounded-lg shadow-xl text-center">
+          <h1 className="text-3xl font-semibold text-white mb-4">Please Login First</h1>
+          <Link href="/login" className="text-neutral-200 hover:text-white transition-colors">
+            Go to Login
           </Link>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -164,58 +117,161 @@ const Page = () => {
   );
 
   return (
-    <div className="min-h-screen bg-neutral-950 relative">
-      <HeroBackground />
-      
-      <div className="max-w-6xl mx-auto h-screen flex flex-col">
+    <div className="flex h-screen bg-neutral-950">
+      {/* Left Sidebar */}
+      <div className="w-96 bg-neutral-900 border-r border-neutral-800 flex flex-col">
         {/* Header */}
-        <div className="bg-neutral-900/50 border-b border-neutral-800 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/Lobby">
-                <button className="p-2 hover:bg-neutral-800 rounded-lg transition-colors">
-                  <ArrowLeft className="w-5 h-5 text-neutral-400" />
-                </button>
-              </Link>
-              <div>
-                <h1 className="text-xl font-semibold text-neutral-200">Java Beginners</h1>
-                <div className="flex items-center text-neutral-400 text-sm">
-                  <Users className="w-4 h-4 mr-2" />
-                  <span>24 participants</span>
-                </div>
-              </div>
-            </div>
+        <div className="p-4 bg-neutral-800 border-b border-neutral-700 flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <div className="w-10 h-10 bg-neutral-700 rounded-full"></div>
+            <span className="font-semibold text-white">{contextemail}</span>
+          </div>
+          <div className="flex items-center space-x-3 text-neutral-400">
+            <Menu className="w-5 h-5 cursor-pointer hover:text-white transition-colors" />
+            <MoreVertical className="w-5 h-5 cursor-pointer hover:text-white transition-colors" />
           </div>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4">
-          {messages.map((msg) => (
-            <Message key={msg.id} {...msg} />
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input */}
-        <div className="bg-neutral-900/50 border-t border-neutral-800 p-4">
-          <form onSubmit={sendMessage} className="flex space-x-4">
+        {/* Search */}
+        <div className="p-3 bg-neutral-900">
+          <div className="relative">
             <input
               type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type your message..."
-              className="flex-1 bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-2 text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-neutral-600 transition-colors"
+              placeholder="Search or start new chat"
+              className="w-full py-2 px-4 pl-10 bg-neutral-800 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-neutral-600 placeholder-neutral-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <motion.button
-              type="submit"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-4 py-2 rounded-xl transition-colors"
-            >
-              <Send className="w-5 h-5" />
-            </motion.button>
-          </form>
+            <Search className="w-5 h-5 text-neutral-500 absolute left-3 top-2.5" />
+          </div>
         </div>
+
+        {/* Chats List */}
+        <div className="flex-1 overflow-y-auto hide-scrollbar">
+          {filteredPeople.map((person, index) => (
+            <div
+              key={index}
+
+              onClick={() => {
+                
+                
+                  if (contextisLoggedIn && contextemail && person.email) {
+                    const generateRoomNames = () => {
+                      const emails = [
+                        contextemail.replace('@', '.'),
+                        person.email.replace('@', '.'),
+                      ].sort();
+                      roomNamesRef.current = `${emails[0]}_${emails[1]}`;
+                      contextSetSelectedPerson(person);
+                      router.push(`/ChatRoom/${roomNamesRef.current}`);
+                      setPerson('');
+                    };
+                    generateRoomNames();
+                  }
+               else{
+                console.log(contextemail,person)
+               }
+
+                
+                
+              }}
+              className={`p-4 border-b border-neutral-800 hover:bg-neutral-800 cursor-pointer transition-colors ${
+                selectedPerson?.email === person.email ? 'bg-neutral-800' : ''
+              }`}
+            >
+              <div className="flex items-center space-x-3 ">
+                <div className="w-12 h-12 bg-neutral-700 rounded-full flex-shrink-0"></div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-baseline">
+                    <h3 className="text-sm font-semibold text-white truncate">{person.name}</h3>
+                    <span className="text-xs text-neutral-500">{person.time}</span>
+                  </div>
+                  <p className="text-sm text-neutral-400 truncate">{person.lastMessage}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Right Chat Area */}
+      <div className="flex-1 flex flex-col bg-neutral-950">
+        {contextSelectedPerson ? (
+          <>
+            {/* Chat Header */}
+            <div className="p-4 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-neutral-700 rounded-full"></div>
+                <div>
+                  <h2 className="font-semibold text-white">{contextSelectedPerson.name}</h2>
+                  <p className="text-sm text-neutral-400">{contextSelectedPerson.email}</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Link href={`/VideoCall/${roomNamesRef.current}`}>
+                  <Video className="w-5 h-5 text-neutral-400 cursor-pointer hover:text-white transition-colors" />
+                </Link>
+                <MoreVertical className="w-5 h-5 text-neutral-400 cursor-pointer hover:text-white transition-colors" />
+              </div>
+            </div>
+
+            {/* Chat Messages Area */}
+            <div className="flex-1 p-4 bg-neutral-950 overflow-y-auto">
+              {messages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`flex ${
+                    msg.username === contextemail ? 'justify-end' : 'justify-start'
+                  } mb-4`}
+                >
+                  <div
+                    className={`max-w-[80%] p-3 rounded-lg ${
+                      msg.username === contextemail
+                        ? 'bg-neutral-700 text-white'
+                        : 'bg-neutral-800 text-white'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm text-neutral-300">
+                        {msg.username === contextemail ? 'You' : msg.username}
+                      </span>
+                      <span className="text-xs text-neutral-400">{msg.timestamp}</span>
+                    </div>
+                    <p className="text-sm">{msg.message}</p>
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Message Input */}
+            <form
+              onSubmit={sendMessage}
+              className="p-4 bg-neutral-900 border-t border-neutral-800 flex items-center space-x-2"
+            >
+              <input
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Type a message"
+                className="flex-grow p-3 rounded-lg bg-neutral-800 text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-600"
+              />
+              <button
+                type="submit"
+                className="bg-neutral-700 p-3 rounded-full hover:bg-neutral-600 transition-colors"
+              >
+                <Send className="w-5 h-5 text-white" />
+              </button>
+            </form>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center bg-neutral-950 text-neutral-500">
+            <div className="text-center">
+              <MessageCircle className="w-16 h-16 mx-auto mb-4 text-neutral-700" />
+              <p className="text-neutral-400">Select a chat to start messaging</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

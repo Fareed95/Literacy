@@ -34,9 +34,6 @@ class CertificateView(APIView):
             context = {
                 'name': certificate.user.name,
                 'name_of_certificate': certificate.name,
-                'started_at': certificate.started_at.strftime("%d %B %Y"),
-                'ended_at': certificate.ended_at.strftime("%d %B %Y"),
-                'additionol_testseries_attempted': certificate.additionol_testseries_attempted,
                 'competition_battled': certificate.competition_battled,
                 'competition_won': certificate.competition_won,
             }
@@ -76,9 +73,6 @@ class GenerateCertificate(APIView):
         context = {
             'name': certificate.user.name,
             'name_of_certificate': certificate.name,
-            'started_at': certificate.started_at,
-            'ended_at': certificate.ended_at,
-            'additionol_testseries_attempted': certificate.additionol_testseries_attempted,
             'competition_battled': certificate.competition_battled,
             'competition_won': certificate.competition_won,
         }
