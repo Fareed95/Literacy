@@ -104,7 +104,7 @@ export default function Home() {
                 blurAmount={3}
                 borderColor="#ffffff"
                 glowColor="rgba(255, 255, 255, 0.5)"
-                animationDuration={0.3}
+                animationDuration={0.2}
                 pauseBetweenAnimations={2}
               />
             </motion.div>

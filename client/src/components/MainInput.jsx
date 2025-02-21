@@ -158,7 +158,7 @@ function MainInput() {
       )}
 
       {roadmapData && !loading && (
-        <div className="mt-8 w-full glass p-6 rounded-xl page-transition">
+        <div className="mt-8 w-full p-6 rounded-xl page-transition">
           <Timeline_roadmap_function roadmapData={roadmapData} />
         </div>
       )}

@@ -1,24 +1,112 @@
-'use client'
-import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { useSession } from 'next-auth/react'
-import { usePortfolio } from '@/hooks/usePortfolio'
-import { useAuth } from '@/app/context/AuthContext'
-import { useRouter, useParams } from 'next/navigation'
+'use client';
 
-const HeroBackground = () => (
-  <div className="absolute inset-0 -z-10 overflow-hidden">
-    <div className="absolute inset-0 bg-gradient-to-b from-deep-indigo/20 via-soft-purple/10 to-electric-blue/5" />
-    <div className="absolute inset-0 bg-grid-small-white/[0.2] -z-10" />
-    <div className="absolute inset-0 bg-dot-white/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
-    <div className="absolute inset-0 bg-gradient-radial from-soft-purple/20 via-transparent to-transparent" />
-  </div>
+import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { usePortfolio } from '@/hooks/usePortfolio';
+import { useAuth } from '@/app/context/AuthContext';
+import SplashCursor from '@/components/SplashCursor';
+import { ExternalLink, Globe } from "lucide-react";
+import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
+import { Vortex } from '@/components/ui/vortex';
+import { InfiniteMovingText } from '@/components/ui/infinite-moving-text';
+import { WavyBackground } from '@/components/ui/wavy-background';
+
+
+
+const StatsCard = ({ icon: Icon, label, value }) => (
+  <motion.div
+    whileHover={{ scale: 1.05 }}
+    className="rounded-xl border border-neutral-700 p-6"
+  >
+    <div className="flex items-center gap-4">
+      <div className="p-3 rounded-lg bg-cyan-500/10">
+        <Icon className="w-6 h-6 text-cyan-500" />
+      </div>
+      <div>
+        <p className="text-neutral-400 text-sm">{label}</p>
+        <h4 className="text-2xl font-bold text-neutral-200">{value}</h4>
+      </div>
+    </div>
+  </motion.div>
 );
 
-const Page = () => {
+// Add SparklesCore component
+const SparklesCore = ({ children }) => {
+  const [particles, setParticles] = useState([]);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const generateParticles = () => {
+      const newParticles = Array.from({ length: 50 }).map((_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 2 + 1,
+        duration: Math.random() * 2 + 1,
+      }));
+      setParticles(newParticles);
+    };
+
+    generateParticles();
+    const interval = setInterval(generateParticles, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative">
+      {particles.map((particle) => (
+        <motion.div
+          key={particle.id}
+          className="absolute bg-cyan-500/30 rounded-full pointer-events-none"
+          style={{
+            width: particle.size,
+            height: particle.size,
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+          }}
+          animate={{
+            opacity: [0, 1, 0],
+            scale: [0, 1, 0],
+          }}
+          transition={{
+            duration: particle.duration,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+      ))}
+      {children}
+    </div>
+  );
+};
+
+// Modify TextRevealCard to remove background
+const TextRevealCard = ({ children }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative overflow-hidden rounded-xl"
+    >
+      <motion.div
+        className="relative z-10"
+        animate={{
+          y: isHovered ? -5 : 0,
+        }}
+        transition={{ duration: 0.3 }}
+      >
+        {children}
+      </motion.div>
+    </motion.div>
+  );
+};
+
+const Page = ({ params }) => {
   const { email: authEmail } = useAuth();
-  const params = useParams();
-  const { portfolioData, updateUserDetails, loading, error } = usePortfolio(params.email);
+  const isOwner = authEmail === decodeURIComponent(params.email);
+  const { portfolioData, updateUserDetails, loading, error } = usePortfolio(decodeURIComponent(params.email));
   const [isEditing, setIsEditing] = useState(false);
   const [userDetails, setUserDetails] = useState({
     name: '',
@@ -27,32 +115,18 @@ const Page = () => {
     location: '',
     website: '',
   });
-  const router = useRouter();
 
   useEffect(() => {
-    // Fetch user details and interview slots from your API
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/api/userdetails/${params.email}/`);
-        if (response.ok) {
-          const data = await response.json();
-          setUserDetails({
-            name: data.name || '',
-            title: data.title || '',
-            bio: data.bio || '',
-            location: data.location || '',
-            website: data.website || '',
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-
-    if (params.email) {
-      fetchUserData();
+    if (portfolioData?.userDetails) {
+      setUserDetails({
+        name: portfolioData.userDetails.name || '',
+        title: portfolioData.userDetails.title || '',
+        bio: portfolioData.userDetails.bio || '',
+        location: portfolioData.userDetails.location || '',
+        website: portfolioData.userDetails.website || '',
+      });
     }
-  }, [params.email]);
+  }, [portfolioData]);
 
   const handleUpdateUserDetails = async (e) => {
     e.preventDefault();
@@ -67,7 +141,11 @@ const Page = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neutral-400"></div>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full"
+        />
       </div>
     );
   }
@@ -75,302 +153,355 @@ const Page = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
-        <motion.div
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass p-8 rounded-2xl text-center max-w-md mx-4"
+          className="bg-neutral-900/50 border border-neutral-800 p-8 rounded-2xl backdrop-blur-md text-center"
         >
-          <h2 className="text-2xl font-bold text-electric-blue mb-4">Portfolio Not Found</h2>
-          <p className="text-neon-cyan mb-6">
-            {params.email === authEmail 
-              ? "You haven't created your portfolio yet. Would you like to create one?"
-              : "This user hasn't created their portfolio yet."}
-          </p>
-          {params.email === authEmail && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsEditing(true)}
-              className="neon-btn"
-            >
-              Create Portfolio
-            </motion.button>
-          )}
+          <p className="text-red-400">Error loading portfolio data</p>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <>
-    <HeroBackground/>
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
-      {isEditing ? (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass p-8 rounded-2xl max-w-2xl mx-4 w-full"
-        >
-          <h2 className="text-2xl font-bold text-electric-blue mb-6">
-            {portfolioData ? 'Edit Portfolio' : 'Create Portfolio'}
-          </h2>
-          <form onSubmit={handleUpdateUserDetails} className="space-y-6">
-            <div className="space-y-4">
-              <div>
-                <label className="text-neon-cyan block mb-2">Name</label>
-                <input
-                  type="text"
-                  value={userDetails.name}
-                  onChange={(e) => setUserDetails(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-neon-cyan block mb-2">Title</label>
-                <input
-                  type="text"
-                  value={userDetails.title}
-                  onChange={(e) => setUserDetails(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-neon-cyan block mb-2">Bio</label>
-                <textarea
-                  value={userDetails.bio}
-                  onChange={(e) => setUserDetails(prev => ({ ...prev, bio: e.target.value }))}
-                  className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue h-32 resize-none"
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-neon-cyan block mb-2">Location</label>
-                  <input
-                    type="text"
-                    value={userDetails.location}
-                    onChange={(e) => setUserDetails(prev => ({ ...prev, location: e.target.value }))}
-                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
-                  />
-                </div>
-                <div>
-                  <label className="text-neon-cyan block mb-2">Website</label>
-                  <input
-                    type="url"
-                    value={userDetails.website}
-                    onChange={(e) => setUserDetails(prev => ({ ...prev, website: e.target.value }))}
-                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-end space-x-4">
-              <motion.button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                className="glass px-6 py-2 rounded-lg hover:bg-deep-indigo/20"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Cancel
-              </motion.button>
-              <motion.button
-                type="submit"
-                className="neon-btn"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {portfolioData ? 'Save Changes' : 'Create Portfolio'}
-              </motion.button>
-            </div>
-          </form>
-        </motion.div>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass p-8 rounded-2xl max-w-4xl mx-4 w-full max-h-[80vh] overflow-y-auto hide-scrollbar"
-        >
-          {/* Header Section */}
-          <div className="flex justify-between items-center mb-8 sticky top-0 bg-neutral-950/50 backdrop-blur-md p-4 rounded-xl z-10">
-            <div>
-              <h2 className="text-2xl font-bold text-electric-blue">{userDetails.name}</h2>
-              <p className="text-neon-cyan">{userDetails.title}</p>
-            </div>
-            {params.email === authEmail && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsEditing(true)}
-                className="glass px-4 py-2 rounded-lg hover:bg-deep-indigo/20"
-              >
-                Edit Profile
-              </motion.button>
-            )}
-          </div>
-
-          <div className="space-y-12">
-            {/* About Section */}
-            {userDetails.bio && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass p-6 rounded-xl"
-              >
-                <h3 className="text-lg font-semibold text-electric-blue mb-2">About</h3>
-                <p className="text-neutral-300">{userDetails.bio}</p>
-              </motion.div>
-            )}
-
-            {/* Education Section */}
-            {portfolioData?.userDetails?.[0]?.education?.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass p-6 rounded-xl"
-              >
-                <h3 className="text-lg font-semibold text-electric-blue mb-4">Education</h3>
-                {portfolioData.userDetails[0].education.map((edu) => (
-                  <div key={edu.id} className="border-l-2 border-electric-blue pl-4 mb-4">
-                    <h4 className="text-neon-cyan font-semibold">{edu.degree}</h4>
-                    <p className="text-neutral-300">{edu.field_of_study}</p>
-                    <p className="text-neutral-400">{edu.University}, {edu.location}</p>
-                    <p className="text-neutral-400">{edu.start_date} - {edu.end_date}</p>
-                    {edu.current_grade && (
-                      <p className="text-electric-blue mt-1">Grade: {edu.current_grade}</p>
-                    )}
-                  </div>
-                ))}
-              </motion.div>
-            )}
-
-            {/* Skills Section */}
-            {portfolioData?.userDetails?.[0]?.toolname?.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass p-6 rounded-xl"
-              >
-                <h3 className="text-lg font-semibold text-electric-blue mb-4">Skills</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {portfolioData.userDetails[0].toolname.map((category) => (
-                    <div key={category.id} className="glass p-4 rounded-lg hover:bg-neutral-800/30 transition-colors">
-                      <h4 className="text-neon-cyan font-semibold mb-2">{category.name}</h4>
-                      {category.tools.length > 0 ? (
-                        <ul className="space-y-1">
-                          {category.tools.map((tool) => (
-                            <li key={tool.id} className="text-neutral-300">{tool.name}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-neutral-400 text-sm italic">Skills to be added</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Certificates Section */}
-            {portfolioData?.userDetails?.[0]?.certificate?.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass p-6 rounded-xl"
-              >
-                <h3 className="text-lg font-semibold text-electric-blue mb-4">Certificates</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {portfolioData.userDetails[0].certificate.map((cert) => (
-                    <div key={cert.id} className="glass p-4 rounded-lg hover:bg-neutral-800/30 transition-colors">
-                      <h4 className="text-neon-cyan font-semibold">{cert.name}</h4>
-                      <p className="text-neutral-400 text-sm">
-                        {new Date(cert.started_at).toLocaleDateString()} - {new Date(cert.ended_at).toLocaleDateString()}
-                      </p>
-                      <div className="mt-2 space-y-1 text-sm">
-                        <p className="text-neutral-300">Tests Attempted: {cert.additionol_testseries_attempted}</p>
-                        <p className="text-neutral-300">Competitions: {cert.competition_battled}</p>
-                        <p className="text-neutral-300">Wins: {cert.competition_won}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Projects Section */}
-            {portfolioData?.userDetails?.[0]?.project?.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass p-6 rounded-xl"
-              >
-                <h3 className="text-lg font-semibold text-electric-blue mb-4">Projects</h3>
-                <div className="space-y-4">
-                  {portfolioData.userDetails[0].project.map((proj) => (
-                    <div key={proj.id} className="glass p-4 rounded-lg hover:bg-neutral-800/30 transition-colors">
-                      <h4 className="text-neon-cyan font-semibold">{proj.name}</h4>
-                      <p className="text-neutral-300 mt-2">{proj.description}</p>
-                      {proj.link && proj.link.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {proj.link.map((link) => (
-                            <a
-                              key={link.id}
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center px-3 py-1 rounded-full bg-electric-blue/20 text-electric-blue hover:bg-electric-blue/30 transition-colors text-sm"
-                            >
-                              {link.name}
-                            </a>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Contact Information */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="glass p-6 rounded-xl"
-            >
-              <h3 className="text-lg font-semibold text-electric-blue mb-4">Contact</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-neon-cyan">Email</p>
-                  <p className="text-neutral-300">{portfolioData?.userDetails?.[0]?.email}</p>
-                </div>
-                {userDetails.location && (
-                  <div>
-                    <p className="text-neon-cyan">Location</p>
-                    <p className="text-neutral-300">{userDetails.location}</p>
-                  </div>
+    <div className="min-h-screen bg-neutral-950">
+      <SparklesCore>
+        <SplashCursor />
+        <WavyBackground>
+        {/* Hero Section */}
+        <div className="relative pt-32 pb-16">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl mx-auto px-4"
+          >
+            <TextRevealCard>
+              <div className="text-center">
+                <motion.h1 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 mb-4"
+                >
+                  {userDetails.name || 'Portfolio'}
+                </motion.h1>
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-2xl text-neutral-400 mb-6"
+                >
+                  {userDetails.title}
+                </motion.p>
+                {userDetails.bio && (
+                  <motion.p 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-neutral-300 max-w-2xl mx-auto mb-8"
+                  >
+                    {userDetails.bio}
+                  </motion.p>
                 )}
-                {userDetails.website && (
-                  <div>
-                    <p className="text-neon-cyan">Website</p>
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex items-center justify-center space-x-6"
+                >
+                  {userDetails.location && (
+                    <span className="text-neutral-400 flex items-center">
+                      <Globe className="w-4 h-4 mr-2" /> {userDetails.location}
+                    </span>
+                  )}
+                  {userDetails.website && (
                     <a
                       href={userDetails.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-electric-blue hover:text-neon-cyan transition-colors"
+                      className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center"
                     >
-                      {userDetails.website}
+                      <ExternalLink className="w-4 h-4 mr-2" /> Website
                     </a>
-                  </div>
-                )}
+                  )}
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
-        </motion.div>
+            </TextRevealCard>
+          </motion.div>
+        </div>
+        </WavyBackground>
+        <div className="max-w-7xl mx-auto px-4 space-y-24 pb-32">
+          {/* Skills Section */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative"
+          >
+            <TextRevealCard>
+              <div>
+                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Skills & Expertise</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {portfolioData?.toolNames?.map((toolName) => (
+                    <motion.div
+                      key={toolName.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      whileHover={{ y: -5 }}
+                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
+                    >
+                      <h3 className="text-xl font-semibold text-neutral-200 mb-4">{toolName.name}</h3>
+                      <div className="space-y-3">
+                        {toolName.tools?.map((tool) => (
+                          <div key={tool.id} className="space-y-2">
+                            <p className="text-blue-400 font-medium">{tool.name}</p>
+                            {tool.components?.map((component) => (
+                              <p key={component.id} className="text-neutral-400 pl-4 text-sm">
+                                • {component.name}
+                              </p>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </TextRevealCard>
+          </motion.section>
+
+          <InfiniteMovingText />
+
+          {/* Education Section */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative"
+          >
+            <TextRevealCard>
+              <div>
+                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Education</h2>
+                <div className="space-y-6">
+                  {portfolioData?.userDetails?.education?.map((edu) => (
+                    <motion.div
+                      key={edu.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
+                    >
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <h3 className="text-xl font-semibold text-neutral-200">{edu.degree}</h3>
+                          <p className="text-blue-400 mt-2">{edu.field_of_study}</p>
+                          <p className="text-neutral-400 mt-1">{edu.University}</p>
+                          <p className="text-neutral-400">{edu.location}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-neutral-300">{edu.start_date} - {edu.end_date}</p>
+                          {edu.current_grade && (
+                            <p className="text-blue-400 mt-2">Grade: {edu.current_grade}</p>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </TextRevealCard>
+          </motion.section>
+
+          {/* Projects Section */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative"
+          >
+            <TextRevealCard>
+              <div>
+                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Projects</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {portfolioData?.userDetails?.project?.map((proj) => (
+                    <motion.div
+                      key={proj.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      whileHover={{ y: -5 }}
+                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
+                    >
+                      <h3 className="text-xl font-semibold text-neutral-200">{proj.name}</h3>
+                      <p className="text-neutral-400 mt-4">{proj.description}</p>
+                      <div className="mt-6">
+                        <p className="text-blue-400">
+                          {proj.start_date} - {proj.end_date || 'Present'}
+                        </p>
+                        {proj.link && proj.link.length > 0 && (
+                          <div className="flex flex-wrap gap-3 mt-4">
+                            {proj.link.map((link) => (
+                              <motion.a
+                                key={link.id}
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-4 py-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-300 text-sm"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                              >
+                                {link.name}
+                              </motion.a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </TextRevealCard>
+          </motion.section>
+
+          {/* Certificates Section */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative"
+          >
+            <TextRevealCard>
+              <div>
+                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Certificates</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {portfolioData?.userDetails?.certificate?.map((cert) => (
+                    <motion.div
+                      key={cert.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      whileHover={{ y: -5 }}
+                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
+                    >
+                      <h3 className="text-xl font-semibold text-neutral-200">{cert.name}</h3>
+                      <p className="text-blue-400 mt-2">{cert.issuing_organization}</p>
+                      <p className="text-neutral-400 mt-4">Issued: {cert.issue_date}</p>
+                      {cert.expiry_date && (
+                        <p className="text-neutral-400">Expires: {cert.expiry_date}</p>
+                      )}
+                      {cert.credential_id && (
+                        <p className="text-blue-400 mt-2">Credential ID: {cert.credential_id}</p>
+                      )}
+                      {cert.credential_url && (
+                        <motion.a
+                          href={cert.credential_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block px-4 py-2 mt-4 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-300 text-sm"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          View Certificate
+                        </motion.a>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </TextRevealCard>
+          </motion.section>
+        </div>
+      </SparklesCore>
+
+      {/* Edit Profile Button - Only visible to owner */}
+      {isOwner && (
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsEditing(true)}
+          className="fixed bottom-8 right-8 px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition-all duration-300"
+        >
+          Edit Profile
+        </motion.button>
+      )}
+
+      {/* Edit Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-neutral-900/80 p-8 rounded-2xl max-w-2xl w-full mx-4 border border-neutral-800 backdrop-blur-md"
+          >
+            <h2 className="text-2xl font-bold text-neutral-200 mb-6">Edit Profile</h2>
+            <form onSubmit={handleUpdateUserDetails} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-neutral-400 block mb-2">Name</label>
+                  <input
+                    type="text"
+                    value={userDetails.name}
+                    onChange={(e) => setUserDetails(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-neutral-400 block mb-2">Title</label>
+                  <input
+                    type="text"
+                    value={userDetails.title}
+                    onChange={(e) => setUserDetails(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-neutral-400 block mb-2">Bio</label>
+                <textarea
+                  value={userDetails.bio}
+                  onChange={(e) => setUserDetails(prev => ({ ...prev, bio: e.target.value }))}
+                  rows={4}
+                  className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none resize-none"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-neutral-400 block mb-2">Location</label>
+                  <input
+                    type="text"
+                    value={userDetails.location}
+                    onChange={(e) => setUserDetails(prev => ({ ...prev, location: e.target.value }))}
+                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-neutral-400 block mb-2">Website</label>
+                  <input
+                    type="url"
+                    value={userDetails.website}
+                    onChange={(e) => setUserDetails(prev => ({ ...prev, website: e.target.value }))}
+                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end space-x-4">
+                <motion.button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="px-6 py-2 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 rounded-lg transition-all duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  type="submit"
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-all duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Save Changes
+                </motion.button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
       )}
     </div>
-    </>
   );
 };
 
-export default Page;
+export default Page; 
