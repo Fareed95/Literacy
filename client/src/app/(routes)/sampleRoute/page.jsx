@@ -1,8 +1,71 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useSession } from "next-auth/react";
+
+const hardcodedData = {
+  id: 26,
+  name: "Faddy",
+  email: "www.fareedsayed786@gmail.com",
+  is_staff: false,
+  testimonial: [],
+  is_company: true,
+  companies: [
+    {
+      user_email: "www.fareedsayed786@gmail.com",
+      user_id: 26,
+      id: 2,
+      name: "Faddy",
+      description: "tere bhai ki company hi bkl",
+      logo: null,
+      website: "google.com",
+      location: "aajiiii tund mera ",
+      industry: "Food ",
+      founded_at: "2025-02-20",
+      contact_phone: "998767831",
+      internships: [
+        {
+          id: 1,
+          company: 2,
+          title: "Django",
+          description: "lelo bhai django ka internship hai mera ",
+          stipend: "12000",
+          duration: "3 months ",
+          location: "mumbai",
+          skills_required: "django",
+          openings: 1,
+          application_deadline: "2025-02-19",
+          posted_at: "2025-01-31T14:12:15Z",
+          students_for_interview: [
+            {
+              id: 1,
+              user: 30,
+              user_name: "FAREED wHATSAPP",
+              internship: 1,
+              internship_name: "Django",
+              registered_at: "2025-02-20T16:00:12.595907Z",
+              is_selected: true,
+              company_name: "Faddy",
+              interviw_time: "2025-03-15T14:30:00Z"
+            }
+          ],
+          students_under_review: [
+            {
+              id: 2,
+              user: 36,
+              user_name: "Study!",
+              internship: 1,
+              internship_name: "Django",
+              registered_at: "2025-02-20T09:02:00Z",
+              is_selected: false,
+              company_name: "Faddy",
+              interviw_time: null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
 
 const StudentCard = ({ student }) => (
   <motion.div
@@ -34,99 +97,10 @@ const StudentCard = ({ student }) => (
 );
 
 export default function SampleRoute() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { data: session } = useSession();
-
-  useEffect(() => {
-    if (!session?.user?.accessToken) {
-      setError('Please log in to view the data');
-      setLoading(false);
-      return;
-    }
-
-    fetch('http://localhost:8000/api/user', {
-      headers: {
-        'Authorization': `Bearer ${session.user.accessToken}`,
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(result => {
-        console.log('Full API Response:', result);
-        console.log('Companies:', result.companies);
-        console.log('First Company:', result.companies[0]);
-        console.log('Internships:', result.companies[0].internships);
-        console.log('First Internship:', result.companies[0].internships[0]);
-        console.log('Students for Interview:', result.companies[0].internships[0].students_for_interview);
-        console.log('Students under Review:', result.companies[0].internships[0].students_under_review);
-        setData(result);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        setError(error.message);
-        setLoading(false);
-      });
-  }, [session]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black p-6 mt-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-neutral-glass border border-glass-border p-6 rounded-2xl backdrop-blur-md">
-            <p className="text-neutral-text">Loading data...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !session?.user?.accessToken) {
-    return (
-      <div className="min-h-screen bg-black p-6 mt-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-neutral-glass border border-glass-border p-6 rounded-2xl backdrop-blur-md">
-            <p className="text-red-500">Error: {error || 'Please log in to view the data'}</p>
-            <p className="text-neutral-accent mt-2">Make sure you are logged in and have the necessary permissions.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Extract data with null checks
-  const company = data?.companies?.[0];
-  const internship = company?.internships?.[0];
-  
-  // Log the extracted data
-  console.log('Extracted company:', company);
-  console.log('Extracted internship:', internship);
-
-  if (!internship) {
-    return (
-      <div className="min-h-screen bg-black p-6 mt-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-neutral-glass border border-glass-border p-6 rounded-2xl backdrop-blur-md">
-            <p className="text-neutral-text">No internship data available</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const studentsForInterview = internship.students_for_interview || [];
-  const studentsUnderReview = internship.students_under_review || [];
-
-  // Log the student arrays
-  console.log('Mapped students for interview:', studentsForInterview);
-  console.log('Mapped students under review:', studentsUnderReview);
+  // Get data from the hardcoded object
+  const internship = hardcodedData.companies[0].internships[0];
+  const studentsForInterview = internship.students_for_interview;
+  const studentsUnderReview = internship.students_under_review;
 
   return (
     <div className="min-h-screen bg-black p-6 mt-20">
@@ -135,7 +109,7 @@ export default function SampleRoute() {
         <div className="bg-neutral-glass border border-glass-border p-6 rounded-2xl backdrop-blur-md">
           <h1 className="text-3xl font-bold text-neutral-text">Interview Management</h1>
           <p className="text-neutral-accent mt-2">
-            Internship: {internship.title} ({company.name})
+            Internship: {internship.title} ({internship.company_name})
           </p>
         </div>
 
@@ -145,13 +119,9 @@ export default function SampleRoute() {
           <div className="bg-neutral-glass border border-glass-border p-6 rounded-2xl backdrop-blur-md">
             <h2 className="text-xl font-bold text-neutral-text mb-4">Students for Interview</h2>
             <div className="space-y-4">
-              {Array.isArray(studentsForInterview) && studentsForInterview.length > 0 ? (
-                studentsForInterview.map((student) => (
-                  <StudentCard key={student.id} student={student} />
-                ))
-              ) : (
-                <p className="text-neutral-accent">No students scheduled for interview.</p>
-              )}
+              {studentsForInterview.map((student) => (
+                <StudentCard key={student.id} student={student} />
+              ))}
             </div>
           </div>
 
@@ -159,13 +129,9 @@ export default function SampleRoute() {
           <div className="bg-neutral-glass border border-glass-border p-6 rounded-2xl backdrop-blur-md">
             <h2 className="text-xl font-bold text-neutral-text mb-4">Students Under Review</h2>
             <div className="space-y-4">
-              {Array.isArray(studentsUnderReview) && studentsUnderReview.length > 0 ? (
-                studentsUnderReview.map((student) => (
-                  <StudentCard key={student.id} student={student} />
-                ))
-              ) : (
-                <p className="text-neutral-accent">No students under review.</p>
-              )}
+              {studentsUnderReview.map((student) => (
+                <StudentCard key={student.id} student={student} />
+              ))}
             </div>
           </div>
         </div>
