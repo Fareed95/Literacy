@@ -32,11 +32,12 @@ function Login() {
 
   const Getuserinfo = async () => {
     const token = localStorage.getItem('authToken');
-    console.log("token",token)
+
     if (!token) {
       toast({
         title: "No authentication token found",
       });
+    console.log("no token")
       return;
     }
   
@@ -49,28 +50,40 @@ function Login() {
         },
         credentials: 'include',
       });
-  
+    console.log(token)
       // Log the response status and status text
       console.log('Response Status:', response.status, response.statusText);
-  
+    
+      // Check if the response is not OK (status code 200-299)
       if (!response.ok) {
-        // Check for specific status codes and handle them accordingly
+        // Log more detailed error information
+        const errorText = await response.text();
+        console.error('Error Response:', errorText);
+    
+        // Handle specific HTTP error codes
         if (response.status === 401) {
-          toast({
-            title: "Unauthorized",
-            description: "Your session may have expired. Please log in again.",
-          });
+          console.error('Unauthorized: Check your token and permissions.');
+        } else if (response.status === 404) {
+          console.error('Not Found: The requested resource does not exist.');
         } else {
-          toast({
-            title: "Failed to fetch user info",
-            description: `Error ${response.status}: ${response.statusText}`,
-          });
+          console.error(`HTTP Error: ${response.statusText}`);
         }
-        throw new Error('Failed to fetch user info');
+    
+        // Optionally, throw an error to be caught by the catch block
+        throw new Error(`HTTP Error: ${response.statusText}`);
       }
-  
+    
+      // Parse the JSON response if the request was successful
       const result = await response.json();
       console.log('User Info:', result);
+    
+      // Proceed with handling the successful response
+      // ...
+    
+    
+    
+  
+      
   
       // Update context with user information
       contextsetIsLoggedIn(true);
@@ -262,7 +275,7 @@ const OAuth = async () => {
 
     // Fetch user information
     await Getuserinfo();
-    console.log("working Oauth")
+   
 
   } catch (error) {
     toast({

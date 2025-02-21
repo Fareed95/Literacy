@@ -41,7 +41,7 @@ function Navbar() {
             <Link href="/" className="flex-shrink-0">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="h-10 w-10 overflow-hidden rounded-lg bg-gradient-to-r from-cyan-500/10 to-white/10"
+                className="h-10 w-10 overflow-hidden"
               >
                 <img src={img.src} alt="Logo" className="h-full w-full object-cover" />
               </motion.div>
@@ -77,7 +77,7 @@ function Navbar() {
                     className="relative group px-4 py-2 rounded-lg overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-white/10 to-cyan-500/20 group-hover:opacity-100 opacity-50 transition-opacity" />
-                    <div className="relative bg-neutral-glass border border-glass-border px-4 py-2 rounded-lg text-neutral-text group-hover:text-white transition-colors">
+                    <div className="relative border-glass-border rounded-lg text-neutral-text group-hover:text-white transition-colors">
                       Logout
                     </div>
                   </motion.button>
