@@ -6,6 +6,7 @@ import { useUserContext } from '@/app/context/Userinfo';
 import UserIcon from '@/components/UserIcon';
 import { motion } from "framer-motion";
 import img from '../../public/logo.png';
+import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 
 function Navbar() {
   const { data: session } = useSession();
@@ -33,14 +34,14 @@ function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-      <div className="glass mx-4 mt-4 rounded-2xl backdrop-blur-md">
+      <div className="bg-neutral-glass border border-glass-border mx-4 mt-4 rounded-2xl backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="h-10 w-10 overflow-hidden"
+                className="h-10 w-10 overflow-hidden rounded-lg bg-gradient-to-r from-cyan-500/10 to-white/10"
               >
                 <img src={img.src} alt="Logo" className="h-full w-full object-cover" />
               </motion.div>
@@ -52,14 +53,14 @@ function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="text-electric-blue hover:text-neon-cyan transition-colors"
+                  className="text-neutral-text hover:text-white transition-colors"
                 >
                   <motion.span
                     whileHover={{ y: -2 }}
                     className="relative group"
                   >
                     {item.label}
-                    <span className="absolute inset-x-0 bottom-0 h-0.5 bg-neon-cyan transform scale-x-0 group-hover:scale-x-100 transition-transform" />
+                    <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-cyan-500 to-white transform scale-x-0 group-hover:scale-x-100 transition-transform" />
                   </motion.span>
                 </Link>
               ))}
@@ -72,16 +73,24 @@ function Navbar() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="neon-btn text-sm"
                     onClick={() => signOut() && Logout()}
+                    className="relative group px-4 py-2 rounded-lg overflow-hidden"
                   >
-                    Logout
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-white/10 to-cyan-500/20 group-hover:opacity-100 opacity-50 transition-opacity" />
+                    <div className="relative bg-neutral-glass border border-glass-border px-4 py-2 rounded-lg text-neutral-text group-hover:text-white transition-colors">
+                      Logout
+                    </div>
                   </motion.button>
                   <motion.div
                     whileHover={{ scale: 1.05 }}
-                    className="hover-glow rounded-full"
+                    className="cursor-pointer"
                   >
-                    <UserIcon />
+                    <AnimatedTooltip items={[{
+                      id: 1,
+                      name: session?.user?.name || "User",
+                      designation: "Member",
+                      image: session?.user?.image || "/default-avatar.png",
+                    }]} />
                   </motion.div>
                 </div>
               ) : (
@@ -89,9 +98,12 @@ function Navbar() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="neon-btn text-sm"
+                    className="relative group px-4 py-2 rounded-lg overflow-hidden"
                   >
-                    Login
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-white/10 to-cyan-500/20 group-hover:opacity-100 opacity-50 transition-opacity" />
+                    <div className="relative bg-neutral-glass border border-glass-border px-4 py-2 rounded-lg text-neutral-text group-hover:text-white transition-colors">
+                      Login
+                    </div>
                   </motion.button>
                 </Link>
               )}
@@ -100,23 +112,26 @@ function Navbar() {
               <div className="md:hidden">
                 <button
                   onClick={() => setIsOpen(!isOpen)}
-                  className="glass p-2 rounded-lg hover:bg-deep-indigo/20"
+                  className="relative group p-2 rounded-lg overflow-hidden"
                 >
-                  <svg
-                    className="h-6 w-6 text-electric-blue"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    {isOpen ? (
-                      <path d="M6 18L18 6M6 6l12 12" />
-                    ) : (
-                      <path d="M4 6h16M4 12h16M4 18h16" />
-                    )}
-                  </svg>
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-white/10 to-cyan-500/20 group-hover:opacity-100 opacity-50 transition-opacity" />
+                  <div className="relative bg-neutral-glass border border-glass-border p-2 rounded-lg">
+                    <svg
+                      className="h-6 w-6 text-neutral-text group-hover:text-white transition-colors"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      {isOpen ? (
+                        <path d="M6 18L18 6M6 6l12 12" />
+                      ) : (
+                        <path d="M4 6h16M4 12h16M4 18h16" />
+                      )}
+                    </svg>
+                  </div>
                 </button>
               </div>
             </div>
@@ -135,7 +150,7 @@ function Navbar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="text-electric-blue hover:text-neon-cyan px-4 py-2 rounded-lg hover:bg-deep-indigo/20 transition-colors"
+                    className="text-neutral-text hover:text-white px-4 py-2 rounded-lg hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-white/10 transition-all duration-300"
                     onClick={() => setIsOpen(false)}
                   >
                     {item.label}

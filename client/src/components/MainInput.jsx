@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { PlaceholdersAndVanishInput } from "./ui/placeholders-and-vanish-input";
 import { useUserContext } from "@/app/context/Userinfo";
 import Timeline_roadmap_function from "./Timeline_roadmap";
+import { MultiStepLoader } from "./ui/multi-step-loader";
+import { motion } from 'framer-motion';
 
 function MainInput() {
   const [inputValue, setInputValue] = useState("");
@@ -11,7 +13,25 @@ function MainInput() {
   const [loading, setLoading] = useState(false);
   const { contextemail } = useUserContext();
   
-  const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER; // Fetch API URL from .env
+  const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER;
+
+  const loadingStates = [
+    {
+      text: "Analyzing your learning goals...",
+    },
+    {
+      text: "Identifying key concepts and skills...",
+    },
+    {
+      text: "Structuring your personalized roadmap...",
+    },
+    {
+      text: "Gathering learning resources...",
+    },
+    {
+      text: "Finalizing your learning path...",
+    },
+  ];
 
   const placeholders = [
     "How can I learn advanced backend development?",
@@ -72,7 +92,6 @@ function MainInput() {
     setLoading(false);
   };
 
-  // Make POST request when roadmapData is updated and has a valid roadmap_id
   useEffect(() => {
     if (roadmapData?.roadmap_id) {
       console.log("Sending request to generate-roadmap-all for roadmap_id:", roadmapData.roadmap_id);
@@ -96,34 +115,45 @@ function MainInput() {
           console.error("Error generating full roadmap:", error);
         });
     }
-  }, [roadmapData]); // Runs only when roadmapData changes
+  }, [roadmapData]);
 
-  
   return (
-    <div className="flex flex-col justify-start items-center px-4">
-      <h2 className="mb-8 text-xl text-center sm:text-5xl glass p-8 rounded-2xl backdrop-blur-md">
-        <div className="flex justify-center items-center space-x-2 floating">
-          Tell us what you want to <span className="text-electric-blue font-bold px-2 hover-glow">LEARN</span>
+    <div className="max-w-4xl mx-auto w-full px-4">
+      <motion.div 
+        className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-6 backdrop-blur-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <form onSubmit={onSubmit} className="flex flex-col md:flex-row gap-4">
+          <input
+            type="text"
+            placeholder="Tell us what you want to learn..."
+            value={inputValue}
+            onChange={handleChange}
+            className="flex-1 bg-neutral-800/50 text-white placeholder-neutral-400 border border-neutral-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-neutral-600 transition-all duration-300"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className={`bg-neutral-800 hover:bg-neutral-700 text-white px-6 py-3 rounded-xl border border-neutral-700 transition-all duration-300 font-medium ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {loading ? 'Searching...' : 'Search'}
+          </button>
+        </form>
+        <div className="mt-4 text-neutral-400 text-sm">
+          Popular: Web Development, Data Science, AI/ML
         </div>
-        <div className="flex justify-center items-center space-x-2 mt-4">
-          and we'll guide you with the best <span className="text-neon-cyan font-bold px-2 hover-glow">RESOURCES</span>
-        </div>
-      </h2>
-
-      <div className="w-full max-w-2xl glass p-4 rounded-xl">
-        <PlaceholdersAndVanishInput
-          placeholders={placeholders}
-          onChange={handleChange}
-          onSubmit={onSubmit}
-        />
-      </div>
+      </motion.div>
 
       {loading && (
-        <div className="mt-8 glass p-6 rounded-xl">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-electric-blue"></div>
-          <p className="mt-4 text-neon-cyan">
-            Generating your roadmap...
-          </p>
+        <div className="fixed inset-0 z-50">
+          <MultiStepLoader
+            loadingStates={loadingStates}
+            loading={loading}
+            duration={2000}
+            loop={true}
+          />
         </div>
       )}
 
