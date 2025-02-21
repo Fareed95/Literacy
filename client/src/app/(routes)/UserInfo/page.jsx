@@ -4,13 +4,67 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import PrevCources from '@/components/PrevCources';
+import { Calendar, Users, Clock, Video } from 'lucide-react';
+
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
-    <div className="absolute inset-0 bg-gradient-to-b from-deep-indigo/20 via-soft-purple/10 to-electric-blue/5" />
-    <div className="absolute inset-0 bg-grid-small-white/[0.2] -z-10" />
-    <div className="absolute inset-0 bg-dot-white/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
-    <div className="absolute inset-0 bg-gradient-radial from-soft-purple/20 via-transparent to-transparent" />
+    <div className="absolute inset-0 bg-neutral-950" />
+    <div className="absolute inset-0 bg-grid-small-white/[0.05] -z-10" />
+    <div className="absolute inset-0 bg-dot-white/[0.05] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
+    <div className="absolute inset-0 bg-gradient-radial from-white/10 via-transparent to-transparent" />
   </div>
+);
+
+const FriendCard = ({ friend }) => (
+  <motion.div
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    className="bg-neutral-900/50 border border-neutral-800 p-4 rounded-xl flex items-center space-x-4 hover:bg-neutral-800/50 transition-colors backdrop-blur-sm"
+  >
+    <div className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-200">
+      {friend.name.charAt(0).toUpperCase()}
+    </div>
+    <div className="flex-1">
+      <h4 className="text-neutral-200 font-medium">{friend.name}</h4>
+      <p className="text-sm text-neutral-400">{friend.status}</p>
+    </div>
+    <div className={`w-2 h-2 rounded-full ${friend.isOnline ? 'bg-neutral-200' : 'bg-neutral-600'
+      }`} />
+  </motion.div>
+);
+
+const InterviewSlot = ({ slot }) => (
+  <motion.div
+    initial={{ opacity: 0, x: 20 }}
+    animate={{ opacity: 1, x: 0 }}
+    className="bg-neutral-900/50 border border-neutral-800 p-4 rounded-xl space-y-3 hover:bg-neutral-800/50 transition-colors backdrop-blur-sm"
+  >
+    <div className="flex items-center justify-between">
+      <h4 className="text-neutral-200 font-medium">{slot.title}</h4>
+      <span className={`px-2 py-1 rounded-full text-xs ${slot.status === 'upcoming' ? 'bg-neutral-700 text-neutral-200' :
+        slot.status === 'completed' ? 'bg-neutral-800 text-neutral-400' :
+          'bg-neutral-700 text-neutral-400'
+        }`}>
+        {slot.status.charAt(0).toUpperCase() + slot.status.slice(1)}
+      </span>
+    </div>
+    <div className="flex items-center space-x-2 text-sm text-neutral-400">
+      <Calendar className="w-4 h-4" />
+      <span>{slot.date}</span>
+    </div>
+    <div className="flex items-center space-x-2 text-sm text-neutral-400">
+      <Clock className="w-4 h-4" />
+      <span>{slot.time}</span>
+    </div>
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      className="w-full px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+    >
+      <Video className="w-4 h-4" />
+      <span>Join Meeting</span>
+    </motion.button>
+  </motion.div>
 );
 
 const UserInfoPage = () => {
@@ -74,19 +128,60 @@ const UserInfoPage = () => {
     });
   };
 
+  // Mock data for friends
+  const friends = [
+    { id: 1, name: 'Sarah Chen', status: 'Working on Web Development', isOnline: true },
+    { id: 2, name: 'Mike Johnson', status: 'Learning React', isOnline: false },
+    { id: 3, name: 'Emily Davis', status: 'Studying Data Structures', isOnline: true },
+    { id: 4, name: 'Alex Thompson', status: 'Practicing Algorithms', isOnline: true },
+    { id: 5, name: 'Jessica Lee', status: 'Taking a break', isOnline: false },
+  ];
+
+  // Mock data for interview slots
+  const interviewSlots = [
+    {
+      id: 1,
+      title: 'Frontend Developer Interview',
+      date: 'March 15, 2024',
+      time: '10:00 AM',
+      status: 'upcoming',
+    },
+    {
+      id: 2,
+      title: 'System Design Discussion',
+      date: 'March 17, 2024',
+      time: '2:30 PM',
+      status: 'upcoming',
+    },
+    {
+      id: 3,
+      title: 'Data Structures Practice',
+      date: 'March 10, 2024',
+      time: '11:00 AM',
+      status: 'completed',
+    },
+    {
+      id: 4,
+      title: 'Mock Interview Session',
+      date: 'March 8, 2024',
+      time: '4:00 PM',
+      status: 'completed',
+    },
+  ];
+
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
+    <div className="min-h-screen pt-24 pb-12 px-4 bg-neutral-950">
       <HeroBackground />
-      
-      <div className="max-w-4xl mx-auto space-y-8">
+
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <h1 className="text-4xl font-bold text-electric-blue mb-2">User Profile</h1>
-          <p className="text-neon-cyan">Manage your account settings and preferences</p>
+          <h1 className="text-4xl font-bold text-neutral-200 mb-2">User Profile</h1>
+          <p className="text-neutral-400">Manage your account settings and preferences</p>
         </motion.div>
 
         {/* Profile Overview */}
@@ -94,123 +189,83 @@ const UserInfoPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="glass p-6 rounded-2xl"
+          className="bg-neutral-900/50 border border-neutral-800 p-6 rounded-2xl backdrop-blur-sm"
         >
-          <div className="flex items-center space-x-4">
-            <div className="w-20 h-20 rounded-full bg-electric-blue/20 flex items-center justify-center text-2xl">
-              {userDetails.name.charAt(0).toUpperCase()}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-20 h-20 rounded-full bg-neutral-800 flex items-center justify-center text-2xl text-neutral-200">
+                {userDetails.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-neutral-200">{userDetails.name}</h2>
+                <p className="text-neutral-400">{userDetails.email}</p>
+                <p className="text-neutral-500 mt-1">Role: {userDetails.role}</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-electric-blue">{userDetails.name}</h2>
-              <p className="text-neon-cyan">{userDetails.email}</p>
-              <p className="text-soft-purple mt-1">Role: {userDetails.role}</p>
+            <div className="flex items-center space-x-4">      
+              <h1 className="text-neutral-200">Points: 100</h1>
             </div>
           </div>
         </motion.div>
 
-        {/* Account Details */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="glass p-6 rounded-2xl"
-        >
-          <h3 className="text-xl font-semibold text-electric-blue mb-4">Account Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-neon-cyan">Member Since</p>
-              <p className="text-foreground/80">{formatDate(userDetails.joinDate)}</p>
-            </div>
-            <div>
-              <p className="text-neon-cyan">Last Active</p>
-              <p className="text-foreground/80">{formatDate(userDetails.lastActive)}</p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Preferences */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="glass p-6 rounded-2xl"
-        >
-          <h3 className="text-xl font-semibold text-electric-blue mb-4">Preferences</h3>
-          <div className="space-y-4">
-            {/* Theme Toggle */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-neon-cyan">Theme</p>
-                <p className="text-sm text-foreground/60">Choose your preferred theme</p>
-              </div>
-              <button
-                onClick={() => handleUpdatePreferences('theme', userDetails.preferences.theme === 'dark' ? 'light' : 'dark')}
-                className="neon-btn"
-              >
-                {userDetails.preferences.theme === 'dark' ? '🌙 Dark' : '☀️ Light'}
-              </button>
-            </div>
-
-            {/* Notifications Toggle */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-neon-cyan">Notifications</p>
-                <p className="text-sm text-foreground/60">Receive email notifications</p>
-              </div>
-              <button
-                onClick={() => handleUpdatePreferences('notifications', !userDetails.preferences.notifications)}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  userDetails.preferences.notifications
-                    ? 'neon-btn'
-                    : 'glass hover:bg-deep-indigo/20'
-                }`}
-              >
-                {userDetails.preferences.notifications ? 'Enabled' : 'Disabled'}
-              </button>
-            </div>
-
-            {/* Language Selection */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-neon-cyan">Language</p>
-                <p className="text-sm text-foreground/60">Select your preferred language</p>
-              </div>
-              <select
-                value={userDetails.preferences.language}
-                onChange={(e) => handleUpdatePreferences('language', e.target.value)}
-                className="glass px-4 py-2 rounded-lg bg-transparent border border-electric-blue/30 focus:outline-none focus:ring-2 focus:ring-electric-blue"
-              >
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="fr">Français</option>
-              </select>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="flex justify-end space-x-4"
-        >
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="glass px-6 py-2 rounded-lg hover:bg-deep-indigo/20"
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Friends List */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-neutral-900/50 border border-neutral-800 p-6 rounded-2xl backdrop-blur-sm"
           >
-            Reset Preferences
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="neon-btn"
-          >
-            Save Changes
-          </motion.button>
-        </motion.div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-2">
+                <Users className="w-5 h-5 text-neutral-200" />
+                <h3 className="text-xl font-semibold text-neutral-200">Friends</h3>
+              </div>
+              <span className="text-neutral-400">{friends.length} friends</span>
+            </div>
+            <div className="space-y-4">
+              {friends.map((friend, index) => (
+                <FriendCard
+                  key={friend.id}
+                  friend={friend}
+                />
+              ))}
+            </div>
+          </motion.div>
 
+          {/* Interview Slots */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-neutral-900/50 border border-neutral-800 p-6 rounded-2xl backdrop-blur-sm"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-5 h-5 text-neutral-200" />
+                <h3 className="text-xl font-semibold text-neutral-200">Interview Slots</h3>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-lg transition-colors"
+              >
+                Schedule New
+              </motion.button>
+            </div>
+            <div className="space-y-4">
+              {interviewSlots.map((slot, index) => (
+                <InterviewSlot
+                  key={slot.id}
+                  slot={slot}
+                />
+              ))}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Keep PrevCources at the bottom */}
         <PrevCources />
       </div>
     </div>
