@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { usePortfolio } from '@/hooks/usePortfolio';
 import { useAuth } from '@/app/context/AuthContext';
+import SplashCursor from '@/components/SplashCursor';
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -76,6 +77,7 @@ const Page = ({ params }) => {
   return (
     <div className="min-h-screen bg-neutral-950">
       <HeroBackground />
+      <SplashCursor />
       
       {/* Hero Section */}
       <div className="relative pt-32 pb-16">

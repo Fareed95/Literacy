@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { usePortfolio } from '@/hooks/usePortfolio'
 import { useAuth } from '@/app/context/AuthContext'
 import { useRouter } from 'next/navigation'
-
+import SplashCursor from '@/components/SplashCursor'
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
     <div className="absolute inset-0 bg-gradient-to-b from-deep-indigo/20 via-soft-purple/10 to-electric-blue/5" />
@@ -75,6 +75,7 @@ const Page = () => {
   return (
     <div className="min-h-screen relative">
       <HeroBackground />
+      <SplashCursor />
       
       {/* Hero Section */}
       <div className="relative pt-32 pb-16 text-center">

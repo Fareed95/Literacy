@@ -9,6 +9,7 @@ import MemberManagement from "@/components/dashboard/organization/MemberManageme
 import CourseLibrary from "@/components/dashboard/organization/CourseLibrary";
 import OrgAnalytics from "@/components/dashboard/organization/OrgAnalytics";
 import OrgSettings from "@/components/dashboard/organization/OrgSettings";
+import InterviewPanels from "@/components/dashboard/organization/InterviewPanels";
 
 export default function OrganizationDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -21,6 +22,7 @@ export default function OrganizationDashboard() {
     { id: "courses", label: "Courses" },
     { id: "analytics", label: "Analytics" },
     { id: "settings", label: "Settings" },
+    { id: "interviews", label: "Interviews" },
   ];
 
   const renderContent = () => {
@@ -35,6 +37,8 @@ export default function OrganizationDashboard() {
         return <OrgAnalytics />;
       case "settings":
         return <OrgSettings />;
+      case "interviews":
+        return <InterviewPanels />;
       default:
         return null;
     }
@@ -79,6 +83,8 @@ export default function OrganizationDashboard() {
           {renderContent()}
         </motion.div>
       </div>
+
+      <InterviewPanels/>
     </div>
   );
 } 
