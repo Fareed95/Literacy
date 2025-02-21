@@ -114,7 +114,7 @@ function QuizPage() {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <div className="min-h-screen bg-neutral-950 p-4 relative mt-10">
+    <div className="min-h-screen bg-neutral-950 p-4 relative mt-18">
       <HeroBackground />
       
       <div className="max-w-3xl mx-auto">

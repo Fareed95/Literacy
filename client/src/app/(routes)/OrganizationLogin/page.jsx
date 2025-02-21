@@ -297,7 +297,7 @@ function Login() {
   }, [name, email, session])
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-[#050A0F] mt-[7%]">
-     <div className="flex flex-col items-center justify-center p-6 bg-white dark:bg-neutral-900 rounded-2xl shadow-lg w-full max-w-sm">
+      <div className="flex flex-col items-center justify-center p-6 bg-white dark:bg-neutral-900 rounded-2xl shadow-lg w-full max-w-sm">
   <h2 className="font-bold text-2xl text-neutral-800 dark:text-neutral-200">
     Login to this Website
   </h2>
@@ -306,7 +306,7 @@ function Login() {
   </p>
   
   <Link
-    href="/OrganizationLogin"
+    href="/Login"
     className="mt-4 w-full"
   >
     <button className="w-full py-2 px-4 text-white bg-blue-600 hover:bg-blue-700 transition-all rounded-lg font-medium">
