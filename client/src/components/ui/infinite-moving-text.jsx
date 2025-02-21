@@ -19,9 +19,9 @@ export const InfiniteMovingText = ({
 
   function addAnimation() {
     if (containerRef.current && scrollerRef.current) {
-      // Clone items multiple times for smoother infinite scroll
       const scrollerContent = Array.from(scrollerRef.current.children);
-      for (let i = 0; i < 3; i++) {
+      // Clone more times for ultra-smooth scrolling
+      for (let i = 0; i < 5; i++) {
         scrollerContent.forEach((item) => {
           const duplicatedItem = item.cloneNode(true);
           scrollerRef.current.appendChild(duplicatedItem);
@@ -32,35 +32,46 @@ export const InfiniteMovingText = ({
   }
 
   const speedValue = {
-    fast: 8, // Increased speed
-    normal: 15,
-    slow: 25,
+    fast: 5, // Even faster speed
+    normal: 10,
+    slow: 15,
   };
 
   const textItems = items.map((item, idx) => (
-    <div
+    <motion.div
       key={idx}
-      className="group relative px-6 py-3 mx-4"
+      className="group relative px-8 py-4 mx-6"
+      whileHover={{ scale: 1.05 }}
+      transition={{ type: "spring", stiffness: 400, damping: 10 }}
     >
       <div className="relative z-10">
-        <span className="text-3xl md:text-4xl font-bold text-white">
+        <span className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80">
           {item}
         </span>
       </div>
-      <div className="absolute inset-0 border-2 border-white/20 rounded-lg group-hover:border-white/40 transition-all duration-200" />
-    </div>
+      <div className="absolute inset-0 border-[1px] border-white/10 rounded-lg group-hover:border-white/30 group-hover:bg-white/5 transition-all duration-300" />
+      <motion.div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100"
+        initial={{ opacity: 0 }}
+        whileHover={{ opacity: 1 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0" />
+      </motion.div>
+    </motion.div>
   ));
 
   return (
     <div
       ref={containerRef}
-      className={`w-full overflow-hidden ${className}`}
+      className={`w-full overflow-hidden py-10 ${className}`}
     >
       <motion.div
         ref={scrollerRef}
-        className="flex whitespace-nowrap py-8"
+        className="flex whitespace-nowrap"
         animate={start ? {
-          x: direction === "left" ? [0, -50 * items.length * 20] : [50 * items.length * 20, 0],
+          x: direction === "left" 
+            ? [0, -50 * items.length * 25] 
+            : [50 * items.length * 25, 0],
         } : {}}
         transition={{
           duration: speedValue[speed] * items.length,
