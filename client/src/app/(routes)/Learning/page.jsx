@@ -52,51 +52,8 @@ export default function Learning() {
       setComponentData(data);
       setLoading(false);
     } catch (error) {
-<<<<<<< HEAD
-      console.error("Error fetching roadmap data:", error);
-      setError("Failed to fetch roadmap data. Please try again.");
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    console.log("Updated isCompleted:", isCompleted);
-  }, [isCompleted]);
-
-  
-
-  const handleNextComponent = async () => {
-    if (currentComponentIndex + 1 < roadmap.total_components) {
-      try {
-        const newCompletedIndex = currentComponentIndex + 1;
-        const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}/complete`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ is_completed: newCompletedIndex }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setIsCompleted(newCompletedIndex);
-        setCurrentComponentIndex(newCompletedIndex);
-        fetchComponentData(roadmapId, newCompletedIndex);
-        setQuizAnswers({});
-        setQuizCompleted(false);
-      } catch (error) {
-        console.error("Error updating completion status:", error);
-        setError("Failed to update completion status. Please try again.");
-      }
-    } else {
-      console.log("No more components available."); 
-=======
       console.error('Error fetching component data:', error);
       setLoading(false);
->>>>>>> 0a2ddd450b0d93e6d8f49b4cad04cdc659b3738c
     }
   };
 
