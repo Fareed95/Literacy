@@ -102,6 +102,8 @@ const Page = () => {
   }
 
   return (
+    <>
+    <HeroBackground/>
     <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
       {isEditing ? (
         <motion.div
@@ -240,6 +242,7 @@ const Page = () => {
         </motion.div>
       )}
     </div>
+    </>
   );
 };
 

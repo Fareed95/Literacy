@@ -45,16 +45,6 @@ const Page = () => {
     }
   }, [portfolioData]);
 
-  const handleUpdateUserDetails = async (e) => {
-    e.preventDefault();
-    try {
-      await updateUserDetails(userDetails);
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error updating user details:', error);
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
@@ -73,6 +63,7 @@ const Page = () => {
 
   return (
     <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+      <HeroBackground/>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
