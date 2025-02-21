@@ -6,10 +6,12 @@ import { usePortfolio } from '@/hooks/usePortfolio';
 import { useAuth } from '@/app/context/AuthContext';
 import SplashCursor from '@/components/SplashCursor';
 import { ExternalLink, Globe } from "lucide-react";
-import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
-import { Vortex } from '@/components/ui/vortex';
+// import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
+// import { Vortex } from '@/components/ui/vortex';
 import { InfiniteMovingText } from '@/components/ui/infinite-moving-text';
 import { WavyBackground } from '@/components/ui/wavy-background';
+import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 
 
 
@@ -104,39 +106,234 @@ const TextRevealCard = ({ children }) => {
 };
 
 const Page = ({ params }) => {
+  const { data: session } = useSession();
   const { email: authEmail } = useAuth();
-  const isOwner = authEmail === decodeURIComponent(params.email);
-  const { portfolioData, updateUserDetails, loading, error } = usePortfolio(decodeURIComponent(params.email));
+  const decodedEmail = decodeURIComponent(params.email);
+  
+  // Update the ownership check to compare both session email and auth context email
+  const isOwner = (session?.user?.email === decodedEmail) || (authEmail === decodedEmail);
+  
+  // Simplify the auth check to just require either the session token or ownership
+  const canEdit = isOwner && (session?.user?.accessToken || session?.user?.email);
+
+  const { portfolioData, updateUserDetails, loading, error } = usePortfolio(decodedEmail);
   const [isEditing, setIsEditing] = useState(false);
   const [userDetails, setUserDetails] = useState({
     name: '',
-    title: '',
-    bio: '',
-    location: '',
-    website: '',
+    email: '',
+    phone_number: '',
+    about: '',
+    education: [{
+      degree: '',
+      field_of_study: '',
+      University: '',
+      location: '',
+      start_date: '',
+      end_date: '',
+      current_grade: ''
+    }],
+    certificate: [{
+      name: '',
+      started_at: '',
+      ended_at: '',
+      additionol_testseries_attempted: 0,
+      competition_battled: 0,
+      competition_won: 0
+    }],
+    project: [{
+      name: '',
+      description: '',
+      link: []
+    }],
+    toolname: [{
+      name: '',
+      tools: []
+    }]
   });
 
   useEffect(() => {
     if (portfolioData?.userDetails) {
       setUserDetails({
         name: portfolioData.userDetails.name || '',
-        title: portfolioData.userDetails.title || '',
-        bio: portfolioData.userDetails.bio || '',
-        location: portfolioData.userDetails.location || '',
-        website: portfolioData.userDetails.website || '',
+        email: portfolioData.userDetails.email || '',
+        phone_number: portfolioData.userDetails.phone_number || '',
+        about: portfolioData.userDetails.about || '',
+        education: portfolioData.userDetails.education || [],
+        certificate: portfolioData.userDetails.certificate || [],
+        project: portfolioData.userDetails.project || [],
+        toolname: portfolioData.userDetails.toolname || []
       });
     }
   }, [portfolioData]);
 
+  const handleAddEducation = () => {
+    setUserDetails(prev => ({
+      ...prev,
+      education: [...prev.education, {
+        degree: '',
+        field_of_study: '',
+        University: '',
+        location: '',
+        start_date: '',
+        end_date: '',
+        current_grade: ''
+      }]
+    }));
+  };
+
+  const handleRemoveEducation = (index) => {
+    setUserDetails(prev => ({
+      ...prev,
+      education: prev.education.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleAddProject = () => {
+    setUserDetails(prev => ({
+      ...prev,
+      project: [...prev.project, {
+        name: '',
+        description: '',
+        link: []
+      }]
+    }));
+  };
+
+  const handleRemoveProject = (index) => {
+    setUserDetails(prev => ({
+      ...prev,
+      project: prev.project.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleAddCertificate = () => {
+    setUserDetails(prev => ({
+      ...prev,
+      certificate: [...prev.certificate, {
+        name: '',
+        started_at: new Date().toISOString(),
+        ended_at: new Date().toISOString(),
+        additionol_testseries_attempted: 0,
+        competition_battled: 0,
+        competition_won: 0
+      }]
+    }));
+  };
+
+  const handleRemoveCertificate = (index) => {
+    setUserDetails(prev => ({
+      ...prev,
+      certificate: prev.certificate.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleUpdateUserDetails = async (e) => {
     e.preventDefault();
     try {
-      await updateUserDetails(userDetails);
+      // Show loading state
       setIsEditing(false);
+      
+      // Format the data according to the API requirements
+      const formattedData = {
+        userdetails: [{
+          id: portfolioData?.userDetails?.id,
+          name: userDetails.name,
+          email: userDetails.email,
+          phone_number: userDetails.phone_number,
+          about: userDetails.about,
+          education: userDetails.education.map(edu => ({
+            ...edu,
+            user: portfolioData?.userDetails?.id,
+            start_date: edu.start_date ? new Date(edu.start_date).toISOString().split('T')[0] : null,
+            end_date: edu.end_date ? new Date(edu.end_date).toISOString().split('T')[0] : null
+          })),
+          certificate: userDetails.certificate.map(cert => ({
+            ...cert,
+            user: portfolioData?.userDetails?.id,
+            started_at: cert.started_at ? new Date(cert.started_at).toISOString() : null,
+            ended_at: cert.ended_at ? new Date(cert.ended_at).toISOString() : null,
+            additionol_testseries_attempted: Number(cert.additionol_testseries_attempted) || 0,
+            competition_battled: Number(cert.competition_battled) || 0,
+            competition_won: Number(cert.competition_won) || 0
+          })),
+          project: userDetails.project.map(proj => ({
+            ...proj,
+            user: portfolioData?.userDetails?.id,
+            link: Array.isArray(proj.link) ? proj.link : []
+          })),
+          toolname: userDetails.toolname.map(tool => ({
+            ...tool,
+            user: portfolioData?.userDetails?.id,
+            tools: Array.isArray(tool.tools) ? tool.tools : []
+          }))
+        }]
+      };
+
+      // Get the token from the session
+      if (!session?.user?.accessToken) {
+        throw new Error('You must be logged in to update your profile');
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/update/${params.email}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.user.accessToken}`
+        },
+        body: JSON.stringify(formattedData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update profile');
+      }
+
+      const data = await response.json();
+      
+      // Update the local state with the new data
+      if (data.userdetails && data.userdetails[0]) {
+        setUserDetails({
+          name: data.userdetails[0].name || '',
+          email: data.userdetails[0].email || '',
+          phone_number: data.userdetails[0].phone_number || '',
+          about: data.userdetails[0].about || '',
+          education: data.userdetails[0].education || [],
+          certificate: data.userdetails[0].certificate || [],
+          project: data.userdetails[0].project || [],
+          toolname: data.userdetails[0].toolname || []
+        });
+
+        // Show success message
+        alert('Profile updated successfully');
+
+        // Force a refetch of the portfolio data to update the UI
+        if (typeof window !== 'undefined') {
+          window.location.reload();
+        }
+      }
+
+      // Show success message (you can implement a toast notification here)
+      console.log('Profile updated successfully');
+      
     } catch (error) {
       console.error('Error updating user details:', error);
+      // Show error message to user
+      alert(error.message || 'Failed to update profile');
+      setIsEditing(true); // Keep the form open if there's an error
     }
   };
+
+  // Add debug logging
+  useEffect(() => {
+    console.log('Auth Debug:', {
+      sessionEmail: session?.user?.email,
+      authEmail,
+      paramsEmail: decodedEmail,
+      isOwner,
+      canEdit,
+      hasToken: !!session?.user?.accessToken
+    });
+  }, [session, authEmail, decodedEmail, isOwner, canEdit]);
 
   if (loading) {
     return (
@@ -167,7 +364,7 @@ const Page = ({ params }) => {
   return (
     <div className="min-h-screen bg-neutral-950">
       <SparklesCore>
-        <SplashCursor />
+        {/* <SplashCursor /> */}
         <WavyBackground>
         {/* Hero Section */}
         <div className="relative pt-32 pb-16">
@@ -230,6 +427,8 @@ const Page = ({ params }) => {
           </motion.div>
         </div>
         </WavyBackground>
+
+                  
         <div className="max-w-7xl mx-auto px-4 space-y-24 pb-32">
           {/* Skills Section */}
           <motion.section
@@ -406,7 +605,18 @@ const Page = ({ params }) => {
         </div>
       </SparklesCore>
 
-      {/* Edit Profile Button - Only visible to owner */}
+      {/* Add debug info for development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed top-20 right-4 bg-black/80 p-4 rounded-lg text-xs text-white z-50">
+          <p>Session Email: {session?.user?.email}</p>
+          <p>Auth Email: {authEmail}</p>
+          <p>Profile Email: {decodedEmail}</p>
+          <p>Is Owner: {isOwner.toString()}</p>
+          <p>Can Edit: {canEdit.toString()}</p>
+        </div>
+      )}
+
+      {/* Edit Profile Button - Only visible to authenticated owner */}
       {isOwner && (
         <motion.button
           whileHover={{ scale: 1.05 }}
@@ -419,64 +629,306 @@ const Page = ({ params }) => {
       )}
 
       {/* Edit Modal */}
-      {isEditing && (
+      {isEditing && isOwner && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-neutral-900/80 p-8 rounded-2xl max-w-2xl w-full mx-4 border border-neutral-800 backdrop-blur-md"
+            className="bg-neutral-900/80 p-8 rounded-2xl max-w-4xl w-full mx-4 border border-neutral-800 backdrop-blur-md max-h-[90vh] overflow-y-auto"
           >
             <h2 className="text-2xl font-bold text-neutral-200 mb-6">Edit Profile</h2>
             <form onSubmit={handleUpdateUserDetails} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-neutral-400 block mb-2">Name</label>
-                  <input
-                    type="text"
-                    value={userDetails.name}
-                    onChange={(e) => setUserDetails(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-neutral-400 block mb-2">Title</label>
-                  <input
-                    type="text"
-                    value={userDetails.title}
-                    onChange={(e) => setUserDetails(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-neutral-400 block mb-2">Bio</label>
-                <textarea
-                  value={userDetails.bio}
-                  onChange={(e) => setUserDetails(prev => ({ ...prev, bio: e.target.value }))}
-                  rows={4}
-                  className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none resize-none"
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-neutral-400 block mb-2">Location</label>
-                  <input
-                    type="text"
-                    value={userDetails.location}
-                    onChange={(e) => setUserDetails(prev => ({ ...prev, location: e.target.value }))}
-                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-neutral-400 block mb-2">Website</label>
-                  <input
-                    type="url"
-                    value={userDetails.website}
-                    onChange={(e) => setUserDetails(prev => ({ ...prev, website: e.target.value }))}
-                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
-                  />
+              {/* Basic Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-neutral-300">Basic Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-neutral-400 block mb-2">Name</label>
+                    <input
+                      type="text"
+                      value={userDetails.name}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-neutral-400 block mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={userDetails.email}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, email: e.target.value }))}
+                      className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-neutral-400 block mb-2">Phone Number</label>
+                    <input
+                      type="tel"
+                      value={userDetails.phone_number || ''}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, phone_number: e.target.value }))}
+                      className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-neutral-400 block mb-2">About</label>
+                    <textarea
+                      value={userDetails.about || ''}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, about: e.target.value }))}
+                      className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                      rows={3}
+                    />
+                  </div>
                 </div>
               </div>
+
+              {/* Education Section */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold text-neutral-300">Education</h3>
+                  <motion.button
+                    type="button"
+                    onClick={handleAddEducation}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg hover:bg-blue-500/20 transition-colors"
+                  >
+                    Add Education
+                  </motion.button>
+                </div>
+                {userDetails.education.map((edu, index) => (
+                  <div key={index} className="relative p-4 border border-neutral-800 rounded-lg">
+                    <motion.button
+                      type="button"
+                      onClick={() => handleRemoveEducation(index)}
+                      className="absolute top-4 right-4 p-2 text-red-400 hover:text-red-300 transition-colors"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      ×
+                    </motion.button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-neutral-400 block mb-2">Degree</label>
+                        <input
+                          type="text"
+                          value={edu.degree}
+                          onChange={(e) => {
+                            const newEducation = [...userDetails.education];
+                            newEducation[index] = { ...edu, degree: e.target.value };
+                            setUserDetails(prev => ({ ...prev, education: newEducation }));
+                          }}
+                          className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-neutral-400 block mb-2">Field of Study</label>
+                        <input
+                          type="text"
+                          value={edu.field_of_study}
+                          onChange={(e) => {
+                            const newEducation = [...userDetails.education];
+                            newEducation[index] = { ...edu, field_of_study: e.target.value };
+                            setUserDetails(prev => ({ ...prev, education: newEducation }));
+                          }}
+                          className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-neutral-400 block mb-2">University</label>
+                        <input
+                          type="text"
+                          value={edu.University}
+                          onChange={(e) => {
+                            const newEducation = [...userDetails.education];
+                            newEducation[index] = { ...edu, University: e.target.value };
+                            setUserDetails(prev => ({ ...prev, education: newEducation }));
+                          }}
+                          className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-neutral-400 block mb-2">Location</label>
+                        <input
+                          type="text"
+                          value={edu.location}
+                          onChange={(e) => {
+                            const newEducation = [...userDetails.education];
+                            newEducation[index] = { ...edu, location: e.target.value };
+                            setUserDetails(prev => ({ ...prev, education: newEducation }));
+                          }}
+                          className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-neutral-400 block mb-2">Start Date</label>
+                        <input
+                          type="date"
+                          value={edu.start_date}
+                          onChange={(e) => {
+                            const newEducation = [...userDetails.education];
+                            newEducation[index] = { ...edu, start_date: e.target.value };
+                            setUserDetails(prev => ({ ...prev, education: newEducation }));
+                          }}
+                          className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-neutral-400 block mb-2">End Date</label>
+                        <input
+                          type="date"
+                          value={edu.end_date}
+                          onChange={(e) => {
+                            const newEducation = [...userDetails.education];
+                            newEducation[index] = { ...edu, end_date: e.target.value };
+                            setUserDetails(prev => ({ ...prev, education: newEducation }));
+                          }}
+                          className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-neutral-400 block mb-2">Current Grade</label>
+                        <input
+                          type="text"
+                          value={edu.current_grade}
+                          onChange={(e) => {
+                            const newEducation = [...userDetails.education];
+                            newEducation[index] = { ...edu, current_grade: e.target.value };
+                            setUserDetails(prev => ({ ...prev, education: newEducation }));
+                          }}
+                          className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Projects Section */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold text-neutral-300">Projects</h3>
+                  <motion.button
+                    type="button"
+                    onClick={handleAddProject}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg hover:bg-blue-500/20 transition-colors"
+                  >
+                    Add Project
+                  </motion.button>
+                </div>
+                {userDetails.project.map((proj, index) => (
+                  <div key={index} className="relative p-4 border border-neutral-800 rounded-lg">
+                    <motion.button
+                      type="button"
+                      onClick={() => handleRemoveProject(index)}
+                      className="absolute top-4 right-4 p-2 text-red-400 hover:text-red-300 transition-colors"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      ×
+                    </motion.button>
+                    <div>
+                      <label className="text-neutral-400 block mb-2">Project Name</label>
+                      <input
+                        type="text"
+                        value={proj.name}
+                        onChange={(e) => {
+                          const newProjects = [...userDetails.project];
+                          newProjects[index] = { ...proj, name: e.target.value };
+                          setUserDetails(prev => ({ ...prev, project: newProjects }));
+                        }}
+                        className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-neutral-400 block mb-2">Description</label>
+                      <textarea
+                        value={proj.description}
+                        onChange={(e) => {
+                          const newProjects = [...userDetails.project];
+                          newProjects[index] = { ...proj, description: e.target.value };
+                          setUserDetails(prev => ({ ...prev, project: newProjects }));
+                        }}
+                        className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Certificates Section */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold text-neutral-300">Certificates</h3>
+                  <motion.button
+                    type="button"
+                    onClick={handleAddCertificate}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg hover:bg-blue-500/20 transition-colors"
+                  >
+                    Add Certificate
+                  </motion.button>
+                </div>
+                {userDetails.certificate.map((cert, index) => (
+                  <div key={index} className="relative p-4 border border-neutral-800 rounded-lg">
+                    <motion.button
+                      type="button"
+                      onClick={() => handleRemoveCertificate(index)}
+                      className="absolute top-4 right-4 p-2 text-red-400 hover:text-red-300 transition-colors"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      ×
+                    </motion.button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-neutral-400 block mb-2">Certificate Name</label>
+                        <input
+                          type="text"
+                          value={cert.name}
+                          onChange={(e) => {
+                            const newCertificates = [...userDetails.certificate];
+                            newCertificates[index] = { ...cert, name: e.target.value };
+                            setUserDetails(prev => ({ ...prev, certificate: newCertificates }));
+                          }}
+                          className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-neutral-400 block mb-2">Start Date</label>
+                        <input
+                          type="datetime-local"
+                          value={cert.started_at.slice(0, 16)}
+                          onChange={(e) => {
+                            const newCertificates = [...userDetails.certificate];
+                            newCertificates[index] = { ...cert, started_at: e.target.value };
+                            setUserDetails(prev => ({ ...prev, certificate: newCertificates }));
+                          }}
+                          className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-neutral-400 block mb-2">End Date</label>
+                        <input
+                          type="datetime-local"
+                          value={cert.ended_at.slice(0, 16)}
+                          onChange={(e) => {
+                            const newCertificates = [...userDetails.certificate];
+                            newCertificates[index] = { ...cert, ended_at: e.target.value };
+                            setUserDetails(prev => ({ ...prev, certificate: newCertificates }));
+                          }}
+                          className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-200 focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Action Buttons */}
               <div className="flex justify-end space-x-4">
                 <motion.button
                   type="button"
