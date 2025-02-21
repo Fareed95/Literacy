@@ -4,11 +4,8 @@ import { motion } from 'framer-motion'
 import { useSession } from 'next-auth/react'
 import { usePortfolio } from '@/hooks/usePortfolio'
 import { useAuth } from '@/app/context/AuthContext'
-<<<<<<< HEAD
-import { useRouter } from 'next/navigation'
-=======
+
 import { useRouter, useParams } from 'next/navigation'
->>>>>>> 1c43c3772a25d7da88e985fd4d71f036b9c7bf8b
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">

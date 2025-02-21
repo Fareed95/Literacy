@@ -124,12 +124,12 @@ export default function Home() {
   };
 
   const checkQuizCompletion = () => {
-    if (!componentData || !componentData.component || !componentData.component.test_series) {
+    if (!componentData  || !componentData.test_series) {
       setQuizCompleted(false);
       return;
     }
 
-    const allQuestionsAnswered = componentData.component.test_series.every(
+    const allQuestionsAnswered = componentData.test_series.every(
       (_, index) => quizAnswers[index] !== undefined
     );
     setQuizCompleted(allQuestionsAnswered);
