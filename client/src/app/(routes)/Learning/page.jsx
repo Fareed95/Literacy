@@ -102,7 +102,7 @@ export default function Home() {
           body: JSON.stringify({ is_completed: newCompletedIndex }),
         });
 
-        if (!response.ok) {
+        if (!response.ok) { 
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
