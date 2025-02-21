@@ -25,7 +25,7 @@ function EventReg() {
     if (id !== null) {
       const GetEvents = async () => {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/event`, {
+          const response = await fetch(`http://0.0.0.0:8000/api/event`, {
             method: 'GET',
             headers: {
               'Content-Type': "application/json",
@@ -66,7 +66,7 @@ function EventReg() {
       {img && (
         <BackgroundGradient className="rounded-[22px] p-4 sm:p-10 bg-white dark:bg-[#04080D] sm:flex">
           <img
-            src={`${process.env.NEXT_PUBLIC_API_URL}${img}`}
+            src={`http://0.0.0.0:8000${img}`}
             alt="Event"
             height="400"
             width="400"

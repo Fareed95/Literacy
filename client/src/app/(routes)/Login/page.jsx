@@ -32,57 +32,75 @@ function Login() {
 
   const Getuserinfo = async () => {
     const token = localStorage.getItem('authToken');
+    console.log("token",token)
+    if (!token) {
+      toast({
+        title: "No authentication token found",
+      });
+      return;
+    }
+  
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`,
-        {
-            method: 'GET',
-            headers: {
-              "Authorization":token,
-              'Content-Type': "application/json",
-            },
-            credentials: 'include',
-          }
-
-          );
+      const response = await fetch('http://localhost:8000/api/user', {
+        method: 'GET',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          'Content-Type': "application/json",
+        },
+        credentials: 'include',
+      });
+  
+      // Log the response status and status text
+      console.log('Response Status:', response.status, response.statusText);
+  
       if (!response.ok) {
-        toast({
-          title: "There was an error",
-
-        })
-        throw new Error('Failed to fetch user info'); // Handle error properly
-
+        // Check for specific status codes and handle them accordingly
+        if (response.status === 401) {
+          toast({
+            title: "Unauthorized",
+            description: "Your session may have expired. Please log in again.",
+          });
+        } else {
+          toast({
+            title: "Failed to fetch user info",
+            description: `Error ${response.status}: ${response.statusText}`,
+          });
+        }
+        throw new Error('Failed to fetch user info');
       }
-      if (response.ok){
-        const result = await response.json();
-
-      contextsetIsLoggedIn(true)
-      contextsetEmail(result.email)
-      contextsetName(result.name)
+  
+      const result = await response.json();
+      console.log('User Info:', result);
+  
+      // Update context with user information
+      contextsetIsLoggedIn(true);
+      contextsetEmail(result.email);
+      contextsetName(result.name);
+  
       toast({
         title: "You are Successfully Logged In",
-
       });
-      router.push("/")
-      }
-
+  
+      // Redirect to the home page
+      router.push("/");
+  
     } catch (error) {
       toast({
         title: "There was an error",
-
-      })
+        description: error.message,
+      });
       console.error("Error fetching user info:", error);
     }
-
-
   };
+  
 
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
+      const response = await fetch('http://localhost:8000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -90,32 +108,47 @@ function Login() {
         credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
-
+  
+      // Log the response status and status text
+      console.log('Response Status:', response.status, response.statusText);
+  
       if (!response.ok) {
-        toast({
-          title: "Wrong Password",
-        });
+        // Check for specific status codes and handle them accordingly
+        if (response.status === 401) {
+          toast({
+            title: "Wrong Password",
+          });
+        } else {
+          toast({
+            title: "Failed to login",
+            description: `Error ${response.status}: ${response.statusText}`,
+          });
+        }
         return;
       }
-
+  
       const result = await response.json();
-      if (response.ok) {
-
-
-        localStorage.setItem('authToken', result.jwt);
-        Getuserinfo()
-  }
+      console.log('Login Successful:', result);
+  
+      // Store the JWT token in local storage
+      localStorage.setItem('authToken', result.jwt);
+  
+      // Fetch user information
+      await Getuserinfo();
+  
     } catch (error) {
       toast({
         title: "An error occurred",
+        description: error.message,
       });
       console.error("Error submitting form:", error);
     }
   };
+  
 
   // const OAuth = async()=>{
   //   try {
-  //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/oauth2/login/`, {
+  //     const response = await fetch(`http://0.0.0.0:8000/api/oauth2/login/`, {
   //       method: 'POST',
   //       headers: {
   //         'Content-Type': 'application/json',
@@ -149,7 +182,7 @@ function Login() {
 
   async function loginWithGoogle() {
     setLoading(true);
-
+    console.log("hello")
     try {
       await signIn('google')
     } catch (error) {
@@ -157,6 +190,7 @@ function Login() {
       toast.error('Something went wrong with your login.')
     } finally {
       setLoading(false)
+      OAuth();
     }
 
   }
@@ -178,57 +212,76 @@ function Login() {
 
   }
   useEffect(() => {
-
+console.log("session",session)
     if (session) {
       contextsetIsLoggedIn(true)
       contextsetEmail(session.user.email);
       contextsetName(session.user.name);
-
-      
-      
-      
+      setName(session.user.name)
+      setEmail(session.user.email)
   }
   }, [session]);
-useEffect(() => {
-  if(name !==""){
-    OAuth();
-  }
-},[name,email])
+// useEffect(() => {
+//   if(name !==""){
+//     OAuth();
+//   }
+// },[name,email])
 
-  const OAuth = async () => {
-
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/oauth2/login/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ name, email }),
-      });
-      
-      const result = await response.json();
+const OAuth = async () => {
   
-      if (response.ok) {
+  try {
+    const response = await fetch('http://localhost:8000/api/oauth2/login/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ name, email }),
+    });
+    
+    // Log the response status and status text
+    console.log('Response Status:', response, response.statusText);
 
-
-        localStorage.setItem('authToken', result.jwt);
-
-
-        result.jwt &&(router.push('/'),
-      toast({
-        title: "You are Successfully Logged In",
-
-      }))
-        Getuserinfo()
-  }
-    } catch (error) {
-     
-      console.error("Error submitting form:", error);
+    if (!response.ok) {
+      // Check for specific status codes and handle them accordingly
+      
+      throw new Error('Failed to login');
     }
-  };
 
+    const result = await response.json();
+    console.log('Login Successful:', result);
+
+    // Store the JWT token in local storage
+    localStorage.setItem('authToken', result.jwt);
+
+    // Redirect to the home page and show a success message
+    router.push('/');
+    toast({
+      title: "You are Successfully Logged In",
+    });
+
+    // Fetch user information
+    await Getuserinfo();
+    console.log("working Oauth")
+
+  } catch (error) {
+    toast({
+      title: "There was an error",
+      description: error.message,
+    });
+    console.error("Error submitting form:", error);
+  }
+};
+
+useEffect(() => {
+  console.log("name",name)
+  console.log("email",email)
+  if(session&&name&&email){
+    OAuth();
+    
+    console.log("name",name)
+  }
+},[name,email,session])
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-[#050A0F] mt-[7%]">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">

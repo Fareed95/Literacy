@@ -22,7 +22,7 @@ const password =contextpassword;
 const Getuserinfo = async () => {
   const token = localStorage.getItem('authToken');
   try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`,
+      const response = await fetch(`http://0.0.0.0:8000/api/user`,
       {
           method: 'GET',
           headers: {
@@ -64,7 +64,7 @@ const Getuserinfo = async () => {
   const Autologin=async()=>{
 
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
+      const response = await fetch(`http://0.0.0.0:8000/api/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ const Getuserinfo = async () => {
     const[otp,setOtp]=useState('')
     const handleSubmit=async(e)=>{
         e.preventDefault();
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/register`, {
+        const response = await fetch(`http://0.0.0.0:8000/api/register`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
