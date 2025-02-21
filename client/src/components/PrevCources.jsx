@@ -1,10 +1,11 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRoadmap } from '@/app/context/RoadmapContext';
 import { useUserContext } from '@/app/context/Userinfo';
 import { motion } from 'framer-motion';
-import { GlowingEffect } from './ui/glowing-effect';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
+import { Box, Lock, Search, Settings, Sparkles } from "lucide-react";
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -14,6 +15,73 @@ const HeroBackground = () => (
     <div className="absolute inset-0 bg-gradient-radial from-white/10 via-transparent to-transparent" />
   </div>
 );
+const CardWithGradientBorder = ({ children, onClick }) => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const cardRef = useRef(null);
+
+  const updateMousePosition = (e) => {
+    if (!cardRef.current) return;
+    
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={updateMousePosition}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="group relative rounded-xl cursor-pointer"
+      onClick={onClick}
+    >
+      {/* Outer border container */}
+      <div
+        className="absolute inset-0 rounded-xl transition-opacity duration-300"
+        style={{
+          padding: '6px',
+          background: 'rgba(255, 255, 255, 0.03)',
+          opacity: isHovered ? 1 : 0,
+        }}
+      >
+        <div className="absolute inset-0 rounded-xl bg-neutral-950" />
+      </div>
+
+      {/* Inner gradient border container */}
+      <div
+        className="absolute inset-[2px] rounded-xl transition-opacity duration-300"
+        style={{
+          padding: '2px',
+          background: isHovered
+            ? `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.15), transparent 40%)`
+            : 'transparent',
+          opacity: isHovered ? 1 : 0,
+        }}
+      >
+        <div className="absolute inset-0 rounded-xl bg-neutral-950" />
+      </div>
+
+      {/* Glow effect */}
+      <div
+        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{
+          background: isHovered
+            ? `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.1), transparent 40%)`
+            : 'transparent',
+        }}
+      />
+
+      {/* Content */}
+      <div className="relative bg-neutral-900/50 p-6 rounded-xl backdrop-blur-sm z-10">
+        {children}
+      </div>
+    </motion.div>
+  );
+};
 
 function PrevCources() {
   const [roadmaps, setRoadmaps] = useState([]);
@@ -26,32 +94,38 @@ function PrevCources() {
   const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER;
 
   useEffect(() => {
-    if (contextemail && MODEL_API_SERVER) {
-      fetch(`${MODEL_API_SERVER}/user-roadmaps`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: contextemail }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Failed to fetch roadmaps');
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setRoadmaps(data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setError(error.message);
-          setLoading(false);
+    const fetchRoadmaps = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${MODEL_API_SERVER}/user-roadmaps`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: contextemail,
+          }),
         });
-    } else {
-      setLoading(false);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch roadmaps');
+        }
+
+        const data = await response.json();
+        setRoadmaps(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching roadmaps:', err);
+        setError('Failed to load roadmaps');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (contextemail) {
+      fetchRoadmaps();
     }
-  }, [contextemail, MODEL_API_SERVER]);
+  }, [contextemail]);
 
   const handleCardClick = (roadmap) => {
     setRoadmap({ roadmap_id: roadmap.id });
@@ -71,6 +145,8 @@ function PrevCources() {
   );
 
   return (
+    
+
     <div className="relative min-h-screen py-12 px-4 md:px-8">
       <HeroBackground />
       
@@ -83,19 +159,20 @@ function PrevCources() {
           <h2 className="text-3xl font-bold text-white">Your Learning Journey</h2>
           <p className="text-neutral-400 text-lg">Continue where you left off or start something new</p>
         </div>
-
+       
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {roadmaps.map((roadmap) => (
-            <motion.div
+            <CardWithGradientBorder
               key={roadmap.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              whileHover={{ y: -5 }}
-              className="relative bg-neutral-900/50 backdrop-blur-sm rounded-xl p-6 border border-neutral-800 hover:border-neutral-700 transition-all duration-300 cursor-pointer overflow-hidden"
               onClick={() => handleCardClick(roadmap)}
             >
-              <GlowingEffect />
-              <div className="space-y-6 relative z-10">
+<GlowingEffect
+    spread={40}
+    glow={true}
+    disabled={false}
+    proximity={64}
+    inactiveZone={0.01} />
+              <div className="space-y-6">
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold text-white">{roadmap.name}</h3>
                   <div className="h-1 w-24 bg-gradient-to-r from-neutral-400 to-neutral-600 rounded-full" />
@@ -145,7 +222,7 @@ function PrevCources() {
                   </motion.button>
                 </div>
               </div>
-            </motion.div>
+            </CardWithGradientBorder>
           ))}
         </div>
 
@@ -167,6 +244,9 @@ function PrevCources() {
           </motion.div>
         )}
       </motion.div>
+      
+
+  {/* <Checking/> */}
     </div>
   );
 }
