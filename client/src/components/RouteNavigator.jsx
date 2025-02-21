@@ -7,9 +7,6 @@ const RouteNavigator = () => {
   const routes = [
     { path: '/avatar', label: 'AI Avatar' },
     { path: '/quiz', label: 'Quiz' },
-    { path: '/About', label: 'About' },
-    { path: '/Events', label: 'Events' },
-    { path: '/Gallery', label: 'Gallery' },
     { path: '/Learning', label: 'Learning' },
     { path: '/Lobby', label: 'Chat Lobby' },
     { path: '/Login', label: 'Login' },

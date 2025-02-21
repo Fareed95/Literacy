@@ -1,11 +1,9 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useSession } from 'next-auth/react'
 import { usePortfolio } from '@/hooks/usePortfolio'
 import { useAuth } from '@/app/context/AuthContext'
 import { useRouter } from 'next/navigation'
-import SplashCursor from '@/components/splashCursor'
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -74,7 +72,6 @@ const Page = () => {
   }
 
   return (
-    <SplashCursor>
     <div className="min-h-screen relative">
       <HeroBackground />
       
@@ -366,7 +363,6 @@ const Page = () => {
         </div>
       )}
     </div>
-    </SplashCursor>
   );
 };
 

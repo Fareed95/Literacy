@@ -1,18 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; 
 
-interface Resource {
-  id: string;
-  title: string;
-  type: 'video' | 'document' | 'course' | 'article';
-  description: string;
-  dateAdded: string;
-  views: number;
-  rating: number;
-}
-
-const ResourceCard = ({ resource }: { resource: Resource }) => (
+const ResourceCard = ({ resource }) => (
   <div className="glass p-4 rounded-xl hover-glow">
     <div className="space-y-3">
       <div className="flex justify-between items-start">
@@ -45,7 +35,7 @@ const ResourceCard = ({ resource }: { resource: Resource }) => (
 
 export default function ResourceCenter() {
   // Mock data - replace with actual data fetching
-  const resources: Resource[] = [
+  const resources = [
     {
       id: '1',
       title: 'Advanced Backend Development Guide',
