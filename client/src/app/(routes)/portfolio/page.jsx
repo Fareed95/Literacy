@@ -7,10 +7,10 @@ import { useRouter } from 'next/navigation'
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
-    <div className="absolute inset-0 bg-gradient-to-b from-deep-indigo/20 via-soft-purple/10 to-electric-blue/5" />
-    <div className="absolute inset-0 bg-grid-small-white/[0.2] -z-10" />
-    <div className="absolute inset-0 bg-dot-white/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
-    <div className="absolute inset-0 bg-gradient-radial from-soft-purple/20 via-transparent to-transparent" />
+    <div className="absolute inset-0 bg-neutral-950" />
+    <div className="absolute inset-0 bg-grid-small-white/[0.05] -z-10" />
+    <div className="absolute inset-0 bg-dot-white/[0.05] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
+    <div className="absolute inset-0 bg-gradient-radial from-white/10 via-transparent to-transparent" />
   </div>
 );
 
@@ -57,24 +57,23 @@ const Page = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-electric-blue"></div>
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neutral-400"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500">Error loading portfolio data</p>
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <p className="text-red-400">Error loading portfolio data</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen bg-neutral-950 relative">
       <HeroBackground />
-      
 
       {/* Hero Section */}
       <div className="relative pt-32 pb-16 text-center">
@@ -83,18 +82,18 @@ const Page = () => {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-4xl mx-auto px-4 space-y-4"
         >
-          <h1 className="text-6xl font-bold text-electric-blue">
+          <h1 className="text-6xl font-bold text-neutral-200">
             {userDetails.name || 'Your Name'}
           </h1>
-          <p className="text-2xl text-neon-cyan">{userDetails.title || 'Your Title'}</p>
+          <p className="text-2xl text-neutral-400">{userDetails.title || 'Your Title'}</p>
           {userDetails.bio && (
-            <p className="text-lg text-foreground/80 mt-4 max-w-2xl mx-auto">
+            <p className="text-lg text-neutral-400/80 mt-4 max-w-2xl mx-auto">
               {userDetails.bio}
             </p>
           )}
           <div className="flex items-center justify-center space-x-4 mt-6">
             {userDetails.location && (
-              <span className="text-soft-purple flex items-center">
+              <span className="text-neutral-300 flex items-center">
                 <span className="mr-2">📍</span> {userDetails.location}
               </span>
             )}
@@ -103,7 +102,7 @@ const Page = () => {
                 href={userDetails.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-electric-blue hover:text-neon-cyan transition-colors flex items-center"
+                className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center"
               >
                 <span className="mr-2">🔗</span> Website
               </a>
@@ -119,8 +118,8 @@ const Page = () => {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-blue to-transparent" />
-          <h2 className="text-4xl font-bold text-electric-blue text-center mb-16">Skills & Expertise</h2>
+          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-neutral-200/20 to-transparent" />
+          <h2 className="text-4xl font-bold text-neutral-200 text-center mb-16">Skills & Expertise</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {portfolioData?.toolNames?.map((toolName) => (
               <motion.div
@@ -128,15 +127,15 @@ const Page = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 whileHover={{ y: -5 }}
-                className="glass p-6 rounded-xl hover-glow"
+                className="bg-neutral-900/50 border border-neutral-800 p-6 rounded-xl backdrop-blur-sm hover:bg-neutral-800/50 transition-all"
               >
-                <h3 className="text-2xl font-semibold text-neon-cyan mb-4">{toolName.name}</h3>
+                <h3 className="text-2xl font-semibold text-neutral-200 mb-4">{toolName.name}</h3>
                 <div className="space-y-3">
                   {toolName.tools?.map((tool) => (
                     <div key={tool.id} className="space-y-2">
-                      <p className="text-electric-blue font-medium">{tool.name}</p>
+                      <p className="text-cyan-400 font-medium">{tool.name}</p>
                       {tool.components?.map((component) => (
-                        <p key={component.id} className="text-foreground/60 pl-4 text-sm">
+                        <p key={component.id} className="text-neutral-400 pl-4 text-sm">
                           • {component.name}
                         </p>
                       ))}
@@ -154,27 +153,27 @@ const Page = () => {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-blue to-transparent" />
-          <h2 className="text-4xl font-bold text-electric-blue text-center mb-16">Education</h2>
+          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-neutral-200/20 to-transparent" />
+          <h2 className="text-4xl font-bold text-neutral-200 text-center mb-16">Education</h2>
           <div className="space-y-8">
             {portfolioData?.userDetails?.education?.map((edu) => (
               <motion.div
                 key={edu.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="glass p-8 rounded-xl hover-glow"
+                className="bg-neutral-900/50 border border-neutral-800 p-8 rounded-xl backdrop-blur-sm hover:bg-neutral-800/50 transition-all"
               >
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
-                    <h3 className="text-2xl font-semibold text-neon-cyan">{edu.degree}</h3>
-                    <p className="text-electric-blue mt-2">{edu.field_of_study}</p>
-                    <p className="text-foreground/60 mt-1">{edu.University}</p>
-                    <p className="text-foreground/60">{edu.location}</p>
+                    <h3 className="text-2xl font-semibold text-neutral-200">{edu.degree}</h3>
+                    <p className="text-cyan-400 mt-2">{edu.field_of_study}</p>
+                    <p className="text-neutral-400 mt-1">{edu.University}</p>
+                    <p className="text-neutral-400">{edu.location}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-neon-cyan">{edu.start_date} - {edu.end_date}</p>
+                    <p className="text-neutral-300">{edu.start_date} - {edu.end_date}</p>
                     {edu.current_grade && (
-                      <p className="text-electric-blue mt-2">Grade: {edu.current_grade}</p>
+                      <p className="text-cyan-400 mt-2">Grade: {edu.current_grade}</p>
                     )}
                   </div>
                 </div>
@@ -189,8 +188,8 @@ const Page = () => {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-blue to-transparent" />
-          <h2 className="text-4xl font-bold text-electric-blue text-center mb-16">Projects</h2>
+          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-neutral-200/20 to-transparent" />
+          <h2 className="text-4xl font-bold text-neutral-200 text-center mb-16">Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {portfolioData?.userDetails?.project?.map((proj) => (
               <motion.div
@@ -198,12 +197,12 @@ const Page = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 whileHover={{ y: -5 }}
-                className="glass p-8 rounded-xl hover-glow"
+                className="bg-neutral-900/50 border border-neutral-800 p-8 rounded-xl backdrop-blur-sm hover:bg-neutral-800/50 transition-all"
               >
-                <h3 className="text-2xl font-semibold text-neon-cyan">{proj.name}</h3>
-                <p className="text-foreground/80 mt-4">{proj.description}</p>
+                <h3 className="text-2xl font-semibold text-neutral-200">{proj.name}</h3>
+                <p className="text-neutral-400 mt-4">{proj.description}</p>
                 <div className="mt-6">
-                  <p className="text-electric-blue">
+                  <p className="text-cyan-400">
                     {proj.start_date} - {proj.end_date || 'Present'}
                   </p>
                   {proj.link && proj.link.length > 0 && (
@@ -214,7 +213,7 @@ const Page = () => {
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="neon-btn text-sm"
+                          className="px-4 py-2 bg-neutral-800 text-neutral-200 rounded-lg hover:bg-neutral-700 transition-colors"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
@@ -235,8 +234,8 @@ const Page = () => {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-blue to-transparent" />
-          <h2 className="text-4xl font-bold text-electric-blue text-center mb-16">Certificates</h2>
+          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-neutral-200/20 to-transparent" />
+          <h2 className="text-4xl font-bold text-neutral-200 text-center mb-16">Certificates</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {portfolioData?.userDetails?.certificate?.map((cert) => (
               <motion.div
@@ -244,23 +243,23 @@ const Page = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 whileHover={{ y: -5 }}
-                className="glass p-8 rounded-xl hover-glow"
+                className="bg-neutral-900/50 border border-neutral-800 p-8 rounded-xl backdrop-blur-sm hover:bg-neutral-800/50 transition-all"
               >
-                <h3 className="text-2xl font-semibold text-neon-cyan">{cert.name}</h3>
-                <p className="text-electric-blue mt-2">{cert.issuing_organization}</p>
-                <p className="text-foreground/60 mt-4">Issued: {cert.issue_date}</p>
+                <h3 className="text-2xl font-semibold text-neutral-200">{cert.name}</h3>
+                <p className="text-cyan-400 mt-2">{cert.issuing_organization}</p>
+                <p className="text-neutral-400 mt-4">Issued: {cert.issue_date}</p>
                 {cert.expiry_date && (
-                  <p className="text-foreground/60">Expires: {cert.expiry_date}</p>
+                  <p className="text-neutral-400">Expires: {cert.expiry_date}</p>
                 )}
                 {cert.credential_id && (
-                  <p className="text-neon-cyan mt-2">Credential ID: {cert.credential_id}</p>
+                  <p className="text-cyan-400 mt-2">Credential ID: {cert.credential_id}</p>
                 )}
                 {cert.credential_url && (
                   <motion.a
                     href={cert.credential_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="neon-btn text-sm mt-4 inline-block"
+                    className="px-4 py-2 bg-neutral-800 text-neutral-200 rounded-lg hover:bg-neutral-700 transition-colors mt-4 inline-block"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -278,7 +277,7 @@ const Page = () => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsEditing(true)}
-        className="fixed bottom-8 right-8 neon-btn"
+        className="fixed bottom-8 right-8 px-6 py-3 bg-neutral-800 text-neutral-200 rounded-lg hover:bg-neutral-700 transition-colors border border-neutral-700"
       >
         Edit Profile
       </motion.button>
@@ -289,53 +288,53 @@ const Page = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass p-8 rounded-2xl max-w-2xl w-full mx-4"
+            className="bg-neutral-900/50 border border-neutral-800 p-8 rounded-2xl backdrop-blur-sm max-w-2xl w-full mx-4"
           >
-            <h2 className="text-2xl font-bold text-electric-blue mb-6">Edit Profile</h2>
+            <h2 className="text-2xl font-bold text-neutral-200 mb-6">Edit Profile</h2>
             <form onSubmit={handleUpdateUserDetails} className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <label className="text-neon-cyan block mb-2">Name</label>
+                  <label className="text-neutral-300 block mb-2">Name</label>
                   <input
                     type="text"
                     value={userDetails.name}
                     onChange={(e) => setUserDetails(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-neutral-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
                   />
                 </div>
                 <div>
-                  <label className="text-neon-cyan block mb-2">Title</label>
+                  <label className="text-neutral-300 block mb-2">Title</label>
                   <input
                     type="text"
                     value={userDetails.title}
                     onChange={(e) => setUserDetails(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-neutral-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
                   />
                 </div>
                 <div>
-                  <label className="text-neon-cyan block mb-2">Bio</label>
+                  <label className="text-neutral-300 block mb-2">Bio</label>
                   <textarea
                     value={userDetails.bio}
                     onChange={(e) => setUserDetails(prev => ({ ...prev, bio: e.target.value }))}
-                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue h-32"
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-neutral-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 h-32"
                   />
                 </div>
                 <div>
-                  <label className="text-neon-cyan block mb-2">Location</label>
+                  <label className="text-neutral-300 block mb-2">Location</label>
                   <input
                     type="text"
                     value={userDetails.location}
                     onChange={(e) => setUserDetails(prev => ({ ...prev, location: e.target.value }))}
-                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-neutral-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
                   />
                 </div>
                 <div>
-                  <label className="text-neon-cyan block mb-2">Website</label>
+                  <label className="text-neutral-300 block mb-2">Website</label>
                   <input
                     type="url"
                     value={userDetails.website}
                     onChange={(e) => setUserDetails(prev => ({ ...prev, website: e.target.value }))}
-                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-neutral-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
                   />
                 </div>
               </div>
@@ -343,7 +342,7 @@ const Page = () => {
                 <motion.button
                   type="button"
                   onClick={() => setIsEditing(false)}
-                  className="glass px-6 py-2 rounded-lg hover:bg-deep-indigo/20"
+                  className="px-6 py-2 bg-neutral-800 text-neutral-200 rounded-lg hover:bg-neutral-700 transition-colors"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -351,7 +350,7 @@ const Page = () => {
                 </motion.button>
                 <motion.button
                   type="submit"
-                  className="neon-btn"
+                  className="px-6 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
