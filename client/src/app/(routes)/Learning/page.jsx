@@ -37,7 +37,7 @@ export default function Home() {
 
   const fetchComponentData = async (roadmapId, componentNumber) => {
     try {
-      if (componentNumber == 0) {
+      if (componentNumber === 0) {
         console.log("Setting first component data:", roadmap.first_component);
         setComponentData(roadmap.first_component);
       } else {
@@ -48,11 +48,11 @@ export default function Home() {
           },
           body: JSON.stringify({ component_number: componentNumber }),
         });
-  
+        console.log("response", response);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-  
+
         const data = await response.json();
         console.log("Fetched component data:", data);
         setComponentData(data);
@@ -61,10 +61,9 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching component data:", error);
       setError("Failed to fetch component data. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   };
+
   const fetchRoadmapData = async (roadmapId) => {
     try {
       const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}`);
@@ -73,51 +72,69 @@ export default function Home() {
       }
       const data = await response.json();
       setIsCompleted(data.is_completed);
-      fetchComponentData(roadmapId, data.is_completed);
-      console.log( data.is_completed ,roadmapId );
+      if (roadmapId) {
+        fetchComponentData(roadmapId, data.is_completed);
+      }
+      console.log(data.is_completed, roadmapId);
     } catch (error) {
       console.error("Error fetching roadmap data:", error);
       setError("Failed to fetch roadmap data. Please try again.");
-      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (roadmapId && componentData === null) {
+        fetchComponentData(roadmapId, isCompleted);
+      } else {
+        clearInterval(interval);
+        setIsLoading(false);
+      }
+    }, 2000); // Retry every 2 seconds
+
+    return () => clearInterval(interval);
+  }, [roadmapId, componentData, isCompleted]);
 
   useEffect(() => {
     console.log("Updated isCompleted:", isCompleted);
   }, [isCompleted]);
 
-  
+  useEffect(() => {
+    const handleNextComponent = async () => {
+      if (currentComponentIndex + 1 < roadmap.total_components) {
+        try {
+          const newCompletedIndex = currentComponentIndex + 1;
+          const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}/complete`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ is_completed: newCompletedIndex }),
+          });
 
-  const handleNextComponent = async () => {
-    if (currentComponentIndex + 1 < roadmap.total_components) {
-      try {
-        const newCompletedIndex = currentComponentIndex + 1;
-        const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}/complete`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ is_completed: newCompletedIndex }),
-        });
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          const data = await response.json();
+          setIsCompleted(newCompletedIndex);
+          setCurrentComponentIndex(newCompletedIndex);
+          fetchComponentData(roadmapId, newCompletedIndex);
+          setQuizAnswers({});
+          setQuizCompleted(false);
+        } catch (error) {
+          console.error("Error updating completion status:", error);
+          setError("Failed to update completion status. Please try again.");
         }
-
-        const data = await response.json();
-        setIsCompleted(newCompletedIndex);
-        setCurrentComponentIndex(newCompletedIndex);
-        fetchComponentData(roadmapId, newCompletedIndex);
-        setQuizAnswers({});
-        setQuizCompleted(false);
-      } catch (error) {
-        console.error("Error updating completion status:", error);
-        setError("Failed to update completion status. Please try again.");
+      } else {
+        console.log("No more components available.");
       }
-    } else {
-      console.log("No more components available.");
+    };
+
+    if (componentData) {
+      handleNextComponent();
     }
-  };
+  }, [componentData, roadmapId]);
 
   const handleQuizAnswer = (questionIndex, selectedAnswer) => {
     setQuizAnswers((prevAnswers) => ({
@@ -142,54 +159,40 @@ export default function Home() {
     checkQuizCompletion();
   }, [quizAnswers]);
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-        className="w-16 h-16 border-4 border-electric-blue border-t-transparent rounded-full"
-      />
-    </div>
-  );
+  if (isLoading || componentData === null) {
+    return (
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="w-16 h-16 border-4 border-electric-blue border-t-transparent rounded-full"
+        />
+      </div>
+    );
+  }
 
-  if (error) return (
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
-      <motion.div
-        {...fadeIn}
-        className="glass p-8 rounded-2xl text-center max-w-md mx-4"
-      >
-        <div className="text-red-500 text-6xl mb-4">⚠️</div>
-        <h2 className="text-2xl font-bold text-electric-blue mb-4">Error</h2>
-        <p className="text-neon-cyan mb-6">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="neon-btn"
+  if (error) {
+    return (
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <motion.div
+          {...fadeIn}
+          className="glass p-8 rounded-2xl text-center max-w-md mx-4"
         >
-          Try Again
-        </button>
-      </motion.div>
-    </div>
-  );
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-electric-blue mb-4">Error</h2>
+          <p className="text-neon-cyan mb-6">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="neon-btn"
+          >
+            Try Again
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
 
-  if (!componentData) return (
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
-      <motion.div
-        {...fadeIn}
-        className="glass p-8 rounded-2xl text-center max-w-md mx-4"
-      >
-        <BookOpen className="w-16 h-16 text-electric-blue mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-electric-blue mb-4">No Content Available</h2>
-        <p className="text-neon-cyan mb-6">Please select a learning path to begin.</p>
-        <button
-          onClick={() => router.push('/')}
-          className="neon-btn"
-        >
-          Go to Dashboard
-        </button>
-      </motion.div>
-    </div>
-  );
-console.log("componentData",componentData);
+  console.log("componentData", componentData);
   return (
     <>
       {isCompleted === 0 ? (
@@ -197,7 +200,7 @@ console.log("componentData",componentData);
           <Head>
             <title>{componentData.name}</title>
           </Head>
-  
+
           <motion.div {...fadeIn} className="w-full max-w-7xl glass border border-soft-purple/20 rounded-2xl shadow-2xl p-6 space-y-6">
             {/* Progress Header */}
             <div className="flex items-center justify-between mb-8">
@@ -220,7 +223,7 @@ console.log("componentData",componentData);
                 <Award className="w-8 h-8 text-electric-blue" />
               </div>
             </div>
-  
+
             {/* Video Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -249,7 +252,7 @@ console.log("componentData",componentData);
                 </motion.div>
               ))}
             </motion.div>
-  
+
             {/* Description Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -260,7 +263,7 @@ console.log("componentData",componentData);
               <h2 className="text-xl font-bold text-electric-blue mb-4">Overview</h2>
               <p className="text-neon-cyan">{componentData.description}</p>
             </motion.div>
-  
+
             {/* Supplementary Materials Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -292,7 +295,7 @@ console.log("componentData",componentData);
                 </motion.a>
               </div>
             </motion.div>
-  
+
             {/* Quiz Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -305,7 +308,7 @@ console.log("componentData",componentData);
                 <h2 className="text-xl font-semibold text-electric-blue">Knowledge Check</h2>
               </div>
               <div className="glass p-6 rounded-xl border border-soft-purple/20">
-              {componentData.test_series.map((question, index) => (
+                {componentData.test_series.map((question, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: -20 }}
@@ -335,7 +338,7 @@ console.log("componentData",componentData);
                 ))}
               </div>
             </motion.div>
-  
+
             {/* Next Component Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -353,7 +356,7 @@ console.log("componentData",componentData);
           <Head>
             <title>{componentData.component.name}</title>
           </Head>
-  
+
           <motion.div {...fadeIn} className="w-full max-w-7xl glass border border-soft-purple/20 rounded-2xl shadow-2xl p-6 space-y-6">
             {/* Progress Header */}
             <div className="flex items-center justify-between mb-8">
@@ -376,7 +379,7 @@ console.log("componentData",componentData);
                 <Award className="w-8 h-8 text-electric-blue" />
               </div>
             </div>
-  
+
             {/* Video Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -405,7 +408,7 @@ console.log("componentData",componentData);
                 </motion.div>
               ))}
             </motion.div>
-  
+
             {/* Description Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -416,7 +419,7 @@ console.log("componentData",componentData);
               <h2 className="text-xl font-bold text-electric-blue mb-4">Overview</h2>
               <p className="text-neon-cyan">{componentData.component.description}</p>
             </motion.div>
-  
+
             {/* Supplementary Materials Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -448,7 +451,7 @@ console.log("componentData",componentData);
                 </motion.a>
               </div>
             </motion.div>
-  
+
             {/* Quiz Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -489,7 +492,7 @@ console.log("componentData",componentData);
                     </div>
                   </motion.div>
                 ))}
-  
+
                 {quizCompleted && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -510,7 +513,7 @@ console.log("componentData",componentData);
                 )}
               </div>
             </motion.div>
-  
+
             {/* Next Component Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -526,5 +529,4 @@ console.log("componentData",componentData);
       )}
     </>
   );
-  
 }
