@@ -4,17 +4,16 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
-const themes = [
-  { id: 'web', name: 'Web Development', icon: '💻' },
-  { id: 'mobile', name: 'Mobile Development', icon: '📱' },
-  { id: 'ai', name: 'Artificial Intelligence', icon: '🤖' },
-  { id: 'data', name: 'Data Science', icon: '📊' },
-  { id: 'cloud', name: 'Cloud Computing', icon: '☁️' },
-  { id: 'security', name: 'Cybersecurity', icon: '🔒' },
-];
+// const themes = [
+//   { id: 'web', name: 'Web Development', icon: '💻' },
+//   { id: 'mobile', name: 'Mobile Development', icon: '📱' },
+//   { id: 'ai', name: 'Artificial Intelligence', icon: '🤖' },
+//   { id: 'data', name: 'Data Science', icon: '📊' },
+//   { id: 'cloud', name: 'Cloud Computing', icon: '☁️' },
+//   { id: 'security', name: 'Cybersecurity', icon: '🔒' },
+// ];
 
-const mockQuestions = {
-  web: [
+const mockQuestions = [
     {
       id: 1,
       question: "What does HTML stand for?",
@@ -127,78 +126,26 @@ const mockQuestions = {
       ],
       correct: "Adapting to Different Screen Sizes"
     }
-  ],
+  ];
   // Add more themes with their respective questions here
-};
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
-    {/* Gradient background */}
-    <div className="absolute inset-0 bg-gradient-to-b from-deep-indigo/20 via-soft-purple/10 to-electric-blue/5" />
-    
-    {/* Animated grid */}
-    <div className="absolute inset-0 bg-grid-small-white/[0.2] -z-10" />
-    
-    {/* Gradient dots */}
-    <div className="absolute inset-0 bg-dot-white/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
-    
-    {/* Radial gradient */}
-    <div className="absolute inset-0 bg-gradient-radial from-soft-purple/20 via-transparent to-transparent" />
+    <div className="absolute inset-0 bg-neutral-950" />
+    <div className="absolute inset-0 bg-grid-small-white/[0.05] -z-10" />
+    <div className="absolute inset-0 bg-dot-white/[0.05] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
+    <div className="absolute inset-0 bg-gradient-radial from-white/10 via-transparent to-transparent" />
   </div>
 );
 
-const FloatingElements = () => {
-  const elements = [
-    { icon: "🎯", delay: 0 },
-    { icon: "💡", delay: 0.2 },
-    { icon: "🧩", delay: 0.4 },
-    { icon: "🎮", delay: 0.6 },
-    { icon: "🏆", delay: 0.8 },
-  ];
-
-  return (
-    <div className="absolute inset-0 -z-5 overflow-hidden">
-      {elements.map((el, index) => (
-        <motion.div
-          key={index}
-          className="absolute text-4xl"
-          initial={{ opacity: 0, y: 100 }}
-          animate={{ 
-            opacity: [0.5, 1, 0.5],
-            y: [-20, 20, -20],
-            x: index % 2 === 0 ? [-20, 20, -20] : [20, -20, 20]
-          }}
-          transition={{
-            duration: 5,
-            delay: el.delay,
-            repeat: Infinity,
-            repeatType: "reverse"
-          }}
-          style={{
-            left: `${(index + 1) * 15}%`,
-            top: `${(index + 1) * 10}%`
-          }}
-        >
-          {el.icon}
-        </motion.div>
-      ))}
-    </div>
-  );
-};
-
 function QuizPage() {
-  const [selectedTheme, setSelectedTheme] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [score, setScore] = useState(0);
   const router = useRouter();
 
-  const handleThemeSelect = (theme) => {
-    setSelectedTheme(theme);
-  };
-
   const handleAnswer = (answer) => {
-    const isCorrect = answer === mockQuestions[selectedTheme.id][currentQuestion].correct;
+    const isCorrect = answer === mockQuestions[currentQuestion].correct;
     setAnswers({
       ...answers,
       [currentQuestion]: { answer, isCorrect }
@@ -208,65 +155,17 @@ function QuizPage() {
       setScore(score + 1);
     }
 
-    if (currentQuestion < mockQuestions[selectedTheme.id].length - 1) {
+    if (currentQuestion < mockQuestions.length - 1) {
       setTimeout(() => {
         setCurrentQuestion(currentQuestion + 1);
       }, 500);
     } else {
       // Navigate to congratulations page with score
-      router.push(`/quiz/congratulations?score=${score}&total=${mockQuestions[selectedTheme.id].length}&theme=${selectedTheme.name}`);
+      router.push(`/quiz/congratulations?score=${score}&total=${mockQuestions.length}&theme=Web Development`);
     }
   };
 
-  if (!selectedTheme) {
-    return (
-      <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4 relative overflow-hidden">
-        <HeroBackground />
-        <FloatingElements />
-        
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl w-full glass p-8 rounded-2xl relative z-10"
-        >
-          <motion.div
-            initial={{ y: -20 }}
-            animate={{ y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-center mb-8"
-          >
-            <h1 className="text-4xl md:text-6xl font-bold text-electric-blue mb-4">
-              Test Your Knowledge
-            </h1>
-            <p className="text-neon-cyan text-lg">
-              Choose a theme and challenge yourself!
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {themes.map((theme, index) => (
-              <motion.button
-                key={theme.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05, y: -5 }}
-                whileTap={{ scale: 0.95 }}
-                className="glass p-8 rounded-xl hover-glow text-center relative overflow-hidden group"
-                onClick={() => handleThemeSelect(theme)}
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-electric-blue/5 rounded-full -mr-16 -mt-16 group-hover:bg-electric-blue/10 transition-colors" />
-                <span className="text-5xl mb-4 block transform group-hover:scale-110 transition-transform">{theme.icon}</span>
-                <h3 className="text-xl font-semibold text-neon-cyan">{theme.name}</h3>
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
-
-  const currentQuestionData = mockQuestions[selectedTheme.id][currentQuestion];
+  const currentQuestionData = mockQuestions[currentQuestion];
 
   return (
     <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4 relative overflow-hidden">
@@ -275,7 +174,7 @@ function QuizPage() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-3xl w-full glass p-8 rounded-2xl relative z-10"
+        className="max-w-3xl w-full bg-neutral-900/50 border border-neutral-800 p-8 rounded-2xl relative z-10 backdrop-blur-sm"
       >
         {/* Progress Bar */}
         <div className="mb-8">
@@ -283,23 +182,23 @@ function QuizPage() {
             <motion.span 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-neon-cyan text-lg"
+              className="text-neutral-400 text-lg"
             >
-              Question {currentQuestion + 1} of {mockQuestions[selectedTheme.id].length}
+              Question {currentQuestion + 1} of {mockQuestions.length}
             </motion.span>
             <motion.span 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-electric-blue text-lg font-semibold"
+              className="text-neutral-200 text-lg font-semibold"
             >
               Score: {score}
             </motion.span>
           </div>
-          <div className="w-full h-3 bg-deep-indigo/20 rounded-full overflow-hidden">
+          <div className="w-full h-3 bg-neutral-800 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${((currentQuestion + 1) / mockQuestions[selectedTheme.id].length) * 100}%` }}
-              className="h-full bg-gradient-to-r from-electric-blue to-neon-cyan rounded-full"
+              animate={{ width: `${((currentQuestion + 1) / mockQuestions.length) * 100}%` }}
+              className="h-full bg-neutral-600 rounded-full"
             />
           </div>
         </div>
@@ -307,35 +206,39 @@ function QuizPage() {
         {/* Question */}
         <motion.div
           key={currentQuestion}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
           className="space-y-8"
         >
-          <h2 className="text-3xl font-bold text-electric-blue">
+          <h2 className="text-2xl font-semibold text-neutral-200">
             {currentQuestionData.question}
           </h2>
-          <div className="space-y-4">
+
+          {/* Options */}
+          <div className="grid gap-4">
             {currentQuestionData.options.map((option, index) => (
               <motion.button
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`w-full glass p-6 rounded-xl text-left hover-glow transition-all relative overflow-hidden group ${
+                onClick={() => handleAnswer(option)}
+                className={`w-full p-4 text-left rounded-xl transition-all ${
                   answers[currentQuestion]?.answer === option
                     ? answers[currentQuestion].isCorrect
-                      ? 'bg-green-500/20 text-green-500'
-                      : 'bg-red-500/20 text-red-500'
-                    : 'text-neon-cyan'
+                      ? 'bg-neutral-700 text-neutral-200'
+                      : 'bg-neutral-800 text-neutral-400'
+                    : 'bg-neutral-800/50 hover:bg-neutral-700/50 text-neutral-300'
                 }`}
-                onClick={() => handleAnswer(option)}
                 disabled={answers[currentQuestion]}
               >
-                <div className="absolute top-0 right-0 w-24 h-24 bg-electric-blue/5 rounded-full -mr-12 -mt-12 group-hover:bg-electric-blue/10 transition-colors" />
-                <span className="relative z-10">{option}</span>
+                <span className="flex items-center space-x-3">
+                  <span className="w-6 h-6 flex items-center justify-center rounded-full border border-neutral-600 text-sm">
+                    {String.fromCharCode(65 + index)}
+                  </span>
+                  <span>{option}</span>
+                </span>
               </motion.button>
             ))}
           </div>
