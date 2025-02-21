@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { io } from 'socket.io-client';
 import { useUserContext } from '@/app/context/Userinfo';
+import { motion } from 'framer-motion';
 
 const page = () => {
   const { room } = useParams();
@@ -173,66 +174,112 @@ const page = () => {
 
   return (
     contextisLoggedIn ? (
-      <div className="min-h-screen text-neutral-100 p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold text-center mb-4">Participants:</h3>
-            <div className="flex justify-center space-x-4">
+      <div className="min-h-screen bg-neutral-950 text-neutral-100 p-6 mt-[5%]">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Participants Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-neutral-900/50 backdrop-blur-sm border border-neutral-800 rounded-2xl p-6"
+          >
+            <h3 className="text-2xl font-semibold text-center mb-6 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+              Active Participants
+            </h3>
+            <div className="flex flex-wrap justify-center gap-4">
               {users.map((user, index) => (
-                <span 
-                  key={index} 
-                  className="bg-neutral-800 px-4 py-2 rounded-full text-neutral-300"
+                <motion.span 
+                  key={index}
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-neutral-800/50 border border-neutral-700 px-6 py-2 rounded-full text-neutral-200 flex items-center gap-2"
                 >
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                   {user.name || 'Anonymous'}
-                </span>
+                </motion.span>
               ))}
             </div>
-          </div>
+          </motion.div>
           
-          <div className="sm:flex justify-center sm:space-x-8 mb-8">
-            <div className="relative">
+          {/* Video Grid */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Local Video */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative group"
+            >
               <video 
                 ref={localVideoRef} 
                 autoPlay 
                 playsInline 
                 muted 
-                className="w-[90vw] sm:w-[500px] sm:h-[400px] bg-black rounded-3xl shadow-lg"
-              ></video>
-              <div className="absolute bottom-2 left-2 bg-neutral-800/70 px-3 py-1 rounded-full text-sm">
-                You ({name})
+                className="w-full aspect-video bg-neutral-900 rounded-2xl shadow-lg border border-neutral-800 transition-transform duration-300 group-hover:scale-[1.02]"
+              />
+              <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full text-sm border border-neutral-800">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                  You ({name})
+                </div>
               </div>
-            </div>
-            <br></br>
-            <div className="relative">
+            </motion.div>
+
+            {/* Remote Video */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="relative group"
+            >
               <video 
                 ref={remoteVideoRef} 
                 autoPlay 
                 playsInline 
-                className="w-[90vw] sm:w-[500px] sm:h-[400px] bg-black rounded-3xl shadow-lg"
-              ></video>
+                className="w-full aspect-video bg-neutral-900 rounded-2xl shadow-lg border border-neutral-800 transition-transform duration-300 group-hover:scale-[1.02]"
+              />
               {users.length > 0 && (
-                <div className="absolute bottom-2 left-2 bg-neutral-800/70 px-3 py-1 rounded-full text-sm">
-                  {users[0]?.name || 'Remote Participant'}
+                <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full text-sm border border-neutral-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                    {users[0]?.name || 'Remote Participant'}
+                  </div>
                 </div>
               )}
-            </div>
+            </motion.div>
           </div>
           
-          <div className="flex justify-center space-x-4">
-            <button 
-              onClick={endCall} 
-              className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md transition duration-300 ease-in-out transform hover:scale-105"
+          {/* Controls */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex justify-center"
+          >
+            <motion.button 
+              onClick={endCall}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-red-500/20 hover:bg-red-500/30 text-red-500 border border-red-500/50 font-medium px-8 py-3 rounded-full transition-all duration-300 flex items-center gap-2"
             >
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
               End Call
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         </div>
       </div>
     ) : (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center justify-center rounded-lg shadow-lg">
-          <h1 className="text-9xl font-semibold text-neutral-100">Please Login First</h1>
-        </div>
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-6">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-neutral-900/50 backdrop-blur-sm border border-neutral-800 rounded-2xl p-12 text-center"
+        >
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent mb-4">
+            Please Login First
+          </h1>
+          <p className="text-neutral-400">
+            You need to be logged in to join this video call
+          </p>
+        </motion.div>
       </div>
     )
   );
