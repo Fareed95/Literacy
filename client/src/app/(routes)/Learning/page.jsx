@@ -189,7 +189,7 @@ export default function Home() {
       </motion.div>
     </div>
   );
-
+console.log("componentData",componentData);
   return (
     <>
       {isCompleted === 0 ? (
@@ -305,7 +305,34 @@ export default function Home() {
                 <h2 className="text-xl font-semibold text-electric-blue">Knowledge Check</h2>
               </div>
               <div className="glass p-6 rounded-xl border border-soft-purple/20">
-                {/* Quiz content commented out */}
+              {componentData.test_series.map((question, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="mb-6"
+                  >
+                    <h3 className="text-lg font-semibold text-electric-blue mb-4">{question.question}</h3>
+                    <div className="space-y-3">
+                      {question.options.map((option, optionIndex) => (
+                        <label
+                          key={optionIndex}
+                          className="flex items-center space-x-3 p-3 glass rounded-lg cursor-pointer transition-all hover:bg-deep-indigo/20"
+                        >
+                          <input
+                            type="radio"
+                            name={`question-${index}`}
+                            value={option}
+                            onChange={() => handleQuizAnswer(index, option)}
+                            className="form-radio text-electric-blue"
+                          />
+                          <span className="text-neon-cyan">{option}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </motion.div>
   
