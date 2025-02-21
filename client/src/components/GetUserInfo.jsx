@@ -1,62 +1,76 @@
-"use client"
-import React from 'react'
-import { useEffect } from 'react';
+"use client";
+import React, { useEffect } from 'react';
 import { useUserContext } from '@/app/context/Userinfo';
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
+
 function GetUserInfo() {
-    const { toast } = useToast();
+  const { toast } = useToast();
+  const { contextsetIsLoggedIn, contextsetEmail, contextsetName, contextisLoggedIn } = useUserContext();
 
-    const {contextsetIsLoggedIn,contextsetEmail,contextsetName,contextisLoggedIn}= useUserContext();
+  const getUserInfo = async () => {
+    const token = localStorage.getItem('authToken');
 
-    const getUserInfo = async () => {
-       
-           
-              const token = localStorage.getItem('authToken');
-              
-           
-          
-        if (!token) return; // Early return if no token exists
-    
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`, {
-            method: 'GET',
-            headers: {
-              "Authorization": token,
-              'Content-Type': "application/json",
-            },
-            credentials: 'include',
-          });
-    
-         
-    if(response.ok){
-        const result = await response.json();
-          contextsetIsLoggedIn(true);
-          contextsetEmail(result.email);
-          contextsetName(result.name);
-          toast({
-            title: "Successfully logged in",
-            description: `Welcome back, ${result.name}!`,
-          });
+    if (!token) {
+      console.warn("No authentication token found");
+      return; // Early return if no token exists
     }
-          
-    
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-          
-        }
-       
-      };
-      useEffect(() => {
+    console.log('Token:', token); 
+    try {
+      const response = await fetch('http://localhost:8000/api/user', {
+        method: 'GET',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          'Content-Type': "application/json",
+        },
+        credentials: 'include',
+      });
 
-            getUserInfo()
-        
-        
-      },[contextisLoggedIn])
-  return (
-    <div>
-      
-    </div>
-  )
+      // Log the response status and status text
+      console.log('Response Status:', response.status, response.statusText);
+
+      if (!response.ok) {
+        // Check for specific status codes and handle them accordingly
+        if (response.status === 401) {
+          toast({
+            title: "Unauthorized",
+            description: "Your session may have expired. Please log in again.",
+          });
+        } else {
+          toast({
+            title: "Failed to fetch user info",
+            description: `Error ${response.status}: ${response.statusText}`,
+          });
+        }
+        throw new Error('Failed to fetch user info');
+      }
+
+      const result = await response.json();
+      console.log('User Info:', result);
+
+      // Update context with user information
+      contextsetIsLoggedIn(true);
+      contextsetEmail(result.email);
+      contextsetName(result.name);
+
+      toast({
+        title: "Successfully logged in",
+        description: `Welcome back, ${result.name}!`,
+      });
+
+    } catch (error) {
+      toast({
+        title: "There was an error",
+        description: error.message,
+      });
+      console.error("Error fetching user info:", error);
+    }
+  };
+
+  useEffect(() => {
+    getUserInfo();
+  }, [contextisLoggedIn]);
+
+  return <div></div>;
 }
 
-export default GetUserInfo
+export default GetUserInfo;

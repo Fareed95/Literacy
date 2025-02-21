@@ -17,7 +17,7 @@ const [member,setMember] = useState(false)
     const token = localStorage.getItem('authToken');
 
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`,
+        const response = await fetch(`http://0.0.0.0:8000/api/user`,
         {
             method: 'GET',
             headers: {

@@ -40,21 +40,29 @@ const InterviewSlot = ({ slot }) => (
     className="bg-neutral-900/50 border border-neutral-800 p-4 rounded-xl space-y-3 hover:bg-neutral-800/50 transition-colors backdrop-blur-sm"
   >
     <div className="flex items-center justify-between">
-      <h4 className="text-neutral-200 font-medium">{slot.title}</h4>
-      <span className={`px-2 py-1 rounded-full text-xs ${slot.status === 'upcoming' ? 'bg-neutral-700 text-neutral-200' :
-        slot.status === 'completed' ? 'bg-neutral-800 text-neutral-400' :
-          'bg-neutral-700 text-neutral-400'
-        }`}>
-        {slot.status.charAt(0).toUpperCase() + slot.status.slice(1)}
+      <h4 className="text-neutral-200 font-medium">{slot.internship_name}</h4>
+      <span className="px-2 py-1 rounded-full text-xs bg-neutral-700 text-neutral-200">
+        {slot.is_selected ? 'Selected' : 'Pending'}
       </span>
     </div>
     <div className="flex items-center space-x-2 text-sm text-neutral-400">
+      <Users className="w-4 h-4" />
+      <span>{slot.company_name}</span>
+    </div>
+    <div className="flex items-center space-x-2 text-sm text-neutral-400">
       <Calendar className="w-4 h-4" />
-      <span>{slot.date}</span>
+      <span>{new Date(slot.interviw_time).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })}</span>
     </div>
     <div className="flex items-center space-x-2 text-sm text-neutral-400">
       <Clock className="w-4 h-4" />
-      <span>{slot.time}</span>
+      <span>{new Date(slot.interviw_time).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })}</span>
     </div>
     <motion.button
       whileHover={{ scale: 1.02 }}
@@ -62,7 +70,7 @@ const InterviewSlot = ({ slot }) => (
       className="w-full px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-lg flex items-center justify-center space-x-2 transition-colors"
     >
       <Video className="w-4 h-4" />
-      <span>Join Meeting</span>
+      <span>Join Interview</span>
     </motion.button>
   </motion.div>
 );
@@ -81,31 +89,33 @@ const UserInfoPage = () => {
       language: 'en',
     }
   });
+  const [interviewSlots, setInterviewSlots] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    // Fetch user details from your API
-    const fetchUserDetails = async () => {
+    // Fetch user details and interview slots from your API
+    const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/userdetails/${email}/`);
+        const response = await fetch(`http://localhost:8000/api/user`);
         if (response.ok) {
           const data = await response.json();
           setUserDetails(prev => ({
             ...prev,
             name: data.name || name,
             email: data.email || email,
-            role: data.role || 'Student',
-            joinDate: data.created_at || new Date().toISOString(),
-            lastActive: data.last_login || new Date().toISOString(),
+            role: data.is_company ? 'Company' : 'Student',
+            joinDate: new Date().toISOString(),
+            lastActive: new Date().toISOString(),
           }));
+          setInterviewSlots(data.interview_selected || []);
         }
       } catch (error) {
-        console.error('Error fetching user details:', error);
+        console.error('Error fetching user data:', error);
       }
     };
 
-    if (isLoggedIn && email) {
-      fetchUserDetails();
+    if (isLoggedIn) {
+      fetchUserData();
     }
   }, [email, isLoggedIn, name]);
 
@@ -138,7 +148,7 @@ const UserInfoPage = () => {
   ];
 
   // Mock data for interview slots
-  const interviewSlots = [
+  const interviewSlotsMock = [
     {
       id: 1,
       title: 'Frontend Developer Interview',
@@ -246,21 +256,18 @@ const UserInfoPage = () => {
                 <Calendar className="w-5 h-5 text-neutral-200" />
                 <h3 className="text-xl font-semibold text-neutral-200">Interview Slots</h3>
               </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-lg transition-colors"
-              >
-                Schedule New
-              </motion.button>
             </div>
             <div className="space-y-4">
-              {interviewSlots.map((slot, index) => (
-                <InterviewSlot
-                  key={slot.id}
-                  slot={slot}
-                />
-              ))}
+              {interviewSlots.length > 0 ? (
+                interviewSlots.map((slot) => (
+                  <InterviewSlot
+                    key={slot.id}
+                    slot={slot}
+                  />
+                ))
+              ) : (
+                <p className="text-neutral-400 text-center py-4">No interview slots scheduled</p>
+              )}
             </div>
           </motion.div>
         </div>

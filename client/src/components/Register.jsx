@@ -51,7 +51,7 @@ const { data: session } = useSession()
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/register`, {
+      const response = await fetch(`http://0.0.0.0:8000/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

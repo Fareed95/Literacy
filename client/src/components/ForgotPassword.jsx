@@ -41,7 +41,7 @@ const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/password-reset/`,
+        `http://0.0.0.0:8000/api/password-reset/`,
         {
           method: "POST",
           headers: {
@@ -70,7 +70,7 @@ const handleSubmit = async (e) => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/password-reset-request/`,
+        `http://0.0.0.0:8000/api/password-reset-request/`,
         {
           method: "POST",
           headers: {
@@ -115,7 +115,7 @@ const handleSubmit = async (e) => {
 if (!token) return; // Early return if no token exists
 
 try {
-const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`, {
+const response = await fetch(`http://0.0.0.0:8000/api/user`, {
   method: 'GET',
   headers: {
     "Authorization": token,
@@ -154,7 +154,7 @@ useEffect(() => {
 
     const password =pass;
    
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
+    const response = await fetch(`http://0.0.0.0:8000/api/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
