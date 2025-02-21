@@ -1,133 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-
-// const themes = [
-//   { id: 'web', name: 'Web Development', icon: '💻' },
-//   { id: 'mobile', name: 'Mobile Development', icon: '📱' },
-//   { id: 'ai', name: 'Artificial Intelligence', icon: '🤖' },
-//   { id: 'data', name: 'Data Science', icon: '📊' },
-//   { id: 'cloud', name: 'Cloud Computing', icon: '☁️' },
-//   { id: 'security', name: 'Cybersecurity', icon: '🔒' },
-// ];
-
-const mockQuestions = [
-    {
-      id: 1,
-      question: "What does HTML stand for?",
-      options: [
-        "Hyper Text Markup Language",
-        "High Tech Modern Language",
-        "Hyper Transfer Markup Language",
-        "Hybrid Text Management Language"
-      ],
-      correct: "Hyper Text Markup Language"
-    },
-    {
-      id: 2,
-      question: "Which of these is a JavaScript framework?",
-      options: ["Django", "Flask", "React", "Ruby"],
-      correct: "React"
-    },
-    {
-      id: 3,
-      question: "What is CSS used for?",
-      options: [
-        "Database Management",
-        "Styling Web Pages",
-        "Server Configuration",
-        "Network Security"
-      ],
-      correct: "Styling Web Pages"
-    },
-    {
-      id: 4,
-      question: "What is the latest version of HTML?",
-      options: ["HTML4", "HTML5", "HTML6", "HTML7"],
-      correct: "HTML5"
-    },
-    {
-      id: 5,
-      question: "Which tag is used for creating hyperlinks?",
-      options: ["<link>", "<a>", "<href>", "<url>"],
-      correct: "<a>"
-    },
-    {
-      id: 6,
-      question: "What is the purpose of JavaScript?",
-      options: [
-        "Styling",
-        "Structure",
-        "Interactivity",
-        "Database Management"
-      ],
-      correct: "Interactivity"
-    },
-    {
-      id: 7,
-      question: "What does API stand for?",
-      options: [
-        "Application Programming Interface",
-        "Advanced Programming Integration",
-        "Automated Program Interface",
-        "Application Process Integration"
-      ],
-      correct: "Application Programming Interface"
-    },
-    {
-      id: 8,
-      question: "Which is a CSS preprocessor?",
-      options: ["SASS", "Java", "Python", "PHP"],
-      correct: "SASS"
-    },
-    {
-      id: 9,
-      question: "What is Redux used for?",
-      options: [
-        "State Management",
-        "Database Operations",
-        "Server Configuration",
-        "UI Design"
-      ],
-      correct: "State Management"
-    },
-    {
-      id: 10,
-      question: "What is webpack?",
-      options: [
-        "Module Bundler",
-        "Programming Language",
-        "Database System",
-        "Web Server"
-      ],
-      correct: "Module Bundler"
-    },
-    {
-      id: 11,
-      question: "What is the purpose of npm?",
-      options: [
-        "Package Manager",
-        "Web Browser",
-        "Code Editor",
-        "Operating System"
-      ],
-      correct: "Package Manager"
-    },
-    {
-      id: 12,
-      question: "What is responsive design?",
-      options: [
-        "Fast Loading Websites",
-        "Adapting to Different Screen Sizes",
-        "Secure Websites",
-        "Database Design"
-      ],
-      correct: "Adapting to Different Screen Sizes"
-    }
-  ];
-  // Add more themes with their respective questions here
+import { Loader2 } from 'lucide-react';
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -139,65 +15,118 @@ const HeroBackground = () => (
 );
 
 function QuizPage() {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState({});
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const router = useRouter();
 
-  const handleAnswer = (answer) => {
-    const isCorrect = answer === mockQuestions[currentQuestion].correct;
-    setAnswers({
-      ...answers,
-      [currentQuestion]: { answer, isCorrect }
-    });
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:8001/testseries`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            input_value: "I want to learn java"
+          })
+        });
 
-    if (isCorrect) {
+        if (!response.ok) {
+          throw new Error('Failed to fetch questions');
+        }
+
+        const data = await response.json();
+        if (!data.questions || data.questions.length === 0) {
+          throw new Error('No questions available');
+        }
+        setQuestions(data.questions);
+      } catch (err) {
+        console.error('Error fetching questions:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuestions();
+  }, []);
+
+  const handleAnswer = (answer) => {
+    if (isAnswered) return;
+    
+    setSelectedAnswer(answer);
+    setIsAnswered(true);
+    
+    if (answer === questions[currentQuestionIndex].answer) {
       setScore(score + 1);
     }
 
-    if (currentQuestion < mockQuestions.length - 1) {
-      setTimeout(() => {
-        setCurrentQuestion(currentQuestion + 1);
-      }, 500);
-    } else {
-      // Navigate to congratulations page with score
-      router.push(`/quiz/congratulations?score=${score}&total=${mockQuestions.length}&theme=Web Development`);
-    }
+    // Wait for 1.5 seconds before moving to the next question
+    setTimeout(() => {
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setSelectedAnswer(null);
+        setIsAnswered(false);
+      } else {
+        // Quiz completed, navigate to results page
+        router.push(`/quiz/congratulations?score=${score + (answer === questions[currentQuestionIndex].answer ? 1 : 0)}&total=${questions.length}&topic=Java`);
+      }
+    }, 1500);
   };
 
-  const currentQuestionData = mockQuestions[currentQuestion];
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <HeroBackground />
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-neutral-400 mx-auto mb-4" />
+          <p className="text-neutral-400">Loading questions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <HeroBackground />
+        <div className="text-center">
+          <p className="text-red-400 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-neutral-800 text-neutral-200 rounded-lg hover:bg-neutral-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-neutral-950 p-4 relative mt-10">
       <HeroBackground />
       
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-3xl w-full bg-neutral-900/50 border border-neutral-800 p-8 rounded-2xl relative z-10 backdrop-blur-sm"
-      >
-        {/* Progress Bar */}
+      <div className="max-w-3xl mx-auto">
+        {/* Progress bar */}
         <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <motion.span 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="text-neutral-400 text-lg"
-            >
-              Question {currentQuestion + 1} of {mockQuestions.length}
-            </motion.span>
-            <motion.span 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="text-neutral-200 text-lg font-semibold"
-            >
-              Score: {score}
-            </motion.span>
+          <div className="flex justify-between text-sm text-neutral-400 mb-2">
+            <span>Question {currentQuestionIndex + 1} of {questions.length}</span>
+            <span>Score: {score}</span>
           </div>
-          <div className="w-full h-3 bg-neutral-800 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-neutral-800 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${((currentQuestion + 1) / mockQuestions.length) * 100}%` }}
+              animate={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
               className="h-full bg-neutral-600 rounded-full"
             />
           </div>
@@ -205,45 +134,42 @@ function QuizPage() {
 
         {/* Question */}
         <motion.div
-          key={currentQuestion}
+          key={currentQuestionIndex}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="space-y-8"
+          className="bg-neutral-900/50 border border-neutral-800 p-6 rounded-xl backdrop-blur-sm mb-6"
         >
-          <h2 className="text-2xl font-semibold text-neutral-200">
-            {currentQuestionData.question}
-          </h2>
-
-          {/* Options */}
-          <div className="grid gap-4">
-            {currentQuestionData.options.map((option, index) => (
+          <h2 className="text-xl text-neutral-200 mb-4">{currentQuestion.question}</h2>
+          
+          <div className="space-y-3">
+            {currentQuestion.options.map((option, index) => (
               <motion.button
                 key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
                 onClick={() => handleAnswer(option)}
-                className={`w-full p-4 text-left rounded-xl transition-all ${
-                  answers[currentQuestion]?.answer === option
-                    ? answers[currentQuestion].isCorrect
-                      ? 'bg-neutral-700 text-neutral-200'
-                      : 'bg-neutral-800 text-neutral-400'
-                    : 'bg-neutral-800/50 hover:bg-neutral-700/50 text-neutral-300'
-                }`}
-                disabled={answers[currentQuestion]}
+                disabled={isAnswered}
+                className={`w-full p-4 rounded-lg text-left transition-all ${
+                  isAnswered
+                    ? option === currentQuestion.answer
+                      ? 'bg-green-500/20 text-green-300 border-green-500/50'
+                      : option === selectedAnswer
+                      ? 'bg-red-500/20 text-red-300 border-red-500/50'
+                      : 'bg-neutral-800/50 text-neutral-400'
+                    : 'bg-neutral-800/50 text-neutral-200 hover:bg-neutral-700/50'
+                } border border-neutral-700`}
+                whileHover={!isAnswered ? { scale: 1.02 } : {}}
+                whileTap={!isAnswered ? { scale: 0.98 } : {}}
               >
-                <span className="flex items-center space-x-3">
-                  <span className="w-6 h-6 flex items-center justify-center rounded-full border border-neutral-600 text-sm">
+                <div className="flex items-center">
+                  <span className="w-6 h-6 rounded-full border border-current flex items-center justify-center mr-3 text-sm">
                     {String.fromCharCode(65 + index)}
                   </span>
-                  <span>{option}</span>
-                </span>
+                  {option}
+                </div>
               </motion.button>
             ))}
           </div>
         </motion.div>
-      </motion.div>
+      </div>
     </div>
   );
 }
