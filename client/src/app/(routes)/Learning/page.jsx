@@ -7,7 +7,6 @@ import { useRoadmap } from '@/app/context/RoadmapContext';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
-
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
@@ -15,7 +14,7 @@ const fadeIn = {
 };
 
 export default function Home() {
-  const { roadmap ,setRoadmap} = useRoadmap();
+  const { roadmap } = useRoadmap();
   const [componentData, setComponentData] = useState(null);
   const [quizAnswers, setQuizAnswers] = useState({});
   const [quizCompleted, setQuizCompleted] = useState(false);
@@ -25,43 +24,20 @@ export default function Home() {
   const [roadmapId, setRoadmapId] = useState(null);
   const [isCompleted, setIsCompleted] = useState(null);
   const router = useRouter();
-  
   const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER;
 
-  // entry point
   useEffect(() => {
     if (roadmap?.roadmap_id) {
       setRoadmapId(roadmap.roadmap_id);
       fetchRoadmapData(roadmap.roadmap_id);
-      console.log("first com", roadmap.first_component);
     } else {
       router.push('/');
     }
   }, [roadmap]);
 
-// it gets the roadmap data 
-  const fetchRoadmapData = async (roadmapId) => {
-    try {
-      const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const data = await response.json();
-      setIsCompleted(data.is_completed);
-      fetchComponentData(roadmapId, isCompleted);
-      console.log( 
-        "Roadmap data loaded successfully:", data.is_completed);
-    } catch (error) {
-      console.error("Error fetching roadmap data:", error);
-      setError("Failed to fetch roadmap data. Please try again.");
-      setIsLoading(false);
-    }
-  };
-
-
   const fetchComponentData = async (roadmapId, componentNumber) => {
     try {
-      if (componentNumber == 0) {
+      if (componentNumber === 0) {
         console.log("Setting first component data:", roadmap.first_component);
         setComponentData(roadmap.first_component);
       } else {
@@ -72,11 +48,11 @@ export default function Home() {
           },
           body: JSON.stringify({ component_number: componentNumber }),
         });
-  
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-  
+
         const data = await response.json();
         console.log("Fetched component data:", data);
         setComponentData(data);
@@ -90,24 +66,34 @@ export default function Home() {
     }
   };
 
+  const fetchRoadmapData = async (roadmapId) => {
+    try {
+      const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      setIsCompleted(data.is_completed);
+      fetchComponentData(roadmapId, data.is_completed);
+      console.log(data.is_completed, roadmapId);
+    } catch (error) {
+      console.error("Error fetching roadmap data:", error);
+      setError("Failed to fetch roadmap data. Please try again.");
+      setIsLoading(false);
+    }
+  };
 
-  useEffect(() => {
-    console.log("Updated isCompleted:", isCompleted);
-  }, [isCompleted]);
-
-  
 
   const handleNextComponent = async () => {
-    if (isCompleted < roadmap.total_components) {
+    if (isCompleted + 1 < roadmap.total_components) {
       try {
-        const newCompletedIndex = currentComponentIndex + 1;
+        const newCompletedIndex = isCompleted + 1;
         console.log("Updating completion status to:", newCompletedIndex);
         const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}/complete`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
           },
-          
           body: JSON.stringify({ is_completed: newCompletedIndex }),
         });
 
@@ -117,13 +103,10 @@ export default function Home() {
 
         const data = await response.json();
         setIsCompleted(newCompletedIndex);
-        setRoadmap({
-          roadmap_id: roadmap.roadmap_id, // Send the roadmap id
-          total_components: roadmap.total_components,
-          first_component:roadmap.first_component  // Send the total components count
-        });
-        router.push('/Learning');
-
+        setCurrentComponentIndex(newCompletedIndex);
+        fetchComponentData(roadmapId, newCompletedIndex);
+        setQuizAnswers({});
+        setQuizCompleted(false);
       } catch (error) {
         console.error("Error updating completion status:", error);
         setError("Failed to update completion status. Please try again.");
@@ -211,7 +194,7 @@ export default function Home() {
           <Head>
             <title>{componentData.name}</title>
           </Head>
-  
+
           <motion.div {...fadeIn} className="w-full max-w-7xl glass border border-soft-purple/20 rounded-2xl shadow-2xl p-6 space-y-6">
             {/* Progress Header */}
             <div className="flex items-center justify-between mb-8">
@@ -234,7 +217,7 @@ export default function Home() {
                 <Award className="w-8 h-8 text-electric-blue" />
               </div>
             </div>
-  
+
             {/* Video Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -263,7 +246,7 @@ export default function Home() {
                 </motion.div>
               ))}
             </motion.div>
-  
+
             {/* Description Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -274,7 +257,7 @@ export default function Home() {
               <h2 className="text-xl font-bold text-electric-blue mb-4">Overview</h2>
               <p className="text-neon-cyan">{componentData.description}</p>
             </motion.div>
-  
+
             {/* Supplementary Materials Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -306,7 +289,7 @@ export default function Home() {
                 </motion.a>
               </div>
             </motion.div>
-  
+
             {/* Quiz Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -322,7 +305,7 @@ export default function Home() {
                 {/* Quiz content commented out */}
               </div>
             </motion.div>
-  
+
             {/* Next Component Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -340,7 +323,7 @@ export default function Home() {
           <Head>
             <title>{componentData.component.name}</title>
           </Head>
-  
+
           <motion.div {...fadeIn} className="w-full max-w-7xl glass border border-soft-purple/20 rounded-2xl shadow-2xl p-6 space-y-6">
             {/* Progress Header */}
             <div className="flex items-center justify-between mb-8">
@@ -363,7 +346,7 @@ export default function Home() {
                 <Award className="w-8 h-8 text-electric-blue" />
               </div>
             </div>
-  
+
             {/* Video Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -392,7 +375,7 @@ export default function Home() {
                 </motion.div>
               ))}
             </motion.div>
-  
+
             {/* Description Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -403,7 +386,7 @@ export default function Home() {
               <h2 className="text-xl font-bold text-electric-blue mb-4">Overview</h2>
               <p className="text-neon-cyan">{componentData.component.description}</p>
             </motion.div>
-  
+
             {/* Supplementary Materials Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -435,7 +418,7 @@ export default function Home() {
                 </motion.a>
               </div>
             </motion.div>
-  
+
             {/* Quiz Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -476,7 +459,7 @@ export default function Home() {
                     </div>
                   </motion.div>
                 ))}
-  
+
                 {quizCompleted && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -497,7 +480,7 @@ export default function Home() {
                 )}
               </div>
             </motion.div>
-  
+
             {/* Next Component Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -513,5 +496,4 @@ export default function Home() {
       )}
     </>
   );
-  
 }
