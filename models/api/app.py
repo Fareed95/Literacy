@@ -198,6 +198,7 @@ def generate_roadmap_first_component():
         first_name = result_json[0]['name']
         description = result_json[0]['description']
         document = result_json[0]['document']
+        test_series = result_json[0]['test_series']
 
             
         # Debugging: Print the roadmap_result to check its format
@@ -220,7 +221,8 @@ def generate_roadmap_first_component():
                 "name": str(first_name),
                 "description": str(description),
                 "document": str(document),
-                "videos": best_videos if best_videos else []
+                "videos": best_videos if best_videos else [],
+                "test_series": test_series
             }
         }
 
