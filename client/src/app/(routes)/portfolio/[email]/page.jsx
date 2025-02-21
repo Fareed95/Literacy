@@ -4,10 +4,14 @@ import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { usePortfolio } from '@/hooks/usePortfolio';
 import { useAuth } from '@/app/context/AuthContext';
-// import SplashCursor from '@/components/SplashCursor';
+import SplashCursor from '@/components/SplashCursor';
 import { ExternalLink, Globe } from "lucide-react";
 import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
 import { Vortex } from '@/components/ui/vortex';
+import { InfiniteMovingText } from '@/components/ui/infinite-moving-text';
+import { WavyBackground } from '@/components/ui/wavy-background';
+
+
 
 const StatsCard = ({ icon: Icon, label, value }) => (
   <motion.div
@@ -163,6 +167,8 @@ const Page = ({ params }) => {
   return (
     <div className="min-h-screen bg-neutral-950">
       <SparklesCore>
+        <SplashCursor />
+        <WavyBackground>
         {/* Hero Section */}
         <div className="relative pt-32 pb-16">
           <motion.div 
@@ -223,7 +229,7 @@ const Page = ({ params }) => {
             </TextRevealCard>
           </motion.div>
         </div>
-
+        </WavyBackground>
         <div className="max-w-7xl mx-auto px-4 space-y-24 pb-32">
           {/* Skills Section */}
           <motion.section
@@ -262,6 +268,8 @@ const Page = ({ params }) => {
               </div>
             </TextRevealCard>
           </motion.section>
+
+          <InfiniteMovingText />
 
           {/* Education Section */}
           <motion.section
