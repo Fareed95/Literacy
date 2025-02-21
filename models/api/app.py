@@ -12,6 +12,7 @@ from scrapping.youtube_scrapping import youtube_search  # Assuming synchronous f
 from scrapping.pdf_scrapping import search_and_download_pdf  # PDF scraping module
 from extraction.skill_extractor import extraction
 from llm.test_series import test_series
+from llm.ai_mentor import Ai_mentor
 import psycopg2
 from dotenv import load_dotenv
 
@@ -469,7 +470,26 @@ def test_series_api():
 
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+    
 
+@app.route("/ai-mentor", methods=["POST"])
+def ai_mentor_api():
+    """
+    AI Mentor API
+    """
+    try:
+        data = request.get_json()
+        question = data.get('question')
+        component = data.get('component')
+
+        if not question or not component:
+            return jsonify({"error": "question and component are required"}), 400
+
+        result = Ai_mentor(question=question, component=component)
+        return jsonify(result), 200
+
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 
 # Run Flask app
 if __name__ == '__main__':
