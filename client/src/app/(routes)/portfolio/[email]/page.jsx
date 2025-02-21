@@ -1,14 +1,28 @@
-'use client';
+'use client'
+import React, { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { useSession } from 'next-auth/react'
+import { usePortfolio } from '@/hooks/usePortfolio'
+import { useAuth } from '@/app/context/AuthContext'
+import { useRouter, useParams } from 'next/navigation'
 
-import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
-import { usePortfolio } from '@/hooks/usePortfolio';
-import { useAuth } from '@/app/context/AuthContext';
+const HeroBackground = () => (
+  <div className="absolute inset-0 -z-10 overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-b from-deep-indigo/20 via-soft-purple/10 to-electric-blue/5" />
+    <div className="absolute inset-0 bg-grid-small-white/[0.2] -z-10" />
+    <div className="absolute inset-0 bg-dot-white/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
+    <div className="absolute inset-0 bg-gradient-radial from-soft-purple/20 via-transparent to-transparent" />
+  </div>
+);
 
-const Page = ({ params }) => {
+const Page = () => {
   const { email: authEmail } = useAuth();
-  const isOwner = authEmail === decodeURIComponent(params.email);
-  const { portfolioData, updateUserDetails, loading, error } = usePortfolio(decodeURIComponent(params.email));
+  const router = useRouter();
+  const params = useParams();
+  const viewedEmail = params.email;
+  const isOwner = authEmail === viewedEmail;
+  
+  const { portfolioData, updateUserDetails, loading, error } = usePortfolio(viewedEmail);
   const [isEditing, setIsEditing] = useState(false);
   const [userDetails, setUserDetails] = useState({
     name: '',
@@ -50,33 +64,141 @@ const Page = ({ params }) => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500">Error loading portfolio data</p>
+      <div className="min-h-screen relative">
+        <HeroBackground />
+        <div className="flex items-center justify-center min-h-screen">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass p-8 rounded-2xl text-center max-w-md mx-4"
+          >
+            <h2 className="text-2xl font-bold text-electric-blue mb-4">Portfolio Not Found</h2>
+            <p className="text-neon-cyan mb-6">
+              {isOwner 
+                ? "You haven't created your portfolio yet. Click below to get started!"
+                : "This user hasn't created their portfolio yet."}
+            </p>
+            {isOwner && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsEditing(true)}
+                className="neon-btn"
+              >
+                Create Portfolio
+              </motion.button>
+            )}
+          </motion.div>
+        </div>
+        {isOwner && isEditing && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="glass p-8 rounded-2xl max-w-2xl w-full mx-4"
+            >
+              <h2 className="text-2xl font-bold text-electric-blue mb-6">Create Your Portfolio</h2>
+              <form onSubmit={handleUpdateUserDetails} className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-neon-cyan block mb-2">Name</label>
+                    <input
+                      type="text"
+                      value={userDetails.name}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-neon-cyan block mb-2">Title</label>
+                    <input
+                      type="text"
+                      value={userDetails.title}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-neon-cyan block mb-2">Bio</label>
+                    <textarea
+                      value={userDetails.bio}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, bio: e.target.value }))}
+                      className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue h-32"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-neon-cyan block mb-2">Location</label>
+                    <input
+                      type="text"
+                      value={userDetails.location}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, location: e.target.value }))}
+                      className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-neon-cyan block mb-2">Website</label>
+                    <input
+                      type="url"
+                      value={userDetails.website}
+                      onChange={(e) => setUserDetails(prev => ({ ...prev, website: e.target.value }))}
+                      className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-4">
+                  <motion.button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="glass px-6 py-2 rounded-lg hover:bg-deep-indigo/20"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    type="submit"
+                    className="neon-btn"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Create Portfolio
+                  </motion.button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-950 to-neutral-900">
+
+    <div className="min-h-screen relative">
+      <HeroBackground />
+      
+
       {/* Hero Section */}
-      <div className="relative pt-32 pb-16">
+      <div className="relative pt-32 pb-16 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl mx-auto px-4 text-center"
+          className="max-w-4xl mx-auto px-4 space-y-4"
         >
-          <h1 className="text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-electric-blue to-neon-cyan">
-            {userDetails.name || 'Portfolio'}
+          <h1 className="text-6xl font-bold text-electric-blue">
+            {userDetails.name || 'Your Name'}
           </h1>
-          <p className="text-2xl mt-4 text-soft-purple">{userDetails.title}</p>
+          <p className="text-2xl text-neon-cyan">{userDetails.title || 'Your Title'}</p>
           {userDetails.bio && (
-            <p className="mt-6 text-lg text-gray-400 max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/80 mt-4 max-w-2xl mx-auto">
               {userDetails.bio}
             </p>
           )}
-          <div className="flex items-center justify-center space-x-6 mt-8">
+          <div className="flex items-center justify-center space-x-4 mt-6">
             {userDetails.location && (
-              <span className="text-gray-400 flex items-center">
+              <span className="text-soft-purple flex items-center">
                 <span className="mr-2">📍</span> {userDetails.location}
               </span>
             )}
@@ -101,9 +223,8 @@ const Page = ({ params }) => {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <h2 className="text-4xl font-bold text-center mb-16 bg-clip-text text-transparent bg-gradient-to-r from-electric-blue to-neon-cyan">
-            Skills & Expertise
-          </h2>
+          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-blue to-transparent" />
+          <h2 className="text-4xl font-bold text-electric-blue text-center mb-16">Skills & Expertise</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {portfolioData?.toolNames?.map((toolName) => (
               <motion.div
@@ -111,7 +232,7 @@ const Page = ({ params }) => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 whileHover={{ y: -5 }}
-                className="bg-neutral-900/50 p-6 rounded-xl border border-gray-800 hover:border-electric-blue/50 transition-colors"
+                className="glass p-6 rounded-xl hover-glow"
               >
                 <h3 className="text-2xl font-semibold text-neon-cyan mb-4">{toolName.name}</h3>
                 <div className="space-y-3">
@@ -119,7 +240,7 @@ const Page = ({ params }) => {
                     <div key={tool.id} className="space-y-2">
                       <p className="text-electric-blue font-medium">{tool.name}</p>
                       {tool.components?.map((component) => (
-                        <p key={component.id} className="text-gray-400 pl-4 text-sm">
+                        <p key={component.id} className="text-foreground/60 pl-4 text-sm">
                           • {component.name}
                         </p>
                       ))}
@@ -137,23 +258,22 @@ const Page = ({ params }) => {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <h2 className="text-4xl font-bold text-center mb-16 bg-clip-text text-transparent bg-gradient-to-r from-electric-blue to-neon-cyan">
-            Education
-          </h2>
+          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-blue to-transparent" />
+          <h2 className="text-4xl font-bold text-electric-blue text-center mb-16">Education</h2>
           <div className="space-y-8">
             {portfolioData?.userDetails?.education?.map((edu) => (
               <motion.div
                 key={edu.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-neutral-900/50 p-8 rounded-xl border border-gray-800"
+                className="glass p-8 rounded-xl hover-glow"
               >
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
                     <h3 className="text-2xl font-semibold text-neon-cyan">{edu.degree}</h3>
                     <p className="text-electric-blue mt-2">{edu.field_of_study}</p>
-                    <p className="text-gray-400 mt-1">{edu.University}</p>
-                    <p className="text-gray-400">{edu.location}</p>
+                    <p className="text-foreground/60 mt-1">{edu.University}</p>
+                    <p className="text-foreground/60">{edu.location}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-neon-cyan">{edu.start_date} - {edu.end_date}</p>
@@ -173,9 +293,8 @@ const Page = ({ params }) => {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <h2 className="text-4xl font-bold text-center mb-16 bg-clip-text text-transparent bg-gradient-to-r from-electric-blue to-neon-cyan">
-            Projects
-          </h2>
+          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-blue to-transparent" />
+          <h2 className="text-4xl font-bold text-electric-blue text-center mb-16">Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {portfolioData?.userDetails?.project?.map((proj) => (
               <motion.div
@@ -183,10 +302,10 @@ const Page = ({ params }) => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 whileHover={{ y: -5 }}
-                className="bg-neutral-900/50 p-8 rounded-xl border border-gray-800"
+                className="glass p-8 rounded-xl hover-glow"
               >
                 <h3 className="text-2xl font-semibold text-neon-cyan">{proj.name}</h3>
-                <p className="text-gray-400 mt-4">{proj.description}</p>
+                <p className="text-foreground/80 mt-4">{proj.description}</p>
                 <div className="mt-6">
                   <p className="text-electric-blue">
                     {proj.start_date} - {proj.end_date || 'Present'}
@@ -199,7 +318,7 @@ const Page = ({ params }) => {
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-4 py-2 rounded-lg bg-electric-blue/10 text-electric-blue hover:bg-electric-blue/20 transition-colors text-sm"
+                          className="neon-btn text-sm"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
@@ -220,9 +339,8 @@ const Page = ({ params }) => {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <h2 className="text-4xl font-bold text-center mb-16 bg-clip-text text-transparent bg-gradient-to-r from-electric-blue to-neon-cyan">
-            Certificates
-          </h2>
+          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-blue to-transparent" />
+          <h2 className="text-4xl font-bold text-electric-blue text-center mb-16">Certificates</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {portfolioData?.userDetails?.certificate?.map((cert) => (
               <motion.div
@@ -230,13 +348,13 @@ const Page = ({ params }) => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 whileHover={{ y: -5 }}
-                className="bg-neutral-900/50 p-8 rounded-xl border border-gray-800"
+                className="glass p-8 rounded-xl hover-glow"
               >
                 <h3 className="text-2xl font-semibold text-neon-cyan">{cert.name}</h3>
                 <p className="text-electric-blue mt-2">{cert.issuing_organization}</p>
-                <p className="text-gray-400 mt-4">Issued: {cert.issue_date}</p>
+                <p className="text-foreground/60 mt-4">Issued: {cert.issue_date}</p>
                 {cert.expiry_date && (
-                  <p className="text-gray-400">Expires: {cert.expiry_date}</p>
+                  <p className="text-foreground/60">Expires: {cert.expiry_date}</p>
                 )}
                 {cert.credential_id && (
                   <p className="text-neon-cyan mt-2">Credential ID: {cert.credential_id}</p>
@@ -246,7 +364,7 @@ const Page = ({ params }) => {
                     href={cert.credential_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block px-4 py-2 mt-4 rounded-lg bg-electric-blue/10 text-electric-blue hover:bg-electric-blue/20 transition-colors text-sm"
+                    className="neon-btn text-sm mt-4 inline-block"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -259,25 +377,25 @@ const Page = ({ params }) => {
         </motion.section>
       </div>
 
-      {/* Edit Profile Button - Only visible to owner */}
+      {/* Edit Profile Button - Only show if user is the owner */}
       {isOwner && (
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsEditing(true)}
-          className="fixed bottom-8 right-8 px-6 py-3 rounded-lg bg-electric-blue text-white hover:bg-neon-cyan transition-colors"
+          className="fixed bottom-8 right-8 neon-btn"
         >
           Edit Profile
         </motion.button>
       )}
 
-      {/* Edit Modal */}
-      {isEditing && (
+      {/* Edit Modal - Only accessible to owner */}
+      {isOwner && isEditing && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-neutral-900 p-8 rounded-2xl max-w-2xl w-full mx-4 border border-gray-800"
+            className="glass p-8 rounded-2xl max-w-2xl w-full mx-4"
           >
             <h2 className="text-2xl font-bold text-electric-blue mb-6">Edit Profile</h2>
             <form onSubmit={handleUpdateUserDetails} className="space-y-6">
@@ -288,7 +406,7 @@ const Page = ({ params }) => {
                     type="text"
                     value={userDetails.name}
                     onChange={(e) => setUserDetails(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-electric-blue focus:outline-none"
+                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
                   />
                 </div>
                 <div>
@@ -297,7 +415,7 @@ const Page = ({ params }) => {
                     type="text"
                     value={userDetails.title}
                     onChange={(e) => setUserDetails(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-electric-blue focus:outline-none"
+                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
                   />
                 </div>
                 <div>
@@ -305,7 +423,7 @@ const Page = ({ params }) => {
                   <textarea
                     value={userDetails.bio}
                     onChange={(e) => setUserDetails(prev => ({ ...prev, bio: e.target.value }))}
-                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-electric-blue focus:outline-none h-32"
+                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue h-32"
                   />
                 </div>
                 <div>
@@ -314,7 +432,7 @@ const Page = ({ params }) => {
                     type="text"
                     value={userDetails.location}
                     onChange={(e) => setUserDetails(prev => ({ ...prev, location: e.target.value }))}
-                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-electric-blue focus:outline-none"
+                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
                   />
                 </div>
                 <div>
@@ -323,7 +441,7 @@ const Page = ({ params }) => {
                     type="url"
                     value={userDetails.website}
                     onChange={(e) => setUserDetails(prev => ({ ...prev, website: e.target.value }))}
-                    className="w-full bg-neutral-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-electric-blue focus:outline-none"
+                    className="w-full glass px-4 py-2 rounded-lg focus:ring-2 focus:ring-electric-blue"
                   />
                 </div>
               </div>
@@ -331,7 +449,7 @@ const Page = ({ params }) => {
                 <motion.button
                   type="button"
                   onClick={() => setIsEditing(false)}
-                  className="px-6 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 transition-colors"
+                  className="glass px-6 py-2 rounded-lg hover:bg-deep-indigo/20"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -339,7 +457,7 @@ const Page = ({ params }) => {
                 </motion.button>
                 <motion.button
                   type="submit"
-                  className="px-6 py-2 rounded-lg bg-electric-blue text-white hover:bg-neon-cyan transition-colors"
+                  className="neon-btn"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -354,4 +472,4 @@ const Page = ({ params }) => {
   );
 };
 
-export default Page; 
+export default Page;

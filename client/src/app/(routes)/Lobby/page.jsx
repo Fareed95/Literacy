@@ -2,17 +2,41 @@
 import Link from 'next/link';
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Menu, MoreVertical, MessageCircle, UserPlus, Settings, Bell } from 'lucide-react';
+import { Search, Menu, MoreVertical, MessageCircle, UserPlus, Settings, Bell, Users, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
-    <div className="absolute inset-0 bg-gradient-to-b from-deep-indigo/20 via-soft-purple/10 to-electric-blue/5" />
-    <div className="absolute inset-0 bg-grid-small-white/[0.2] -z-10" />
-    <div className="absolute inset-0 bg-dot-white/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
-    <div className="absolute inset-0 bg-gradient-radial from-soft-purple/20 via-transparent to-transparent" />
+    <div className="absolute inset-0 bg-neutral-950" />
+    <div className="absolute inset-0 bg-grid-small-white/[0.05] -z-10" />
+    <div className="absolute inset-0 bg-dot-white/[0.05] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
+    <div className="absolute inset-0 bg-gradient-radial from-white/10 via-transparent to-transparent" />
   </div>
+);
+
+const ChatRoomCard = ({ name, participants, messages, lastActive }) => (
+  <motion.div
+    whileHover={{ scale: 1.02 }}
+    className="bg-neutral-900/50 border border-neutral-800 p-6 rounded-xl backdrop-blur-sm hover:bg-neutral-800/50 transition-all"
+  >
+    <div className="flex justify-between items-start mb-4">
+      <h3 className="text-xl font-semibold text-neutral-200">{name}</h3>
+      <span className="px-2 py-1 bg-neutral-800 rounded-full text-xs text-neutral-400">
+        {lastActive}
+      </span>
+    </div>
+    <div className="space-y-2">
+      <div className="flex items-center text-neutral-400">
+        <Users className="w-4 h-4 mr-2" />
+        <span>{participants} participants</span>
+      </div>
+      <div className="flex items-center text-neutral-400">
+        <MessageSquare className="w-4 h-4 mr-2" />
+        <span>{messages} messages</span>
+      </div>
+    </div>
+  </motion.div>
 );
 
 const Page = () => {
@@ -107,127 +131,104 @@ const Page = () => {
     person.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const chatRooms = [
+    {
+      id: 1,
+      name: 'Java Beginners',
+      participants: 24,
+      messages: 156,
+      lastActive: '2m ago'
+    },
+    {
+      id: 2,
+      name: 'Web Development',
+      participants: 32,
+      messages: 243,
+      lastActive: '5m ago'
+    },
+    {
+      id: 3,
+      name: 'Data Science',
+      participants: 18,
+      messages: 98,
+      lastActive: '12m ago'
+    },
+    {
+      id: 4,
+      name: 'Machine Learning',
+      participants: 27,
+      messages: 178,
+      lastActive: '15m ago'
+    }
+  ];
+
+  const filteredRooms = chatRooms.filter(room =>
+    room.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen bg-neutral-950 pt-24">
+    <div className="min-h-screen bg-neutral-950 p-4 relative">
       <HeroBackground />
-      <div className="container mx-auto px-4">
-        <motion.div 
+      
+      <div className="max-w-6xl mx-auto pt-20">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl font-bold text-neutral-200 mb-4">Chat Lobby</h1>
+          <p className="text-neutral-400 max-w-2xl mx-auto">
+            Join a room to discuss and learn with other students. Share knowledge, ask questions, and grow together.
+          </p>
+        </motion.div>
+
+        {/* Search Bar */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex rounded-2xl overflow-hidden h-[calc(100vh-8rem)]"
+          className="max-w-md mx-auto mb-12"
         >
-          {/* Left Sidebar */}
-          <motion.div 
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="w-96 glass border-r border-soft-purple/20 flex flex-col"
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500" />
+            <input
+              type="text"
+              placeholder="Search chat rooms..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl pl-10 pr-4 py-3 text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-neutral-700 transition-colors"
+            />
+          </div>
+        </motion.div>
+
+        {/* Chat Rooms Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredRooms.map((room, index) => (
+            <motion.div
+              key={room.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <Link href={`/ChatRoom/${room.id}`}>
+                <ChatRoomCard {...room} />
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Create Room Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-12 text-center"
+        >
+          <button
+            onClick={() => router.push('/CreateRoom')}
+            className="bg-neutral-900/50 border border-neutral-800 px-6 py-3 rounded-xl text-neutral-200 hover:bg-neutral-800/50 transition-all"
           >
-            {/* Header */}
-            <div className="p-4 glass border-b border-soft-purple/20 flex justify-between items-center">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-electric-blue/20 rounded-full flex items-center justify-center">
-                  <span className="text-electric-blue text-lg font-semibold">
-                    {userEmail.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-semibold text-electric-blue">{userEmail}</span>
-                  <span className="text-xs text-neon-cyan block">Online</span>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3 text-neon-cyan">
-                <motion.button whileHover={{ scale: 1.1 }} className="hover:text-electric-blue transition-colors">
-                  <Bell className="w-5 h-5" />
-                </motion.button>
-                <motion.button whileHover={{ scale: 1.1 }} className="hover:text-electric-blue transition-colors">
-                  <Settings className="w-5 h-5" />
-                </motion.button>
-              </div>
-            </div>
-
-            {/* Search */}
-            <div className="p-4 glass">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search chats..."
-                  className="w-full py-2 px-4 pl-10 glass text-electric-blue rounded-xl focus:outline-none focus:ring-2 focus:ring-electric-blue/50 placeholder-neon-cyan/50"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Search className="w-5 h-5 text-neon-cyan absolute left-3 top-2.5" />
-              </div>
-            </div>
-
-            {/* Chats List */}
-            <div className="flex-1 overflow-y-auto hide-scrollbar">
-              {filteredPeople.map((person, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                  onClick={() => {
-                    setPerson(person.email);
-                    setSelectedPerson(person);
-                  }}
-                  className={`p-4 border-b border-soft-purple/20 hover:bg-deep-indigo/20 cursor-pointer transition-all ${
-                    selectedPerson?.email === person.email ? 'bg-deep-indigo/30' : ''
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="relative">
-                      <div className="w-12 h-12 bg-electric-blue/20 rounded-full flex items-center justify-center">
-                        <span className="text-electric-blue text-lg font-semibold">
-                          {person.name.charAt(0)}
-                        </span>
-                      </div>
-                      <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-neutral-900 ${
-                        person.status === 'online' ? 'bg-green-500' :
-                        person.status === 'away' ? 'bg-yellow-500' :
-                        'bg-neutral-500'
-                      }`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-baseline">
-                        <h3 className="text-sm font-semibold text-electric-blue truncate">{person.name}</h3>
-                        <span className="text-xs text-neon-cyan">{person.time}</span>
-                      </div>
-                      <p className="text-sm text-foreground/60 truncate">{person.lastMessage}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Right Chat Area */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex-1 flex flex-col glass relative"
-          >
-            <div className="flex-1 flex items-center justify-center">
-              <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="text-center glass p-8 rounded-2xl max-w-md relative z-10"
-              >
-                <MessageCircle className="w-16 h-16 mx-auto mb-4 text-electric-blue animate-float" />
-                <h2 className="text-2xl font-bold text-electric-blue mb-2">Welcome to Chat</h2>
-                <p className="text-neon-cyan mb-6">Select a conversation to start messaging</p>
-                <motion.button 
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="neon-btn inline-flex items-center space-x-2"
-                >
-                  <UserPlus className="w-5 h-5" />
-                  <span>Start New Chat</span>
-                </motion.button>
-              </motion.div>
-            </div>
-          </motion.div>
+            Create New Room
+          </button>
         </motion.div>
       </div>
     </div>

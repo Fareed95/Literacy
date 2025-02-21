@@ -29,14 +29,38 @@ export const usePortfolio = (email) => {
   // Update user details
   const updateUserDetails = async (updatedData) => {
     try {
-      const data = await fetchWithAuth(API_ENDPOINTS.USER_DETAILS(email), {
-        method: 'PATCH',
+      const response = await fetch(API_ENDPOINTS.USER_DETAILS(email), {
+        method: 'POST', // Try to create first
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(updatedData),
       });
+
+      if (!response.ok && response.status === 404) {
+        // If creation fails with 404, try updating instead
+        const updateResponse = await fetch(API_ENDPOINTS.USER_DETAILS(email), {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedData),
+        });
+
+        if (!updateResponse.ok) {
+          throw new Error('Failed to update portfolio');
+        }
+
+        const data = await updateResponse.json();
+        setPortfolioData(prev => ({ ...prev, userDetails: data }));
+        return data;
+      }
+
+      const data = await response.json();
       setPortfolioData(prev => ({ ...prev, userDetails: data }));
       return data;
     } catch (err) {
-      setError('Failed to update user details');
+      console.error('Failed to update user details:', err);
       throw err;
     }
   };

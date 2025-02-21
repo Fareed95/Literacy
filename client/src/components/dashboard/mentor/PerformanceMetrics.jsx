@@ -2,15 +2,7 @@
 
 import { motion } from "framer-motion";
 
-interface MetricCard {
-  title: string;
-  value: string | number;
-  change: number;
-  trend: 'up' | 'down';
-  description: string;
-}
-
-const MetricCard = ({ metric }: { metric: MetricCard }) => (
+const MetricCard = ({ metric } ) => (
   <div className="glass p-4 rounded-xl hover-glow">
     <div className="space-y-2">
       <div className="flex justify-between items-start">
@@ -27,15 +19,7 @@ const MetricCard = ({ metric }: { metric: MetricCard }) => (
   </div>
 );
 
-interface FeedbackCard {
-  id: string;
-  mentee: string;
-  rating: number;
-  comment: string;
-  date: string;
-}
-
-const FeedbackCard = ({ feedback }: { feedback: FeedbackCard }) => (
+const FeedbackCard = ({ feedback }) => (
   <div className="glass p-4 rounded-xl hover-glow">
     <div className="space-y-2">
       <div className="flex justify-between items-start">
@@ -52,7 +36,7 @@ const FeedbackCard = ({ feedback }: { feedback: FeedbackCard }) => (
 );
 
 export default function PerformanceMetrics() {
-  const metrics: MetricCard[] = [
+  const metrics = [
     {
       title: "Average Session Rating",
       value: "4.8/5",
@@ -83,7 +67,7 @@ export default function PerformanceMetrics() {
     },
   ];
 
-  const feedback: FeedbackCard[] = [
+  const feedback = [
     {
       id: '1',
       mentee: "Alex Johnson",
