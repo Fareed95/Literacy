@@ -11,6 +11,7 @@ from llm.youtube_filteration import youtube_filteration_best  # Assuming synchro
 from scrapping.youtube_scrapping import youtube_search  # Assuming synchronous function
 from scrapping.pdf_scrapping import search_and_download_pdf  # PDF scraping module
 from extraction.skill_extractor import extraction
+from llm.test_series import test_series
 import psycopg2
 from dotenv import load_dotenv
 
@@ -451,7 +452,23 @@ def get_roadmap_component(roadmap_id):
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
     
 
+@app.route("/testseries", methods=["POST"])
+def test_series_api():
+    """
+    Test series API
+    """
+    try:
+        data = request.get_json()
+        input_value = data.get('input_value')
 
+        if not input_value:
+            return jsonify({"error": "input_value is required"}), 400
+
+        result = test_series(input_value=input_value)
+        return jsonify(result), 200
+
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 
 
 # Run Flask app
