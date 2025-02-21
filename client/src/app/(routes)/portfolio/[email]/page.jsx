@@ -190,9 +190,10 @@ const Page = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass p-8 rounded-2xl max-w-2xl mx-4 w-full"
+          className="glass p-8 rounded-2xl max-w-4xl mx-4 w-full max-h-[80vh] overflow-y-auto hide-scrollbar"
         >
-          <div className="flex justify-between items-center mb-8">
+          {/* Header Section */}
+          <div className="flex justify-between items-center mb-8 sticky top-0 bg-neutral-950/50 backdrop-blur-md p-4 rounded-xl z-10">
             <div>
               <h2 className="text-2xl font-bold text-electric-blue">{userDetails.name}</h2>
               <p className="text-neon-cyan">{userDetails.title}</p>
@@ -209,35 +210,161 @@ const Page = () => {
             )}
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-12">
+            {/* About Section */}
             {userDetails.bio && (
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass p-6 rounded-xl"
+              >
                 <h3 className="text-lg font-semibold text-electric-blue mb-2">About</h3>
                 <p className="text-neutral-300">{userDetails.bio}</p>
-              </div>
+              </motion.div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
-              {userDetails.location && (
-                <div>
-                  <h3 className="text-lg font-semibold text-electric-blue mb-2">Location</h3>
-                  <p className="text-neutral-300">{userDetails.location}</p>
+            {/* Education Section */}
+            {portfolioData?.userDetails?.[0]?.education?.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass p-6 rounded-xl"
+              >
+                <h3 className="text-lg font-semibold text-electric-blue mb-4">Education</h3>
+                {portfolioData.userDetails[0].education.map((edu) => (
+                  <div key={edu.id} className="border-l-2 border-electric-blue pl-4 mb-4">
+                    <h4 className="text-neon-cyan font-semibold">{edu.degree}</h4>
+                    <p className="text-neutral-300">{edu.field_of_study}</p>
+                    <p className="text-neutral-400">{edu.University}, {edu.location}</p>
+                    <p className="text-neutral-400">{edu.start_date} - {edu.end_date}</p>
+                    {edu.current_grade && (
+                      <p className="text-electric-blue mt-1">Grade: {edu.current_grade}</p>
+                    )}
+                  </div>
+                ))}
+              </motion.div>
+            )}
+
+            {/* Skills Section */}
+            {portfolioData?.userDetails?.[0]?.toolname?.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass p-6 rounded-xl"
+              >
+                <h3 className="text-lg font-semibold text-electric-blue mb-4">Skills</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {portfolioData.userDetails[0].toolname.map((category) => (
+                    <div key={category.id} className="glass p-4 rounded-lg hover:bg-neutral-800/30 transition-colors">
+                      <h4 className="text-neon-cyan font-semibold mb-2">{category.name}</h4>
+                      {category.tools.length > 0 ? (
+                        <ul className="space-y-1">
+                          {category.tools.map((tool) => (
+                            <li key={tool.id} className="text-neutral-300">{tool.name}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-neutral-400 text-sm italic">Skills to be added</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              )}
-              {userDetails.website && (
-                <div>
-                  <h3 className="text-lg font-semibold text-electric-blue mb-2">Website</h3>
-                  <a
-                    href={userDetails.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-neon-cyan hover:underline"
-                  >
-                    {userDetails.website}
-                  </a>
+              </motion.div>
+            )}
+
+            {/* Certificates Section */}
+            {portfolioData?.userDetails?.[0]?.certificate?.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass p-6 rounded-xl"
+              >
+                <h3 className="text-lg font-semibold text-electric-blue mb-4">Certificates</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {portfolioData.userDetails[0].certificate.map((cert) => (
+                    <div key={cert.id} className="glass p-4 rounded-lg hover:bg-neutral-800/30 transition-colors">
+                      <h4 className="text-neon-cyan font-semibold">{cert.name}</h4>
+                      <p className="text-neutral-400 text-sm">
+                        {new Date(cert.started_at).toLocaleDateString()} - {new Date(cert.ended_at).toLocaleDateString()}
+                      </p>
+                      <div className="mt-2 space-y-1 text-sm">
+                        <p className="text-neutral-300">Tests Attempted: {cert.additionol_testseries_attempted}</p>
+                        <p className="text-neutral-300">Competitions: {cert.competition_battled}</p>
+                        <p className="text-neutral-300">Wins: {cert.competition_won}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
+              </motion.div>
+            )}
+
+            {/* Projects Section */}
+            {portfolioData?.userDetails?.[0]?.project?.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass p-6 rounded-xl"
+              >
+                <h3 className="text-lg font-semibold text-electric-blue mb-4">Projects</h3>
+                <div className="space-y-4">
+                  {portfolioData.userDetails[0].project.map((proj) => (
+                    <div key={proj.id} className="glass p-4 rounded-lg hover:bg-neutral-800/30 transition-colors">
+                      <h4 className="text-neon-cyan font-semibold">{proj.name}</h4>
+                      <p className="text-neutral-300 mt-2">{proj.description}</p>
+                      {proj.link && proj.link.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {proj.link.map((link) => (
+                            <a
+                              key={link.id}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center px-3 py-1 rounded-full bg-electric-blue/20 text-electric-blue hover:bg-electric-blue/30 transition-colors text-sm"
+                            >
+                              {link.name}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Contact Information */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass p-6 rounded-xl"
+            >
+              <h3 className="text-lg font-semibold text-electric-blue mb-4">Contact</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-neon-cyan">Email</p>
+                  <p className="text-neutral-300">{portfolioData?.userDetails?.[0]?.email}</p>
+                </div>
+                {userDetails.location && (
+                  <div>
+                    <p className="text-neon-cyan">Location</p>
+                    <p className="text-neutral-300">{userDetails.location}</p>
+                  </div>
+                )}
+                {userDetails.website && (
+                  <div>
+                    <p className="text-neon-cyan">Website</p>
+                    <a
+                      href={userDetails.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-electric-blue hover:text-neon-cyan transition-colors"
+                    >
+                      {userDetails.website}
+                    </a>
+                  </div>
+                )}
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       )}
