@@ -4,10 +4,6 @@ import { motion } from 'framer-motion'
 import { useSession } from 'next-auth/react'
 import { usePortfolio } from '@/hooks/usePortfolio'
 import { useAuth } from '@/app/context/AuthContext'
-<<<<<<< HEAD
-
-=======
->>>>>>> 1ec64f0b4bafad07c2240eb40daf1a6aefd9b7c2
 import { useRouter, useParams } from 'next/navigation'
 
 const HeroBackground = () => (
