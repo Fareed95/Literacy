@@ -5,6 +5,7 @@ import MainInput from '@/components/MainInput';
 import PrevCources from '@/components/PrevCources';
 import Footer from '@/components/Footer';
 import { useEffect, useState } from 'react';
+import TrueFocus from '@/components/TrueFocus';
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -14,17 +15,17 @@ const fadeIn = {
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
-    {/* Gradient background */}
-    <div className="absolute inset-0 bg-gradient-to-b from-deep-indigo/20 via-soft-purple/10 to-electric-blue/5" />
+    {/* Neutral gradient background */}
+    <div className="absolute inset-0 bg-neutral-950" />
     
-    {/* Animated grid */}
-    <div className="absolute inset-0 bg-grid-small-white/[0.2] -z-10" />
+    {/* Subtle grid */}
+    <div className="absolute inset-0 bg-grid-small-white/[0.05] -z-10" />
     
-    {/* Gradient dots */}
-    <div className="absolute inset-0 bg-dot-white/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
+    {/* Subtle dots */}
+    <div className="absolute inset-0 bg-dot-white/[0.05] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
     
-    {/* Radial gradient */}
-    <div className="absolute inset-0 bg-gradient-radial from-soft-purple/20 via-transparent to-transparent" />
+    {/* Gentle radial gradient */}
+    <div className="absolute inset-0 bg-gradient-radial from-white/10 via-transparent to-transparent" />
   </div>
 );
 
@@ -90,16 +91,23 @@ export default function Home() {
         >
           {/* Hero Section */}
           <div className="text-center mb-12 space-y-6">
-            <motion.h1 
-              className="text-4xl md:text-6xl font-bold text-electric-blue"
+            <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              Learn. Grow. <span className="text-neon-cyan">Excel.</span>
-            </motion.h1>
+              <TrueFocus
+                sentence="Learn Grow Excel"
+                manualMode={false}
+                blurAmount={3}
+                borderColor="#ffffff"
+                glowColor="rgba(255, 255, 255, 0.5)"
+                animationDuration={0.3}
+                pauseBetweenAnimations={2}
+              />
+            </motion.div>
             <motion.p 
-              className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto"
+              className="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
@@ -126,7 +134,7 @@ export default function Home() {
           transition={{ duration: 0.5, delay: 0.8 }}
         >
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold text-electric-blue text-center mb-8">
+            <h2 className="text-3xl font-bold text-neutral-200 text-center mb-8">
               Why Choose Us?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -155,10 +163,10 @@ export default function Home() {
                   transition={{ duration: 0.5, delay: 0.8 + (index * 0.1) }}
                 >
                   <span className="text-4xl mb-4 block">{feature.icon}</span>
-                  <h3 className="text-xl font-semibold text-electric-blue mb-2">
+                  <h3 className="text-xl font-semibold text-neutral-200 mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-foreground/60">
+                  <p className="text-neutral-400">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -175,8 +183,6 @@ export default function Home() {
         >
           <PrevCources />
         </motion.section>
-
-  
 
         <motion.section 
           className="mt-20"

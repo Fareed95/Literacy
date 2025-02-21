@@ -25,12 +25,11 @@ const config: Config = {
     },
     extend: {
       colors: {
-        'electric-blue': '#0A84FF',
-        'neon-cyan': '#00E6E6',
-        'dark-space': '#121212',
-        'deep-indigo': '#3D348B',
-        'glass-white': 'rgba(255, 255, 255, 0.2)',
-        'soft-purple': '#7B61FF',
+        'neutral-glass': 'rgba(255, 255, 255, 0.1)',
+        'neutral-text': '#E5E5E5',
+        'neutral-accent': '#A3A3A3',
+        'glass-border': 'rgba(255, 255, 255, 0.1)',
+        'glass-hover': 'rgba(255, 255, 255, 0.15)',
       },
       animation: {
         "caret-blink": "caret-blink 1.25s ease-out infinite",
