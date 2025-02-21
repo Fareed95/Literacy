@@ -19,7 +19,7 @@ function GetUserInfo() {
       const response = await fetch('http://localhost:8000/api/user', {
         method: 'GET',
         headers: {
-          "Authorization": `Bearer ${token}`,
+          "Authorization": token,
           'Content-Type': "application/json",
         },
         credentials: 'include',
