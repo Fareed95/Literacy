@@ -1,5 +1,5 @@
 "use client";
-
+import { useUserContext } from '@/app/context/Userinfo';
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { Clock, FileText, ArrowRight, BookOpen, Award, BarChart } from 'lucide-react';
@@ -14,8 +14,10 @@ const fadeIn = {
 };
 
 export default function Home() {
+  const {contextsetinput,contextinput} = useUserContext();
   const { roadmap } = useRoadmap();
   const [componentData, setComponentData] = useState(null);
+  const [total, setTotal] = useState(null);
   const [quizAnswers, setQuizAnswers] = useState({});
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [currentComponentIndex, setCurrentComponentIndex] = useState(0);
@@ -37,7 +39,7 @@ export default function Home() {
 
   const fetchComponentData = async (roadmapId, componentNumber) => {
     try {
-      if (componentNumber === 0) {
+      if (componentNumber == 0) {
         console.log("Setting first component data:", roadmap.first_component);
         setComponentData(roadmap.first_component);
       } else {
@@ -48,13 +50,15 @@ export default function Home() {
           },
           body: JSON.stringify({ component_number: componentNumber }),
         });
-
+  
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
+  
         const data = await response.json();
         console.log("Fetched component data:", data);
+        contextsetinput(data.name)
+        console.log(data.name)
         setComponentData(data);
       }
       setError(null);
@@ -65,7 +69,6 @@ export default function Home() {
       setIsLoading(false);
     }
   };
-
   const fetchRoadmapData = async (roadmapId) => {
     try {
       const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}`);
@@ -74,8 +77,10 @@ export default function Home() {
       }
       const data = await response.json();
       setIsCompleted(data.is_completed);
+      setTotal(data.roadmap_json.total_components);
+      console.log("Total components:", data.roadmap_json.total_components);
       fetchComponentData(roadmapId, data.is_completed);
-      console.log(data.is_completed, roadmapId);
+      console.log( data.is_completed ,roadmapId );
     } catch (error) {
       console.error("Error fetching roadmap data:", error);
       setError("Failed to fetch roadmap data. Please try again.");
@@ -83,12 +88,17 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    console.log("Updated isCompleted:", isCompleted);
+  }, [isCompleted]);
+
+  
 
   const handleNextComponent = async () => {
-    if (isCompleted + 1 < roadmap.total_components) {
+    console.log("Totals",total);
+    if (currentComponentIndex + 1 < total) {
       try {
-        const newCompletedIndex = isCompleted + 1;
-        console.log("Updating completion status to:", newCompletedIndex);
+        const newCompletedIndex = currentComponentIndex + 1;
         const response = await fetch(`${MODEL_API_SERVER}/roadmaps/${roadmapId}/complete`, {
           method: 'PATCH',
           headers: {
@@ -112,7 +122,8 @@ export default function Home() {
         setError("Failed to update completion status. Please try again.");
       }
     } else {
-      console.log("No more components available.");
+
+      router.push('/quiz');
     }
   };
 
@@ -124,12 +135,12 @@ export default function Home() {
   };
 
   const checkQuizCompletion = () => {
-    if (!componentData  || !componentData.test_series) {
+    if (!componentData || !componentData.component || !componentData.component.test_series) {
       setQuizCompleted(false);
       return;
     }
 
-    const allQuestionsAnswered = componentData.test_series.every(
+    const allQuestionsAnswered = componentData.component.test_series.every(
       (_, index) => quizAnswers[index] !== undefined
     );
     setQuizCompleted(allQuestionsAnswered);
@@ -194,7 +205,7 @@ export default function Home() {
           <Head>
             <title>{componentData.name}</title>
           </Head>
-
+  
           <motion.div {...fadeIn} className="w-full max-w-7xl glass border border-soft-purple/20 rounded-2xl shadow-2xl p-6 space-y-6">
             {/* Progress Header */}
             <div className="flex items-center justify-between mb-8">
@@ -203,7 +214,7 @@ export default function Home() {
                 <div className="flex items-center space-x-2 mt-2">
                   <BarChart className="w-4 h-4 text-neon-cyan" />
                   <span className="text-neon-cyan">
-                    Progress: {Math.round((currentComponentIndex / roadmap.total_components) * 100)}%
+                    Progress: {Math.round((currentComponentIndex+1 / total) * 100)}%
                   </span>
                 </div>
               </div>
@@ -211,13 +222,13 @@ export default function Home() {
                 <div className="text-right">
                   <p className="text-sm text-neon-cyan">Component</p>
                   <p className="text-lg font-bold text-electric-blue">
-                    {currentComponentIndex + 1} / {roadmap.total_components}
+                    {currentComponentIndex + 1} / {total}
                   </p>
                 </div>
                 <Award className="w-8 h-8 text-electric-blue" />
               </div>
             </div>
-
+  
             {/* Video Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -246,7 +257,7 @@ export default function Home() {
                 </motion.div>
               ))}
             </motion.div>
-
+  
             {/* Description Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -257,7 +268,7 @@ export default function Home() {
               <h2 className="text-xl font-bold text-electric-blue mb-4">Overview</h2>
               <p className="text-neon-cyan">{componentData.description}</p>
             </motion.div>
-
+  
             {/* Supplementary Materials Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -289,7 +300,7 @@ export default function Home() {
                 </motion.a>
               </div>
             </motion.div>
-
+  
             {/* Quiz Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -302,56 +313,10 @@ export default function Home() {
                 <h2 className="text-xl font-semibold text-electric-blue">Knowledge Check</h2>
               </div>
               <div className="glass p-6 rounded-xl border border-soft-purple/20">
-                {componentData.test_series.map((question, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="mb-6"
-                  >
-                    <h3 className="text-lg font-semibold text-electric-blue mb-4">{question.question}</h3>
-                    <div className="space-y-3">
-                      {question.options.map((option, optionIndex) => (
-                        <label
-                          key={optionIndex}
-                          className="flex items-center space-x-3 p-3 glass rounded-lg cursor-pointer transition-all hover:bg-deep-indigo/20"
-                        >
-                          <input
-                            type="radio"
-                            name={`question-${index}`}
-                            value={option}
-                            onChange={() => handleQuizAnswer(index, option)}
-                            className="form-radio text-electric-blue"
-                          />
-                          <span className="text-neon-cyan">{option}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </motion.div>
-                ))}
-
-                {quizCompleted && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-8 glass p-6 rounded-xl"
-                  >
-                    <h3 className="text-xl font-bold text-electric-blue mb-4">Quiz Results</h3>
-                    {componentData.test_series.map((question, index) => (
-                      <div key={index} className="mb-4">
-                        <p className="font-semibold text-neon-cyan">{question.question}</p>
-                        <p className={`mt-2 ${quizAnswers[index] === question.answer ? 'text-green-500' : 'text-red-500'}`}>
-                          Your answer: {quizAnswers[index]}
-                          {quizAnswers[index] === question.answer ? " ✅" : " ❌"}
-                        </p>
-                      </div>
-                    ))}
-                  </motion.div>
-                )}
+                {/* Quiz content commented out */}
               </div>
             </motion.div>
-
+  
             {/* Next Component Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -367,9 +332,9 @@ export default function Home() {
       ) : (
         <div className="bg-neutral-950 text-white min-h-screen flex flex-col items-center p-4 overflow-hidden">
           <Head>
-            <title>{componentData.component.name}</title>
+            <title>{componentData.component.id}</title>
           </Head>
-
+  
           <motion.div {...fadeIn} className="w-full max-w-7xl glass border border-soft-purple/20 rounded-2xl shadow-2xl p-6 space-y-6">
             {/* Progress Header */}
             <div className="flex items-center justify-between mb-8">
@@ -378,7 +343,7 @@ export default function Home() {
                 <div className="flex items-center space-x-2 mt-2">
                   <BarChart className="w-4 h-4 text-neon-cyan" />
                   <span className="text-neon-cyan">
-                    Progress: {Math.round((currentComponentIndex / roadmap.total_components) * 100)}%
+                    Progress: {Math.round((currentComponentIndex+1 / total) * 100)}%
                   </span>
                 </div>
               </div>
@@ -386,13 +351,13 @@ export default function Home() {
                 <div className="text-right">
                   <p className="text-sm text-neon-cyan">Component</p>
                   <p className="text-lg font-bold text-electric-blue">
-                    {currentComponentIndex + 1} / {roadmap.total_components}
+                    {currentComponentIndex + 1} / {total}
                   </p>
                 </div>
                 <Award className="w-8 h-8 text-electric-blue" />
               </div>
             </div>
-
+  
             {/* Video Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -421,7 +386,7 @@ export default function Home() {
                 </motion.div>
               ))}
             </motion.div>
-
+  
             {/* Description Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -432,7 +397,7 @@ export default function Home() {
               <h2 className="text-xl font-bold text-electric-blue mb-4">Overview</h2>
               <p className="text-neon-cyan">{componentData.component.description}</p>
             </motion.div>
-
+  
             {/* Supplementary Materials Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -464,7 +429,7 @@ export default function Home() {
                 </motion.a>
               </div>
             </motion.div>
-
+  
             {/* Quiz Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -505,7 +470,7 @@ export default function Home() {
                     </div>
                   </motion.div>
                 ))}
-
+  
                 {quizCompleted && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -526,7 +491,7 @@ export default function Home() {
                 )}
               </div>
             </motion.div>
-
+  
             {/* Next Component Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -542,4 +507,5 @@ export default function Home() {
       )}
     </>
   );
+  
 }

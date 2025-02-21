@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
-
+import { useUserContext } from '@/app/context/Userinfo';
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
     <div className="absolute inset-0 bg-neutral-950" />
@@ -15,6 +15,7 @@ const HeroBackground = () => (
 );
 
 function QuizPage() {
+  const {contextsetinput,contextinput} = useUserContext();
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -34,7 +35,7 @@ function QuizPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            input_value: "I want to learn java"
+            input_value: `${contextinput}`
           })
         });
 

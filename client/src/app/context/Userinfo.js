@@ -5,6 +5,7 @@ import React, { createContext, useState, useContext } from 'react';
 // Create the UserContext without TypeScript types
 const UserContext = createContext({
   contextemail: '',
+  contextinput: '',
   contextname: '',
   contextpassword: '',
   contextisLoggedIn: false,
@@ -13,6 +14,7 @@ const UserContext = createContext({
   contextimg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
 
   contextsetEmail: () => {},
+  contextsetinput: () => {},
   contextsetName: () => {},
   contextsetPassword: () => {},
   contextsetIsLoggedIn: () => {},
@@ -24,6 +26,7 @@ const UserContext = createContext({
 
 export const UserProvider = ({ children }) => {
   const [contextemail, contextsetEmail] = useState('');
+  const [contextinput, contextsetinput] = useState('');
   const [contextname, contextsetName] = useState('');
   const [contextpassword, contextsetPassword] = useState('');
   const [contextQRInfo, contextsetQRInfo] = useState('');
@@ -33,6 +36,7 @@ export const UserProvider = ({ children }) => {
   
   const value = {
     contextemail,
+    contextinput,
     contextname,
     contextpassword,
     contextisLoggedIn,
@@ -45,7 +49,8 @@ export const UserProvider = ({ children }) => {
     contextQRInfo,
     contextsetQRInfo,
     contextSelectedPerson,
-    contextSetSelectedPerson
+    contextSetSelectedPerson,
+    contextsetinput
   };
 
   return (

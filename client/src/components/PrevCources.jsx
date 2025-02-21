@@ -113,6 +113,7 @@ function PrevCources() {
 
         const data = await response.json();
         setRoadmaps(data);
+
         setError(null);
       } catch (err) {
         console.error('Error fetching roadmaps:', err);
@@ -127,8 +128,9 @@ function PrevCources() {
     }
   }, [contextemail]);
 
-  const handleCardClick = (roadmap) => {
+  const handleCardClick = async(roadmap) => {
     setRoadmap({ roadmap_id: roadmap.id });
+    console.log(roadmap.id);
     router.push('/Learning');
   };
 

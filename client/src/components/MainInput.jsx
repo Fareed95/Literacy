@@ -103,6 +103,7 @@ function MainInput() {
         body: JSON.stringify({ id: roadmapData.roadmap_id }),
       })
         .then((response) => {
+          console.log("Response:", response);
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
@@ -116,6 +117,7 @@ function MainInput() {
         });
     }
   }, [roadmapData]);
+  
 
   return (
     <div className="max-w-4xl mx-auto w-full px-4">
