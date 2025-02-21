@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 from .models import Company, Internship, StudentsRegistered
 from .serializers import CompanyProfileSerializer, InternshipSerializer, StudentsRegisteredSerializer
 
+from api.models import User
+
 
 # 🚀 Company Views
 class CompanyView(APIView):
@@ -82,14 +84,6 @@ class InternshipView(APIView):
         internship.delete()
         return Response({"message": "Internship deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-
-from api.models import User
-from .models import Internship, StudentsRegistered
-from .serializers import StudentsRegisteredSerializer
 
 class ApplyForInternshipView(APIView):
     """
@@ -134,3 +128,16 @@ class ApplyForInternshipView(APIView):
         }
 
         return Response(response_data, status=status.HTTP_201_CREATED)
+
+class StudentsRegisteredView(APIView):
+    """
+    This endpoint lists all students registered for a specific internship and allows updating any field in the StudentsRegistered model.
+    """
+
+    def patch(self, request, internship_id):
+        internship = get_object_or_404(Internship, id=internship_id)
+        students = StudentsRegistered.objects.filter(internship=internship)
+        data = request.data
+        # Update with dynamic fields from the request data
+        students.update(**data)
+        return Response({"message": "Data updated successfully."}, status=status.HTTP_200_OK)

@@ -115,7 +115,7 @@ export default function Home() {
         setError("Failed to update completion status. Please try again.");
       }
     } else {
-      console.log("No more components available.");
+      console.log("No more components available."); 
     }
   };
 

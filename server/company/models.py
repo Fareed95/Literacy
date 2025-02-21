@@ -38,6 +38,7 @@ class StudentsRegistered(models.Model):
     internship = models.ForeignKey(Internship, on_delete=models.CASCADE, related_name='students_registered')
     registered_at = models.DateTimeField(auto_now_add=True)
     is_selected = models.BooleanField(default=False)
+    interviw_time = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ['user', 'internship']

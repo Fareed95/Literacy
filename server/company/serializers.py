@@ -17,6 +17,7 @@ class StudentsRegisteredSerializer(serializers.ModelSerializer):
             'registered_at',
             'is_selected',
             'company_name',
+            'interviw_time',
         ]
 
 

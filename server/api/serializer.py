@@ -15,8 +15,10 @@ class StudentSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
     otp = serializers.CharField(write_only=True, required=False)
     testimonial = TestimonialSerializer(many=True, read_only=True)
-    userdetails = UserDetailsSerializer(many=True,read_only=True)
-    internships_registered = StudentsRegisteredSerializer(many=True, read_only=True)
+    userdetails = UserDetailsSerializer(many=True, read_only=True)
+    interview_selected = serializers.SerializerMethodField()
+    internship_under_review = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
@@ -30,11 +32,20 @@ class StudentSerializer(serializers.ModelSerializer):
             'is_company',
             'testimonial',
             'userdetails',
-            'internships_registered'
-            ]
+            'interview_selected',
+            'internship_under_review'
+        ]
         extra_kwargs = {
             'password': {'write_only': True},
         }
+
+    def get_interview_selected(self, obj):
+        selected_internships = obj.internships_registered.filter(is_selected=True)
+        return StudentsRegisteredSerializer(selected_internships, many=True).data
+
+    def get_internship_under_review(self, obj):
+        under_review_internships = obj.internships_registered.filter(is_selected=False)
+        return StudentsRegisteredSerializer(under_review_internships, many=True).data
 
     def validate(self, data):
         password = data.get('password')
@@ -54,23 +65,21 @@ class StudentSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
 
-        if user.is_company == False:
+        if not user.is_company:
             from portfolio.models import UserDetails
             UserDetails.objects.create(
                 user=user,
                 name=user.name,
                 email=user.email,
-
             )
 
         html_message = render_to_string('emails/registeration_otp.html', {'otp': otp})
         plain_message = strip_tags(html_message)
 
-        # Send email with OTP
         send_mail(
             'Your OTP Code',
             plain_message,
-            'codecell@eng.rizvi.edu.in',  # Replace with your email
+            'codecell@eng.rizvi.edu.in',
             [validated_data['email']],
             fail_silently=False,
             html_message=html_message,
