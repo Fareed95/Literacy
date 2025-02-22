@@ -233,128 +233,181 @@
     <div class="resume-container">
         <img src="../static/logo.png" alt="Company Logo" class="watermark">
         <div class="content" id="resume">
-            <!-- Content will be populated by JavaScript -->
         </div>
     </div>
 
     <script>
         // Resume Data
         const resumeData = {
-            personal: {
-                name: "John Doe",
-                title: "Senior Software Engineer",
-                email: "john.doe@example.com",
-                phone: "(123) 456-7890",
-                location: "San Francisco, CA",
-                linkedin: "linkedin.com/in/johndoe",
-                website: "johndoe.dev",
-                github: "github.com/johndoe"
-            },
-            summary: "Innovative and deadline-driven Software Engineer with 5+ years of experience developing user-centered digital solutions. Proven ability to leverage full-stack expertise to build interactive and scalable web applications.",
-            experience: [
+            id: 1,
+            name: "fareed sayed",
+            email: "fareedsayedprsnl@gmail.com",
+            phone_number: "1111111111",
+            about: "hii my srlf fareed",
+            toolname: [
                 {
-                    title: "Senior Software Engineer",
-                    company: "Tech Solutions Inc.",
-                    location: "San Francisco, CA",
-                    period: "Jan 2020 - Present",
-                    achievements: [
-                        "Led development of cloud-based platform serving 1M+ users",
-                        "Improved application performance by 40% through optimization",
-                        "Mentored 5 junior developers and conducted code reviews"
-                    ]
+                    id: 1,
+                    name: "Programming Languages",
+                    user: 1,
+                    tools: []
                 },
                 {
-                    title: "Software Engineer",
-                    company: "Digital Innovations",
-                    location: "Seattle, WA",
-                    period: "Jun 2018 - Dec 2019",
-                    achievements: [
-                        "Developed RESTful APIs serving mobile and web clients",
-                        "Implemented automated testing reducing bugs by 30%",
-                        "Collaborated with UX team to improve user experience"
-                    ]
+                    id: 2,
+                    name: "Web Technologies",
+                    user: 1,
+                    tools: []
+                },
+                {
+                    id: 3,
+                    name: "Others",
+                    user: 1,
+                    tools: []
                 }
             ],
             education: [
                 {
-                    degree: "Master of Science in Computer Science",
-                    school: "Stanford University",
-                    location: "Stanford, CA",
-                    period: "2016 - 2018",
-                    details: "Focus on Machine Learning and Distributed Systems"
-                },
-                {
-                    degree: "Bachelor of Science in Computer Engineering",
-                    school: "University of California",
-                    location: "Berkeley, CA",
-                    period: "2012 - 2016",
-                    details: "Dean's List, Computer Science Society President"
+                    id: 1,
+                    user: 1,
+                    degree: "Bachelor of Technology",
+                    field_of_study: "Computer Science",
+                    University: "Mumbai University",
+                    location: "Mumbai, Maharashtra",
+                    start_date: "2020-08-01",
+                    end_date: "2024-05-30",
+                    current_grade: "A"
                 }
             ],
-            skills: [
-                "JavaScript", "Python", "React", "Node.js", "AWS",
-                "Docker", "Kubernetes", "MongoDB", "GraphQL", "TypeScript"
-            ],
-            certifications: [
+            certificate: [
                 {
-                    name: "AWS Solutions Architect",
-                    organization: "Amazon Web Services",
-                    date: "2021"
+                    id: 12,
+                    name: "Python Bootcamp",
+                    competition_battled: 3,
+                    competition_won: 2,
+                    user: 1
                 },
                 {
-                    name: "Professional Scrum Master",
-                    organization: "Scrum.org",
-                    date: "2020"
+                    id: 13,
+                    name: "Flask Mastery Certificate",
+                    competition_battled: 10,
+                    competition_won: 5,
+                    user: 1
                 }
             ],
-            languages: [
-                { name: "English", level: "Native", proficiency: 100 },
-                { name: "Spanish", level: "Professional", proficiency: 80 },
-                { name: "French", level: "Intermediate", proficiency: 60 }
-            ],
-            achievements: [
+            project: [
                 {
-                    title: "Innovation Award",
-                    description: "Received company-wide recognition for developing an AI-powered customer service solution"
+                    id: 1,
+                    user: 1,
+                    name: "AI Learning Platform",
+                    description: "A comprehensive learning platform with AI-powered features",
+                    link: [
+                        {
+                            id: 1,
+                            project: 1,
+                            url: "https://github.com/Fareed95/AI-Learning-Platform",
+                            name: "GitHub Repository"
+                        }
+                    ]
                 },
                 {
-                    title: "Conference Speaker",
-                    description: "Regular speaker at tech conferences on topics including microservices and cloud architecture"
+                    id: 2,
+                    user: 1,
+                    name: "Portfolio Website",
+                    description: "Personal portfolio website showcasing projects and skills",
+                    link: []
                 }
             ]
         };
 
         // Render Functions
-        function renderHeader(personal) {
+        function renderHeader(data) {
             return `
                 <div class="header">
-                    <div class="name">${personal.name}</div>
-                    <div class="title">${personal.title}</div>
+                    <div class="name">${data.name}</div>
                     <div class="contact-info">
                         <span class="contact-item">
                             <i class="fas fa-envelope"></i>
-                            ${personal.email}
+                            ${data.email}
                         </span>
                         <span class="contact-item">
                             <i class="fas fa-phone"></i>
-                            ${personal.phone}
+                            ${data.phone_number}
                         </span>
-                        <span class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            ${personal.location}
-                        </span>
-                        <span class="contact-item">
-                            <i class="fab fa-linkedin"></i>
-                            ${personal.linkedin}
-                        </span>
-                        ${personal.github ? `
-                            <span class="contact-item">
-                                <i class="fab fa-github"></i>
-                                ${personal.github}
-                            </span>
-                        ` : ''}
                     </div>
                 </div>
+            `;
+        }
+
+        function renderAbout(about) {
+            return `
+                <div class="section">
+                    <div class="section-title">About</div>
+                    <p>${about}</p>
+                </div>
+            `;
+        }
+
+        function renderEducation(education) {
+            return education.map(edu => `
+                <div class="item">
+                    <div class="item-title">${edu.degree} in ${edu.field_of_study}</div>
+                    <div class="item-subtitle">${edu.University} - ${edu.location}</div>
+                    <div class="item-date">${formatDate(edu.start_date)} - ${formatDate(edu.end_date)}</div>
+                    <p>Grade: ${edu.current_grade}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderCertificates(certificates) {
+            return certificates.map(cert => `
+                <div class="item">
+                    <div class="item-title">${cert.name}</div>
+                    <p>Competitions: Won ${cert.competition_won} out of ${cert.competition_battled}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderProjects(projects) {
+            return projects.map(project => `
+                <div class="item">
+                    <div class="item-title">${project.name}</div>
+                    <p>${project.description}</p>
+                    ${project.link.map(link => `
+                        <a href="${link.url}" target="_blank" class="project-link">
+                            <i class="fab fa-github"></i> ${link.name}
+                        </a>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        function renderTools(toolname) {
+            return toolname.map(category => `
+                <div class="section">
+                    <div class="section-title">${category.name}</div>
+                    <div class="skills-list">
+                        ${category.tools.map(tool => `
+                            <span class="skill">${tool}</span>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        }
+
+        // Render Resume
+        function renderResume(data) {
+            const resume = document.getElementById('resume');
+            resume.innerHTML = `
+                ${renderHeader(data)}
+                ${renderAbout(data.about)}
+                ${renderSection('Education', renderEducation(data.education))}
+                ${renderSection('Certifications', renderCertificates(data.certificate))}
+                ${renderSection('Projects', renderProjects(data.project))}
+                ${renderTools(data.toolname)}
             `;
         }
 
@@ -364,80 +417,6 @@
                     <div class="section-title">${title}</div>
                     ${content}
                 </div>
-            `;
-        }
-
-        function renderExperience(experience) {
-            return experience.map(job => `
-                <div class="item">
-                    <div class="item-title">${job.title}</div>
-                    <div class="item-subtitle">${job.company} - ${job.location}</div>
-                    <div class="item-date">${job.period}</div>
-                    <ul>
-                        ${job.achievements.map(achievement => `<li>${achievement}</li>`).join('')}
-                    </ul>
-                </div>
-            `).join('');
-        }
-
-        function renderEducation(education) {
-            return education.map(edu => `
-                <div class="item">
-                    <div class="item-title">${edu.degree}</div>
-                    <div class="item-subtitle">${edu.school} - ${edu.location}</div>
-                    <div class="item-date">${edu.period}</div>
-                    <p>${edu.details}</p>
-                </div>
-            `).join('');
-        }
-
-        function renderSkills(skills) {
-            return `
-                <div class="skills-list">
-                    ${skills.map(skill => `<span class="skill">${skill}</span>`).join('')}
-                </div>
-            `;
-        }
-
-        function renderLanguages(languages) {
-            return `
-                <div class="languages-list">
-                    ${languages.map(lang => `
-                        <div class="language-item">
-                            <span>${lang.name} (${lang.level})</span>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: ${lang.proficiency}%"></div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function renderAchievements(achievements) {
-            return `
-                <div class="achievements-list">
-                    ${achievements.map(achievement => `
-                        <div class="achievement-card">
-                            <div class="item-title">${achievement.title}</div>
-                            <p>${achievement.description}</p>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        // Render Resume
-        function renderResume(data) {
-            const resume = document.getElementById('resume');
-            resume.innerHTML = `
-                ${renderHeader(data.personal)}
-                ${renderSection('Professional Summary', `<p>${data.summary}</p>`)}
-                ${renderSection('Work Experience', renderExperience(data.experience))}
-                ${renderSection('Education', renderEducation(data.education))}
-                ${renderSection('Skills', renderSkills(data.skills))}
-                ${renderSection('Languages', renderLanguages(data.languages))}
-                ${renderSection('Achievements', renderAchievements(data.achievements))}
             `;
         }
 
