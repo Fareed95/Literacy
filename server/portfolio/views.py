@@ -8,6 +8,9 @@ from .serializers import (
     ToolComponentsSerializer, EducationSerializer, 
     ProjectSerializer, LinkSerializer
 )
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from django.http import HttpResponse
 
 # UserDetails by Email
 class UserDetailsByEmailAPIView(APIView):
@@ -125,4 +128,29 @@ class ResumeAPIView(APIView):
     def get(self, request, email):
         user = get_object_or_404(UserDetails, email=email)
         serializer = UserDetailsSerializer(user)
+        # print(serializer.data)
+        context = {
+            'user': serializer.data,
+            'name': serializer.data['name'],
+            'email': serializer.data['email'],
+            'phone': serializer.data['phone_number'],
+            'education': Education.objects.filter(user=user),
+            'projects': Project.objects.filter(user=user),
+            # 'links': Link.objects.filter(user=user),
+        }
+        print(serializer.data['certificate'])
+        print(Education.objects.filter(user=user))
+        html_content = render_to_string('resume.html', context)
+        resume_name =f"{serializer.data['name']}_resume.pdf"
+
+    # Generate the PDF and return it
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename={resume_name}'
+        HTML(string=html_content).write_pdf(response)
+
+        return response
+
+    
+
+        # return response
         return Response(serializer.data, status=status.HTTP_200_OK)
