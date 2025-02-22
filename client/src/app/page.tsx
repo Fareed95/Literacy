@@ -8,6 +8,9 @@ import { useEffect, useState } from 'react';
 import TrueFocus from '@/components/TrueFocus';
 import Leaderboard from '@/components/Leaderboard';
 import SplashCursor from '@/components/SplashCursor';
+import AvatarComponent from '@/components/avatar/AvatarComponent';
+import VoiceControls from '@/components/avatar/VoiceControls';
+
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
@@ -69,12 +72,101 @@ const FloatingElements = () => {
   );
 };
 
+// Add type definition for messages
+type Message = {
+  type: 'user' | 'ai' | 'error';
+  content: string;
+};
+
+// Test component data for debugging
+const testComponentData = {
+  name: "Introduction to React",
+  description: "Learn the basics of React",
+  topics: ["JSX", "Components", "Props", "State"],
+  difficulty: "Beginner"
+};
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('en');
+  const [response, setResponse] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [componentData, setComponentData] = useState(testComponentData);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Handle user input
+  const handleUserInput = async (text: string) => {
+    if (!text.trim()) return;
+
+    setIsLoading(true);
+    setMessages(prev => [...prev, { type: 'user', content: text }]);
+
+    try {
+      // Store the stringified component data
+      const json_string = JSON.stringify(componentData);
+      console.log('Sending request with:', {
+        json_string,
+        question: text,
+        component_name: componentData.name
+      });
+
+      // Make API request to the bot endpoint
+      const aiResponse = await fetch('http://localhost:8000/api/bot/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          json_string: json_string,
+          question: text,
+          component_name: componentData.name
+        }),
+      });
+
+      if (!aiResponse.ok) {
+        throw new Error(`API responded with status: ${aiResponse.status}`);
+      }
+
+      const data = await aiResponse.json();
+      console.log('API Response:', data);
+
+      // Handle the response
+      const responseText = data.message || data.response || 'No response from AI';
+      setResponse(responseText);
+      setMessages(prev => [...prev, { type: 'ai', content: responseText }]);
+
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      setMessages(prev => [...prev, {
+        type: 'error',
+        content: 'Sorry, I encountered an error. Please try again.'
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Test function to simulate different component data
+  const testWithDifferentComponent = () => {
+    const newTestData = {
+      name: "Advanced JavaScript",
+      description: "Deep dive into JavaScript concepts",
+      topics: ["Closures", "Promises", "Async/Await"],
+      difficulty: "Advanced"
+    };
+    setComponentData(newTestData);
+    console.log('Switched to new component:', newTestData);
+  };
+
+  useEffect(() => {
+    // Log current component data whenever it changes
+    console.log('Current component data:', componentData);
+  }, [componentData]);
 
   if (!mounted) return null;
 
@@ -82,7 +174,7 @@ export default function Home() {
     <main className="relative min-h-screen">
       <HeroBackground />
       <FloatingElements />
-      <SplashCursor />
+      {/* <SplashCursor /> */}
       
       <div className="flex flex-col">
         <motion.section 
@@ -200,6 +292,108 @@ export default function Home() {
           >
             <Leaderboard />
           </motion.div>
+
+          {/* AI Assistant Section */}
+          <motion.div
+            layout
+            className="relative max-w-7xl mx-auto px-4 my-20 flex flex-col md:flex-row items-end justify-end gap-8" 
+          >
+            {/* Chat History and Voice Controls */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="w-full md:w-[400px] space-y-4"
+            >
+              {/* Chat History */}
+              <motion.div
+                className="glass p-6 rounded-2xl"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold text-electric-blue">Chat History</h2>
+                  {process.env.NODE_ENV === 'development' && (
+                    <motion.button
+                      onClick={testWithDifferentComponent}
+                      className="text-xs px-2 py-1 bg-electric-blue/20 rounded-md hover:bg-electric-blue/30"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Test Different Component
+                    </motion.button>
+                  )}
+                </div>
+                <div className="h-[300px] overflow-y-auto hide-scrollbar space-y-4">
+                  {messages.map((message, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${
+                        message.type === 'user' ? 'justify-end' : 'justify-start'
+                      }`}
+                    >
+                      <div
+                        className={`max-w-[80%] p-3 rounded-lg ${
+                          message.type === 'user'
+                            ? 'bg-electric-blue/20 ml-auto'
+                            : message.type === 'error'
+                            ? 'bg-red-500/20'
+                            : 'bg-neon-cyan/20'
+                        }`}
+                      >
+                        <p className="text-sm md:text-base">{message.content}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                  {isLoading && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex justify-start"
+                    >
+                      <div className="bg-neon-cyan/20 p-3 rounded-lg">
+                        <div className="flex space-x-2">
+                          <div className="w-2 h-2 bg-neon-cyan rounded-full animate-bounce" />
+                          <div className="w-2 h-2 bg-neon-cyan rounded-full animate-bounce delay-75" />
+                          <div className="w-2 h-2 bg-neon-cyan rounded-full animate-bounce delay-150" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
+
+              {/* Voice Controls */}
+              <div className="glass p-6 rounded-2xl">
+                <VoiceControls
+                  isListening={isListening}
+                  currentLanguage={currentLanguage}
+                  onSpeechStart={() => setIsListening(true)}
+                  onSpeechEnd={() => setIsListening(false)}
+                  onTextInput={handleUserInput}
+                  disabled={isLoading}
+                />
+              </div>
+            </motion.div>
+
+            {/* Avatar */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="relative w-[150px] h-[150px] flex-shrink-0" 
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 rounded-full blur-xl" />
+              <div className="glass rounded-full aspect-square overflow-hidden border-2 border-white/10 relative z-10">
+                <AvatarComponent
+                  isListening={isListening}
+                  currentLanguage={currentLanguage}
+                  response={response}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
