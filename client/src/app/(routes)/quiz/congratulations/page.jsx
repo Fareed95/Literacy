@@ -23,7 +23,7 @@ function CongratulationsPage() {
 
   const getUserInfo = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/userdetails/${contextemail}`, {
+      const response = await fetch(`http://localhost:8000/api/userdetails/${contextemail}/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ function CongratulationsPage() {
 
   const DownloadCertificate = async () => {
     try {
-      const response = await fetch(`${MODEL_API_SERVER}/api/certificate-generate/${id}`, {
+      const response = await fetch(`http://localhost:8000/api/certificate-generate/${id}/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ function CongratulationsPage() {
     try {
       await getUserInfo();
 
-      const response = await fetch(`${MODEL_API_SERVER}/api/certificate`, {
+      const response = await fetch(`http://localhost:8000/api/certificate/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ function CongratulationsPage() {
       console.error('Error sending certificate:', error);
     }
   };
-
+console.log(id,score,contextinput)
   useEffect(() => {
     const handleResize = () => {
       setWindowSize({
