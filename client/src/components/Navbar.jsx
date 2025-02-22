@@ -81,18 +81,21 @@ function Navbar() {
                       Logout
                     </div>
                   </motion.button>
+                  
+                  
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     className="cursor-pointer"
-                  >
+                  ><div href="/UserInfo">
                     <AnimatedTooltip items={[{
                       id: 1,
                       name: session?.user?.name || "User",
                       designation: "Member",
                       image: session?.user?.image || "/default-avatar.png",
-                    }]} />
+                    }]} /></div>
                   </motion.div>
-                </div>
+                  </div>
+                
               ) : (
                 <Link href="/Login">
                   <motion.button
