@@ -153,7 +153,7 @@ function MainInput() {
           <MultiStepLoader
             loadingStates={loadingStates}
             loading={loading}
-            duration={2000}
+            duration={1000}
             loop={true}
           />
         </div>
