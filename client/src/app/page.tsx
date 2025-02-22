@@ -174,7 +174,7 @@ export default function Home() {
     <main className="relative min-h-screen">
       <HeroBackground />
       <FloatingElements />
-      {/* <SplashCursor /> */}
+      <SplashCursor />
       
       <div className="flex flex-col">
         <motion.section 
