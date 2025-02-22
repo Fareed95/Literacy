@@ -52,7 +52,7 @@ function MainInput() {
     setLoading(true);
     setRoadmapData(null);
 
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 5;
     let attempts = 0;
     let success = false;
 
@@ -93,30 +93,37 @@ function MainInput() {
   };
 
   useEffect(() => {
-    if (roadmapData?.roadmap_id) {
-      console.log("Sending request to generate-roadmap-all for roadmap_id:", roadmapData.roadmap_id);
-      fetch(`${MODEL_API_SERVER}/generate-roadmap-all`, {
+  const fetchFullRoadmap = async () => {
+    if (!roadmapData?.roadmap_id) return;
+
+    console.log("Sending request to generate-roadmap-all for roadmap_id:", roadmapData.roadmap_id);
+    
+    try {
+      const response = await fetch(`${MODEL_API_SERVER}/generate-roadmap-all`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ id: roadmapData.roadmap_id }),
-      })
-        .then((response) => {
-          console.log("Response:", response);
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log("Roadmap all generated successfully:", data);
-        })
-        .catch((error) => {
-          console.error("Error generating full roadmap:", error);
-        });
+      });
+
+      console.log("Response:", response);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Roadmap all generated successfully:", data);
+
+    } catch (error) {
+      console.error("Error generating full roadmap:", error);
     }
-  }, [roadmapData]);
+  };
+
+  fetchFullRoadmap();
+}, [roadmapData]);
+
   
 
   return (

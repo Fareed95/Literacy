@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Resume</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .resume-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 1;
+            width: 500px; /* Adjust size as needed */
+            height: auto;
+            object-fit: contain;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #f0f0f0;
+            padding-bottom: 30px;
+            position: relative;
+        }
+
+        .name {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            letter-spacing: 1px;
+        }
+
+        .title {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .contact-info {
+            color: #666;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #555;
+        }
+
+        .contact-item i {
+            width: 20px;
+            text-align: center;
+            color: #3498db;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #3498db;
+        }
+
+        .item {
+            margin-bottom: 25px;
+            padding-left: 20px;
+            border-left: 3px solid #e9ecef;
+            transition: border-left-color 0.3s;
+        }
+
+        .item:hover {
+            border-left-color: #3498db;
+        }
+
+        .item-title {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .item-subtitle {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 5px;
+        }
+
+        .item-date {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .skill {
+            background: #f8f9fa;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .skill:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .achievements-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .achievement-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .languages-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .language-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .progress-bar {
+            width: 100px;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: #3498db;
+        }
+
+        ul {
+            list-style-position: inside;
+            margin-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .resume-container {
+                padding: 30px;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="resume-container">
+        <img src="../static/logo.png" alt="Company Logo" class="watermark">
+        <div class="content" id="resume">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Resume Data
+        const resumeData = {
+            personal: {
+                name: "John Doe",
+                title: "Senior Software Engineer",
+                email: "john.doe@example.com",
+                phone: "(123) 456-7890",
+                location: "San Francisco, CA",
+                linkedin: "linkedin.com/in/johndoe",
+                website: "johndoe.dev",
+                github: "github.com/johndoe"
+            },
+            summary: "Innovative and deadline-driven Software Engineer with 5+ years of experience developing user-centered digital solutions. Proven ability to leverage full-stack expertise to build interactive and scalable web applications.",
+            experience: [
+                {
+                    title: "Senior Software Engineer",
+                    company: "Tech Solutions Inc.",
+                    location: "San Francisco, CA",
+                    period: "Jan 2020 - Present",
+                    achievements: [
+                        "Led development of cloud-based platform serving 1M+ users",
+                        "Improved application performance by 40% through optimization",
+                        "Mentored 5 junior developers and conducted code reviews"
+                    ]
+                },
+                {
+                    title: "Software Engineer",
+                    company: "Digital Innovations",
+                    location: "Seattle, WA",
+                    period: "Jun 2018 - Dec 2019",
+                    achievements: [
+                        "Developed RESTful APIs serving mobile and web clients",
+                        "Implemented automated testing reducing bugs by 30%",
+                        "Collaborated with UX team to improve user experience"
+                    ]
+                }
+            ],
+            education: [
+                {
+                    degree: "Master of Science in Computer Science",
+                    school: "Stanford University",
+                    location: "Stanford, CA",
+                    period: "2016 - 2018",
+                    details: "Focus on Machine Learning and Distributed Systems"
+                },
+                {
+                    degree: "Bachelor of Science in Computer Engineering",
+                    school: "University of California",
+                    location: "Berkeley, CA",
+                    period: "2012 - 2016",
+                    details: "Dean's List, Computer Science Society President"
+                }
+            ],
+            skills: [
+                "JavaScript", "Python", "React", "Node.js", "AWS",
+                "Docker", "Kubernetes", "MongoDB", "GraphQL", "TypeScript"
+            ],
+            certifications: [
+                {
+                    name: "AWS Solutions Architect",
+                    organization: "Amazon Web Services",
+                    date: "2021"
+                },
+                {
+                    name: "Professional Scrum Master",
+                    organization: "Scrum.org",
+                    date: "2020"
+                }
+            ],
+            languages: [
+                { name: "English", level: "Native", proficiency: 100 },
+                { name: "Spanish", level: "Professional", proficiency: 80 },
+                { name: "French", level: "Intermediate", proficiency: 60 }
+            ],
+            achievements: [
+                {
+                    title: "Innovation Award",
+                    description: "Received company-wide recognition for developing an AI-powered customer service solution"
+                },
+                {
+                    title: "Conference Speaker",
+                    description: "Regular speaker at tech conferences on topics including microservices and cloud architecture"
+                }
+            ]
+        };
+
+        // Render Functions
+        function renderHeader(personal) {
+            return `
+                <div class="header">
+                    <div class="name">${personal.name}</div>
+                    <div class="title">${personal.title}</div>
+                    <div class="contact-info">
+                        <span class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            ${personal.email}
+                        </span>
+                        <span class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            ${personal.phone}
+                        </span>
+                        <span class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${personal.location}
+                        </span>
+                        <span class="contact-item">
+                            <i class="fab fa-linkedin"></i>
+                            ${personal.linkedin}
+                        </span>
+                        ${personal.github ? `
+                            <span class="contact-item">
+                                <i class="fab fa-github"></i>
+                                ${personal.github}
+                            </span>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSection(title, content) {
+            return `
+                <div class="section">
+                    <div class="section-title">${title}</div>
+                    ${content}
+                </div>
+            `;
+        }
+
+        function renderExperience(experience) {
+            return experience.map(job => `
+                <div class="item">
+                    <div class="item-title">${job.title}</div>
+                    <div class="item-subtitle">${job.company} - ${job.location}</div>
+                    <div class="item-date">${job.period}</div>
+                    <ul>
+                        ${job.achievements.map(achievement => `<li>${achievement}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+
+        function renderEducation(education) {
+            return education.map(edu => `
+                <div class="item">
+                    <div class="item-title">${edu.degree}</div>
+                    <div class="item-subtitle">${edu.school} - ${edu.location}</div>
+                    <div class="item-date">${edu.period}</div>
+                    <p>${edu.details}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderSkills(skills) {
+            return `
+                <div class="skills-list">
+                    ${skills.map(skill => `<span class="skill">${skill}</span>`).join('')}
+                </div>
+            `;
+        }
+
+        function renderLanguages(languages) {
+            return `
+                <div class="languages-list">
+                    ${languages.map(lang => `
+                        <div class="language-item">
+                            <span>${lang.name} (${lang.level})</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: ${lang.proficiency}%"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderAchievements(achievements) {
+            return `
+                <div class="achievements-list">
+                    ${achievements.map(achievement => `
+                        <div class="achievement-card">
+                            <div class="item-title">${achievement.title}</div>
+                            <p>${achievement.description}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Render Resume
+        function renderResume(data) {
+            const resume = document.getElementById('resume');
+            resume.innerHTML = `
+                ${renderHeader(data.personal)}
+                ${renderSection('Professional Summary', `<p>${data.summary}</p>`)}
+                ${renderSection('Work Experience', renderExperience(data.experience))}
+                ${renderSection('Education', renderEducation(data.education))}
+                ${renderSection('Skills', renderSkills(data.skills))}
+                ${renderSection('Languages', renderLanguages(data.languages))}
+                ${renderSection('Achievements', renderAchievements(data.achievements))}
+            `;
+        }
+
+        // Initialize
+        renderResume(resumeData);
+    </script>
+</body>
+</html>
