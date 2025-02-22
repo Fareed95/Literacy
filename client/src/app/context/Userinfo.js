@@ -5,6 +5,7 @@ import React, { createContext, useState, useContext } from 'react';
 // Create the UserContext without TypeScript types
 const UserContext = createContext({
   contextemail: '',
+  contextId: '',
   contextinput: '',
   contextname: '',
   contextpassword: '',
@@ -14,6 +15,7 @@ const UserContext = createContext({
   contextimg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
 
   contextsetEmail: () => {},
+  contextsetId: () => {},
   contextsetinput: () => {},
   contextsetName: () => {},
   contextsetPassword: () => {},
@@ -26,6 +28,7 @@ const UserContext = createContext({
 
 export const UserProvider = ({ children }) => {
   const [contextemail, contextsetEmail] = useState('');
+  const [contextId, contextsetId] = useState('');
   const [contextinput, contextsetinput] = useState('');
   const [contextname, contextsetName] = useState('');
   const [contextpassword, contextsetPassword] = useState('');
@@ -36,6 +39,8 @@ export const UserProvider = ({ children }) => {
   
   const value = {
     contextemail,
+    contextId,
+    contextsetId,
     contextinput,
     contextname,
     contextpassword,

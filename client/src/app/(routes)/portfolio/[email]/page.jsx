@@ -1,10 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import { usePortfolio } from '@/hooks/usePortfolio';
 import { useAuth } from '@/app/context/AuthContext';
-import SplashCursor from '@/components/SplashCursor';
+import SplashCursor from '@/components/SplashCursor'; 
 import { ExternalLink, Globe } from "lucide-react";
 // import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
 // import { Vortex } from '@/components/ui/vortex';
@@ -105,10 +105,148 @@ const TextRevealCard = ({ children }) => {
   );
 };
 
+// Add this new AI animation component
+const AIEffect = () => {
+  return (
+    <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 to-neutral-900" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/10 via-transparent to-transparent animate-pulse" />
+      <div className="absolute inset-0 bg-grid-small-white/[0.05] -z-10" />
+      <div className="absolute inset-0">
+        {[...Array(50)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute h-px w-px bg-cyan-500/50 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              scale: [0, 1, 0],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: Math.random() * 3 + 2,
+              repeat: Infinity,
+              ease: "linear",
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Add this new component for the glowing border effect
+const GlowingBorder = ({ children }) => (
+  <div className="relative group">
+    <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+    {children}
+  </div>
+);
+
+// Enhance the hero section with AI-themed elements
+const AIHero = ({ userDetails }) => (
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="relative pt-32 pb-16 overflow-hidden"
+  >
+    <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-transparent to-transparent" />
+      {[...Array(3)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5"
+          animate={{
+            x: ["0%", "100%"],
+            opacity: [0, 1, 0],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            delay: i * 2,
+            ease: "linear",
+          }}
+        />
+      ))}
+    </div>
+    <div className="max-w-4xl mx-auto px-4 relative z-10">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="text-center"
+      >
+        <GlowingBorder>
+          <div className="bg-neutral-900/50 backdrop-blur-xl p-8 rounded-lg">
+            <motion.h1 
+              className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 mb-4"
+              animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+            >
+              {userDetails.name || 'AI Portfolio'}
+            </motion.h1>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <p className="text-neutral-400 mt-4">{userDetails.email}</p>
+              <p className="text-neutral-400 mt-2">{userDetails.phone_number}</p>
+              <p className="text-neutral-400 mt-2 max-w-2xl mx-auto">{userDetails.about}</p>
+            </motion.div>
+          </div>
+        </GlowingBorder>
+      </motion.div>
+    </div>
+  </motion.div>
+);
+
+// Enhance the skills section with AI-themed cards
+const AISkillCard = ({ toolName }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    whileHover={{ y: -5, scale: 1.02 }}
+    className="relative overflow-hidden"
+  >
+    <GlowingBorder>
+      <div className="p-6 rounded-lg bg-neutral-900/50 backdrop-blur-xl relative z-10">
+        <h3 className="text-xl font-semibold text-neutral-200 mb-4">{toolName.name}</h3>
+        <div className="space-y-3">
+          {toolName.tools?.map((tool) => (
+            <motion.div
+              key={tool.id}
+              className="space-y-2"
+              whileHover={{ x: 5 }}
+            >
+              <p className="text-cyan-400 font-medium flex items-center">
+                <span className="mr-2">⚡</span>
+                {tool.name}
+              </p>
+              {tool.components?.map((component) => (
+                <p key={component.id} className="text-neutral-400 pl-6 text-sm flex items-center">
+                  <span className="w-1 h-1 bg-cyan-500 rounded-full mr-2" />
+                  {component.name}
+                </p>
+              ))}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </GlowingBorder>
+  </motion.div>
+);
+
 const Page = ({ params }) => {
+  // Unwrap params using React.use()
+  const unwrappedParams = use(params);
+  const decodedEmail = decodeURIComponent(unwrappedParams.email);
+  
   const { data: session } = useSession();
   const { email: authEmail } = useAuth();
-  const decodedEmail = decodeURIComponent(params.email);
   
   // Update the ownership check to compare both session email and auth context email
   const isOwner = (session?.user?.email === decodedEmail) || (authEmail === decodedEmail);
@@ -134,19 +272,23 @@ const Page = ({ params }) => {
     }],
     certificate: [{
       name: '',
-      started_at: '',
-      ended_at: '',
-      additionol_testseries_attempted: 0,
       competition_battled: 0,
       competition_won: 0
     }],
     project: [{
       name: '',
       description: '',
-      link: []
+      link: [
+        {
+          name: '',
+          url: '',
+          project: '',
+        }
+      ]
     }],
     toolname: [{
       name: '',
+      user: '',
       tools: []
     }]
   });
@@ -154,6 +296,7 @@ const Page = ({ params }) => {
   useEffect(() => {
     if (portfolioData?.userDetails) {
       setUserDetails({
+        id: portfolioData.userDetails.id,
         name: portfolioData.userDetails.name || '',
         email: portfolioData.userDetails.email || '',
         phone_number: portfolioData.userDetails.phone_number || '',
@@ -162,10 +305,135 @@ const Page = ({ params }) => {
         certificate: portfolioData.userDetails.certificate || [],
         project: portfolioData.userDetails.project || [],
         toolname: portfolioData.userDetails.toolname || []
+
+
       });
     }
   }, [portfolioData]);
 
+  // Add debug logging
+  useEffect(() => {
+    console.log('Auth Debug:', {
+      sessionEmail: session?.user?.email,
+      authEmail,
+      paramsEmail: decodedEmail,
+      isOwner,
+      canEdit,
+      hasToken: !!session?.user?.accessToken
+    });
+  }, [session, authEmail, decodedEmail, isOwner, canEdit]);
+
+  // Add these handler functions
+  const handleUpdateUserDetails = async (e) => {
+    e.preventDefault();
+    
+    try {
+      // 1. Update user details
+      const userResponse = await fetch(`http://localhost:8000/api/userdetails/${decodedEmail}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: userDetails.name,
+          phone_number: userDetails.phone_number,
+          about: userDetails.about,
+        }),
+      });
+
+      if (!userResponse.ok) throw new Error('Failed to update user details');
+
+      // 2. Add toolnames
+      if (userDetails.toolname.length > 0) {
+        for (const tool of userDetails.toolname) {
+          await fetch('http://localhost:8000/api/toolnames/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name: tool.name,
+              user: userDetails.id,
+            }),
+          });
+        }
+      }
+
+      // 3. Add education
+      if (userDetails.education.length > 0) {
+        for (const edu of userDetails.education) {
+          await fetch('http://localhost:8000/api/education/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              degree: edu.degree,
+              field_of_study: edu.field_of_study,
+              University: edu.University,
+              location: edu.location,
+              start_date: edu.start_date,
+              end_date: edu.end_date,
+              current_grade: edu.current_grade,
+              user: userDetails?.id,
+            }),
+          });
+        }
+      }
+
+      // 4. Add projects and their links
+      if (userDetails.project.length > 0) {
+        for (const proj of userDetails.project) {
+          // Create project
+          const projectResponse = await fetch('http://localhost:8000/api/projects/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name: proj.name,
+              description: proj.description,
+              user: userDetails?.id,
+            }),
+          });
+
+          if (!projectResponse.ok) throw new Error('Failed to create project');
+          
+          const projectData = await projectResponse.json();
+
+          // Add links for the project
+          if (proj.link && proj.link.length > 0) {
+            for (const link of proj.link) {
+              await fetch('http://localhost:8000/api/links/', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  name: link.name,
+                  url: link.url,
+                  project: projectData.id, // Use the ID from the created project
+                }),
+              });
+            }
+          }
+        }
+      }
+
+      // Close modal and refresh data
+      setIsEditing(false);
+      // Refresh the portfolio data
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
+
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      // Add error handling UI feedback here
+    }
+  };
+
+  // Add these helper functions for form arrays
   const handleAddEducation = () => {
     setUserDetails(prev => ({
       ...prev,
@@ -206,134 +474,27 @@ const Page = ({ params }) => {
     }));
   };
 
-  const handleAddCertificate = () => {
-    setUserDetails(prev => ({
-      ...prev,
-      certificate: [...prev.certificate, {
-        name: '',
-        started_at: new Date().toISOString(),
-        ended_at: new Date().toISOString(),
-        additionol_testseries_attempted: 0,
-        competition_battled: 0,
-        competition_won: 0
-      }]
-    }));
-  };
-
-  const handleRemoveCertificate = (index) => {
-    setUserDetails(prev => ({
-      ...prev,
-      certificate: prev.certificate.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleUpdateUserDetails = async (e) => {
-    e.preventDefault();
-    try {
-      // Show loading state
-      setIsEditing(false);
-      
-      // Format the data according to the API requirements
-      const formattedData = {
-        userdetails: [{
-          id: portfolioData?.userDetails?.id,
-          name: userDetails.name,
-          email: userDetails.email,
-          phone_number: userDetails.phone_number,
-          about: userDetails.about,
-          education: userDetails.education.map(edu => ({
-            ...edu,
-            user: portfolioData?.userDetails?.id,
-            start_date: edu.start_date ? new Date(edu.start_date).toISOString().split('T')[0] : null,
-            end_date: edu.end_date ? new Date(edu.end_date).toISOString().split('T')[0] : null
-          })),
-          certificate: userDetails.certificate.map(cert => ({
-            ...cert,
-            user: portfolioData?.userDetails?.id,
-            started_at: cert.started_at ? new Date(cert.started_at).toISOString() : null,
-            ended_at: cert.ended_at ? new Date(cert.ended_at).toISOString() : null,
-            additionol_testseries_attempted: Number(cert.additionol_testseries_attempted) || 0,
-            competition_battled: Number(cert.competition_battled) || 0,
-            competition_won: Number(cert.competition_won) || 0
-          })),
-          project: userDetails.project.map(proj => ({
-            ...proj,
-            user: portfolioData?.userDetails?.id,
-            link: Array.isArray(proj.link) ? proj.link : []
-          })),
-          toolname: userDetails.toolname.map(tool => ({
-            ...tool,
-            user: portfolioData?.userDetails?.id,
-            tools: Array.isArray(tool.tools) ? tool.tools : []
-          }))
-        }]
+  const handleAddProjectLink = (projectIndex) => {
+    setUserDetails(prev => {
+      const newProjects = [...prev.project];
+      newProjects[projectIndex] = {
+        ...newProjects[projectIndex],
+        link: [...newProjects[projectIndex].link, { name: '', url: '' }]
       };
-
-      // Get the token from the session
-      if (!session?.user?.accessToken) {
-        throw new Error('You must be logged in to update your profile');
-      }
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/update/${params.email}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.user.accessToken}`
-        },
-        body: JSON.stringify(formattedData)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update profile');
-      }
-
-      const data = await response.json();
-      
-      // Update the local state with the new data
-      if (data.userdetails && data.userdetails[0]) {
-        setUserDetails({
-          name: data.userdetails[0].name || '',
-          email: data.userdetails[0].email || '',
-          phone_number: data.userdetails[0].phone_number || '',
-          about: data.userdetails[0].about || '',
-          education: data.userdetails[0].education || [],
-          certificate: data.userdetails[0].certificate || [],
-          project: data.userdetails[0].project || [],
-          toolname: data.userdetails[0].toolname || []
-        });
-
-        // Show success message
-        alert('Profile updated successfully');
-
-        // Force a refetch of the portfolio data to update the UI
-        if (typeof window !== 'undefined') {
-          window.location.reload();
-        }
-      }
-
-      // Show success message (you can implement a toast notification here)
-      console.log('Profile updated successfully');
-      
-    } catch (error) {
-      console.error('Error updating user details:', error);
-      // Show error message to user
-      alert(error.message || 'Failed to update profile');
-      setIsEditing(true); // Keep the form open if there's an error
-    }
+      return { ...prev, project: newProjects };
+    });
   };
 
-  // Add debug logging
-  useEffect(() => {
-    console.log('Auth Debug:', {
-      sessionEmail: session?.user?.email,
-      authEmail,
-      paramsEmail: decodedEmail,
-      isOwner,
-      canEdit,
-      hasToken: !!session?.user?.accessToken
+  const handleRemoveProjectLink = (projectIndex, linkIndex) => {
+    setUserDetails(prev => {
+      const newProjects = [...prev.project];
+      newProjects[projectIndex] = {
+        ...newProjects[projectIndex],
+        link: newProjects[projectIndex].link.filter((_, i) => i !== linkIndex)
+      };
+      return { ...prev, project: newProjects };
     });
-  }, [session, authEmail, decodedEmail, isOwner, canEdit]);
+  };
 
   if (loading) {
     return (
@@ -343,6 +504,7 @@ const Page = ({ params }) => {
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full"
         />
+        <SplashCursor />
       </div>
     );
   }
@@ -362,269 +524,179 @@ const Page = ({ params }) => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950">
-      <SparklesCore>
-        {/* <SplashCursor /> */}
-        <WavyBackground>
-        {/* Hero Section */}
-        <div className="relative pt-32 pb-16">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-4xl mx-auto px-4"
-          >
-            <TextRevealCard>
-              <div className="text-center">
-                <motion.h1 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 mb-4"
-                >
-                  {userDetails.name || 'Portfolio'}
-                </motion.h1>
-                <motion.p 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="text-2xl text-neutral-400 mb-6"
-                >
-                  {userDetails.title}
-                </motion.p>
-                {userDetails.bio && (
-                  <motion.p 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-neutral-300 max-w-2xl mx-auto mb-8"
+    <div className="min-h-screen bg-neutral-950 relative">
+      <AIEffect />
+      <SplashCursor />
+      
+      {/* Replace the existing hero section with AIHero */}
+      <AIHero userDetails={userDetails} />
+
+      {/* Update the skills section */}
+      <div className="max-w-7xl mx-auto px-4 space-y-24 pb-32">
+        <motion.section
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="relative"
+        >
+          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
+          <h2 className="text-3xl font-bold text-center mb-16">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-500">
+              AI Skills & Expertise
+            </span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {portfolioData?.toolNames?.map((toolName) => (
+              <AISkillCard key={toolName.id} toolName={toolName} />
+            ))}
+          </div>
+        </motion.section>
+
+        {/* Education Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative"
+        >
+          <TextRevealCard>
+            <div>
+              <h2 className="text-3xl font-bold text-neutral-200 mb-8">Education</h2>
+              <div className="space-y-6">
+                {portfolioData?.userDetails?.education?.map((edu) => (
+                  <motion.div
+                    key={edu.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
                   >
-                    {userDetails.bio}
-                  </motion.p>
-                )}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex items-center justify-center space-x-6"
-                >
-                  {userDetails.location && (
-                    <span className="text-neutral-400 flex items-center">
-                      <Globe className="w-4 h-4 mr-2" /> {userDetails.location}
-                    </span>
-                  )}
-                  {userDetails.website && (
-                    <a
-                      href={userDetails.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center"
-                    >
-                      <ExternalLink className="w-4 h-4 mr-2" /> Website
-                    </a>
-                  )}
-                </motion.div>
-              </div>
-            </TextRevealCard>
-          </motion.div>
-        </div>
-        </WavyBackground>
-
-                  
-        <div className="max-w-7xl mx-auto px-4 space-y-24 pb-32">
-          {/* Skills Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative"
-          >
-            <TextRevealCard>
-              <div>
-                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Skills & Expertise</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {portfolioData?.toolNames?.map((toolName) => (
-                    <motion.div
-                      key={toolName.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{ y: -5 }}
-                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
-                    >
-                      <h3 className="text-xl font-semibold text-neutral-200 mb-4">{toolName.name}</h3>
-                      <div className="space-y-3">
-                        {toolName.tools?.map((tool) => (
-                          <div key={tool.id} className="space-y-2">
-                            <p className="text-blue-400 font-medium">{tool.name}</p>
-                            {tool.components?.map((component) => (
-                              <p key={component.id} className="text-neutral-400 pl-4 text-sm">
-                                • {component.name}
-                              </p>
-                            ))}
-                          </div>
-                        ))}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <h3 className="text-xl font-semibold text-neutral-200">{edu.degree}</h3>
+                        <p className="text-blue-400 mt-2">{edu.field_of_study}</p>
+                        <p className="text-neutral-400 mt-1">{edu.University}</p>
+                        <p className="text-neutral-400">{edu.location}</p>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </TextRevealCard>
-          </motion.section>
-
-          <InfiniteMovingText />
-
-          {/* Education Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative"
-          >
-            <TextRevealCard>
-              <div>
-                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Education</h2>
-                <div className="space-y-6">
-                  {portfolioData?.userDetails?.education?.map((edu) => (
-                    <motion.div
-                      key={edu.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
-                    >
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <h3 className="text-xl font-semibold text-neutral-200">{edu.degree}</h3>
-                          <p className="text-blue-400 mt-2">{edu.field_of_study}</p>
-                          <p className="text-neutral-400 mt-1">{edu.University}</p>
-                          <p className="text-neutral-400">{edu.location}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-neutral-300">{edu.start_date} - {edu.end_date}</p>
-                          {edu.current_grade && (
-                            <p className="text-blue-400 mt-2">Grade: {edu.current_grade}</p>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </TextRevealCard>
-          </motion.section>
-
-          {/* Projects Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative"
-          >
-            <TextRevealCard>
-              <div>
-                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Projects</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {portfolioData?.userDetails?.project?.map((proj) => (
-                    <motion.div
-                      key={proj.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{ y: -5 }}
-                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
-                    >
-                      <h3 className="text-xl font-semibold text-neutral-200">{proj.name}</h3>
-                      <p className="text-neutral-400 mt-4">{proj.description}</p>
-                      <div className="mt-6">
-                        <p className="text-blue-400">
-                          {proj.start_date} - {proj.end_date || 'Present'}
-                        </p>
-                        {proj.link && proj.link.length > 0 && (
-                          <div className="flex flex-wrap gap-3 mt-4">
-                            {proj.link.map((link) => (
-                              <motion.a
-                                key={link.id}
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-4 py-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-300 text-sm"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                              >
-                                {link.name}
-                              </motion.a>
-                            ))}
-                          </div>
+                      <div className="text-right">
+                        <p className="text-neutral-300">{edu.start_date} - {edu.end_date}</p>
+                        {edu.current_grade && (
+                          <p className="text-blue-400 mt-2">Grade: {edu.current_grade}</p>
                         )}
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            </TextRevealCard>
-          </motion.section>
+            </div>
+          </TextRevealCard>
+        </motion.section>
 
-          {/* Certificates Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative"
-          >
-            <TextRevealCard>
-              <div>
-                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Certificates</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {portfolioData?.userDetails?.certificate?.map((cert) => (
-                    <motion.div
-                      key={cert.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{ y: -5 }}
-                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
-                    >
-                      <h3 className="text-xl font-semibold text-neutral-200">{cert.name}</h3>
-                      <p className="text-blue-400 mt-2">{cert.issuing_organization}</p>
-                      <p className="text-neutral-400 mt-4">Issued: {cert.issue_date}</p>
-                      {cert.expiry_date && (
-                        <p className="text-neutral-400">Expires: {cert.expiry_date}</p>
+        {/* Projects Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative"
+        >
+          <TextRevealCard>
+            <div>
+              <h2 className="text-3xl font-bold text-neutral-200 mb-8">Projects</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {portfolioData?.userDetails?.project?.map((proj) => (
+                  <motion.div
+                    key={proj.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ y: -5 }}
+                    className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
+                  >
+                    <h3 className="text-xl font-semibold text-neutral-200">{proj.name}</h3>
+                    <p className="text-neutral-400 mt-4">{proj.description}</p>
+                    <div className="mt-6">
+                      <p className="text-blue-400">
+                        {proj.start_date} - {proj.end_date || 'Present'}
+                      </p>
+                      {proj.link && proj.link.length > 0 && (
+                        <div className="flex flex-wrap gap-3 mt-4">
+                          {proj.link.map((link) => (
+                            <motion.a
+                              key={link.id}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-300 text-sm"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              {link.name}
+                            </motion.a>
+                          ))}
+                        </div>
                       )}
-                      {cert.credential_id && (
-                        <p className="text-blue-400 mt-2">Credential ID: {cert.credential_id}</p>
-                      )}
-                      {cert.credential_url && (
-                        <motion.a
-                          href={cert.credential_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-block px-4 py-2 mt-4 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-300 text-sm"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          View Certificate
-                        </motion.a>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            </TextRevealCard>
-          </motion.section>
-        </div>
-      </SparklesCore>
+            </div>
+          </TextRevealCard>
+        </motion.section>
 
-      {/* Add debug info for development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed top-20 right-4 bg-black/80 p-4 rounded-lg text-xs text-white z-50">
-          <p>Session Email: {session?.user?.email}</p>
-          <p>Auth Email: {authEmail}</p>
-          <p>Profile Email: {decodedEmail}</p>
-          <p>Is Owner: {isOwner.toString()}</p>
-          <p>Can Edit: {canEdit.toString()}</p>
-        </div>
-      )}
+        {/* Certificates Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative"
+        >
+          <TextRevealCard>
+            <div>
+              <h2 className="text-3xl font-bold text-neutral-200 mb-8">Certificates</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {portfolioData?.userDetails?.certificate?.map((cert) => (
+                  <motion.div
+                    key={cert.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ y: -5 }}
+                    className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
+                  >
+                    <h3 className="text-xl font-semibold text-neutral-200">{cert.name}</h3>
+                    <p className="text-blue-400 mt-2">{cert.issuing_organization}</p>
+                    <p className="text-neutral-400 mt-4">Competition Battled: {cert.competition_battled}</p>
+                    <p className="text-neutral-400 mt-4">Competition Won: {cert.competition_won}</p>
+                    
+                    {cert.credential_id && (
+                      <p className="text-blue-400 mt-2">Credential ID: {cert.credential_id}</p>
+                    )}
+                    {cert.credential_url && (
+                      <motion.a
+                        href={cert.credential_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block px-4 py-2 mt-4 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-300 text-sm"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        View Certificate
+                      </motion.a>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </TextRevealCard>
+        </motion.section>
+      </div>
 
-      {/* Edit Profile Button - Only visible to authenticated owner */}
+      {/* Enhanced edit button */}
       {isOwner && (
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsEditing(true)}
-          className="fixed bottom-8 right-8 px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition-all duration-300"
+          className="fixed bottom-8 right-8 px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-[0_0_15px_rgba(34,211,238,0.5)] hover:shadow-[0_0_25px_rgba(34,211,238,0.5)] transition-all duration-300"
         >
-          Edit Profile
+          <span className="flex items-center">
+            <span className="mr-2">✨</span>
+            Edit Profile
+          </span>
         </motion.button>
       )}
 
@@ -864,7 +936,6 @@ const Page = ({ params }) => {
                   <h3 className="text-lg font-semibold text-neutral-300">Certificates</h3>
                   <motion.button
                     type="button"
-                    onClick={handleAddCertificate}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg hover:bg-blue-500/20 transition-colors"
