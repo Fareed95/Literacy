@@ -8,7 +8,6 @@ import gsap from 'gsap';
 import { motion } from 'framer-motion';
 
 const AvatarComponent = ({
-  isExpanded,
   isListening,
   currentLanguage,
   response
@@ -39,8 +38,8 @@ const AvatarComponent = ({
         // Camera setup
         const aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
         cameraRef.current = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-        cameraRef.current.position.set(0, 0.5, 2.5); // Adjusted for better centering
-        cameraRef.current.lookAt(0, 0.5, 0);
+        cameraRef.current.position.set(0, 0.75, 2); // Adjusted camera position for circular view
+        cameraRef.current.lookAt(0, 0.75, 0);
 
         // Renderer setup
         rendererRef.current = new THREE.WebGLRenderer({ 
@@ -280,21 +279,21 @@ const AvatarComponent = ({
     <div className="relative w-full h-full">
       <div
         ref={containerRef}
-        className="w-full h-full rounded-xl overflow-hidden"
+        className="w-full h-full rounded-full overflow-hidden"
       />
       
       {/* Loading indicator */}
       {(!avatarRef.current || loadingProgress < 100) && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded-xl">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded-full">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-electric-blue border-t-transparent mb-4"></div>
-            <p className="text-electric-blue">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-electric-blue border-t-transparent mb-4"></div>
+            <p className="text-electric-blue text-sm">
               {loadingError ? loadingError : `Loading Avatar... ${loadingProgress}%`}
             </p>
             {loadingError && (
               <button 
                 onClick={() => window.location.reload()}
-                className="mt-4 neon-btn text-sm"
+                className="mt-4 neon-btn text-xs"
               >
                 Retry
               </button>
@@ -304,8 +303,8 @@ const AvatarComponent = ({
       )}
 
       {/* Language indicator */}
-      <div className="absolute top-4 left-4 glass px-3 py-1 rounded-full text-sm">
-        {currentLanguage === 'en' ? '🇺🇸 English' : '🌐 Other'}
+      <div className="absolute top-2 left-2 glass px-2 py-0.5 rounded-full text-xs">
+        {currentLanguage === 'en' ? '🇺🇸' : '🌐'}
       </div>
 
       {/* Listening indicator */}
@@ -313,11 +312,11 @@ const AvatarComponent = ({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 glass px-4 py-2 rounded-full"
+          className="absolute bottom-2 left-1/2 transform -translate-x-1/2 glass px-3 py-1 rounded-full"
         >
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-electric-blue rounded-full animate-pulse" />
-            <span className="text-neon-cyan">Listening...</span>
+          <div className="flex items-center space-x-1">
+            <div className="w-1.5 h-1.5 bg-electric-blue rounded-full animate-pulse" />
+            <span className="text-neon-cyan text-xs">Listening...</span>
           </div>
         </motion.div>
       )}
