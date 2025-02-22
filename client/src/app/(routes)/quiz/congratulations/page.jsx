@@ -13,13 +13,13 @@ function CongratulationsPage() {
   });
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [id, setId] = useState(null);
+  const [id, setId] = useState();
   const { contextId, contextinput, contextemail, contextsetId } = useUserContext();
   const score = parseInt(searchParams.get('score') || '0');
   const total = parseInt(searchParams.get('total') || '12');
   const theme = searchParams.get('theme') || 'Quiz';
   const percentage = Math.round((score / total) * 100);
-  const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER;
+
 
   const getUserInfo = async () => {
     try {
@@ -36,14 +36,16 @@ function CongratulationsPage() {
 
       const result = await response.json();
       setId(result.id);
+
     } catch (error) {
       console.error('Error fetching user info:', error);
     }
   };
+   getUserInfo();
 
   const DownloadCertificate = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/certificate-generate/${id}/`, {
+      const response = await fetch(`http://localhost:8000/api/certificate-generate/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
