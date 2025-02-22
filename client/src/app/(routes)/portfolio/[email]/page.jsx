@@ -105,6 +105,141 @@ const TextRevealCard = ({ children }) => {
   );
 };
 
+// Add this new AI animation component
+const AIEffect = () => {
+  return (
+    <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 to-neutral-900" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/10 via-transparent to-transparent animate-pulse" />
+      <div className="absolute inset-0 bg-grid-small-white/[0.05] -z-10" />
+      <div className="absolute inset-0">
+        {[...Array(50)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute h-px w-px bg-cyan-500/50 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              scale: [0, 1, 0],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: Math.random() * 3 + 2,
+              repeat: Infinity,
+              ease: "linear",
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Add this new component for the glowing border effect
+const GlowingBorder = ({ children }) => (
+  <div className="relative group">
+    <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+    {children}
+  </div>
+);
+
+// Enhance the hero section with AI-themed elements
+const AIHero = ({ userDetails }) => (
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="relative pt-32 pb-16 overflow-hidden"
+  >
+    <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-transparent to-transparent" />
+      {[...Array(3)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5"
+          animate={{
+            x: ["0%", "100%"],
+            opacity: [0, 1, 0],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            delay: i * 2,
+            ease: "linear",
+          }}
+        />
+      ))}
+    </div>
+    <div className="max-w-4xl mx-auto px-4 relative z-10">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="text-center"
+      >
+        <GlowingBorder>
+          <div className="bg-neutral-900/50 backdrop-blur-xl p-8 rounded-lg">
+            <motion.h1 
+              className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 mb-4"
+              animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+            >
+              {userDetails.name || 'AI Portfolio'}
+            </motion.h1>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <p className="text-neutral-400 mt-4">{userDetails.email}</p>
+              <p className="text-neutral-400 mt-2">{userDetails.phone_number}</p>
+              <p className="text-neutral-400 mt-2 max-w-2xl mx-auto">{userDetails.about}</p>
+            </motion.div>
+          </div>
+        </GlowingBorder>
+      </motion.div>
+    </div>
+  </motion.div>
+);
+
+// Enhance the skills section with AI-themed cards
+const AISkillCard = ({ toolName }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    whileHover={{ y: -5, scale: 1.02 }}
+    className="relative overflow-hidden"
+  >
+    <GlowingBorder>
+      <div className="p-6 rounded-lg bg-neutral-900/50 backdrop-blur-xl relative z-10">
+        <h3 className="text-xl font-semibold text-neutral-200 mb-4">{toolName.name}</h3>
+        <div className="space-y-3">
+          {toolName.tools?.map((tool) => (
+            <motion.div
+              key={tool.id}
+              className="space-y-2"
+              whileHover={{ x: 5 }}
+            >
+              <p className="text-cyan-400 font-medium flex items-center">
+                <span className="mr-2">⚡</span>
+                {tool.name}
+              </p>
+              {tool.components?.map((component) => (
+                <p key={component.id} className="text-neutral-400 pl-6 text-sm flex items-center">
+                  <span className="w-1 h-1 bg-cyan-500 rounded-full mr-2" />
+                  {component.name}
+                </p>
+              ))}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </GlowingBorder>
+  </motion.div>
+);
+
 const Page = ({ params }) => {
   // Unwrap params using React.use()
   const unwrappedParams = use(params);
@@ -388,273 +523,179 @@ const Page = ({ params }) => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950">
-      <SparklesCore>
-        {/* <SplashCursor /> */}
-        <WavyBackground>
-        {/* Hero Section */}
-        <div className="relative pt-32 pb-16">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-4xl mx-auto px-4"
-          >
-            <TextRevealCard>
-              <div className="text-center">
-                <motion.h1 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 mb-4"
-                >
-                  {userDetails.name || 'Portfolio'}
-                  <p className="text-neutral-400 mt-4"> {userDetails.email}</p>
-                  <p className="text-neutral-400 mt-4"> {userDetails.phone_number}</p>
-                  <p className="text-neutral-400 mt-4"> {userDetails.about}</p>
-                </motion.h1>
-                <motion.p 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="text-2xl text-neutral-400 mb-6"
-                >
-                  {userDetails.title}
-                </motion.p>
-                {userDetails.bio && (
-                  <motion.p 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-neutral-300 max-w-2xl mx-auto mb-8"
+    <div className="min-h-screen bg-neutral-950 relative">
+      <AIEffect />
+      <SplashCursor />
+      
+      {/* Replace the existing hero section with AIHero */}
+      <AIHero userDetails={userDetails} />
+
+      {/* Update the skills section */}
+      <div className="max-w-7xl mx-auto px-4 space-y-24 pb-32">
+        <motion.section
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="relative"
+        >
+          <div className="absolute -top-16 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
+          <h2 className="text-3xl font-bold text-center mb-16">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-500">
+              AI Skills & Expertise
+            </span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {portfolioData?.toolNames?.map((toolName) => (
+              <AISkillCard key={toolName.id} toolName={toolName} />
+            ))}
+          </div>
+        </motion.section>
+
+        {/* Education Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative"
+        >
+          <TextRevealCard>
+            <div>
+              <h2 className="text-3xl font-bold text-neutral-200 mb-8">Education</h2>
+              <div className="space-y-6">
+                {portfolioData?.userDetails?.education?.map((edu) => (
+                  <motion.div
+                    key={edu.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
                   >
-                    {userDetails.bio}
-                  </motion.p>
-                )}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex items-center justify-center space-x-6"
-                >
-
-                  {userDetails.location && (
-                    <span className="text-neutral-400 flex items-center">
-                      <Globe className="w-4 h-4 mr-2" /> {userDetails.location}
-                    </span>
-                  )}
-
-                  {userDetails.website && (
-                    <a
-                      href={userDetails.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center"
-                    >
-                      <ExternalLink className="w-4 h-4 mr-2" /> Website
-                    </a>
-                  )}
-                </motion.div>
-              </div>
-            </TextRevealCard>
-          </motion.div>
-        </div>
-        </WavyBackground>
-
-
-
-        <div className="max-w-7xl mx-auto px-4 space-y-24 pb-32">
-          {/* Skills Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative"
-          >
-            <TextRevealCard>
-              <div>
-                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Skills & Expertise</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {portfolioData?.toolNames?.map((toolName) => (
-                    <motion.div
-                      key={toolName.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{ y: -5 }}
-                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
-                    >
-                      <h3 className="text-xl font-semibold text-neutral-200 mb-4">{toolName.name}</h3>
-                      <div className="space-y-3">
-                        {toolName.tools?.map((tool) => (
-                          <div key={tool.id} className="space-y-2">
-                            <p className="text-blue-400 font-medium">{tool.name}</p>
-                            {tool.components?.map((component) => (
-                              <p key={component.id} className="text-neutral-400 pl-4 text-sm">
-                                • {component.name}
-                              </p>
-                            ))}
-                          </div>
-                        ))}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <h3 className="text-xl font-semibold text-neutral-200">{edu.degree}</h3>
+                        <p className="text-blue-400 mt-2">{edu.field_of_study}</p>
+                        <p className="text-neutral-400 mt-1">{edu.University}</p>
+                        <p className="text-neutral-400">{edu.location}</p>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </TextRevealCard>
-          </motion.section>
-
-
-          {/* Education Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative"
-          >
-            <TextRevealCard>
-              <div>
-                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Education</h2>
-                <div className="space-y-6">
-                  {portfolioData?.userDetails?.education?.map((edu) => (
-                    <motion.div
-                      key={edu.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
-                    >
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <h3 className="text-xl font-semibold text-neutral-200">{edu.degree}</h3>
-                          <p className="text-blue-400 mt-2">{edu.field_of_study}</p>
-                          <p className="text-neutral-400 mt-1">{edu.University}</p>
-                          <p className="text-neutral-400">{edu.location}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-neutral-300">{edu.start_date} - {edu.end_date}</p>
-                          {edu.current_grade && (
-                            <p className="text-blue-400 mt-2">Grade: {edu.current_grade}</p>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </TextRevealCard>
-          </motion.section>
-
-          {/* Projects Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative"
-          >
-            <TextRevealCard>
-              <div>
-                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Projects</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {portfolioData?.userDetails?.project?.map((proj) => (
-                    <motion.div
-                      key={proj.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{ y: -5 }}
-                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
-                    >
-                      <h3 className="text-xl font-semibold text-neutral-200">{proj.name}</h3>
-                      <p className="text-neutral-400 mt-4">{proj.description}</p>
-                      <div className="mt-6">
-                        <p className="text-blue-400">
-                          {proj.start_date} - {proj.end_date || 'Present'}
-                        </p>
-                        {proj.link && proj.link.length > 0 && (
-                          <div className="flex flex-wrap gap-3 mt-4">
-                            {proj.link.map((link) => (
-                              <motion.a
-                                key={link.id}
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-4 py-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-300 text-sm"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                              >
-                                {link.name}
-                              </motion.a>
-                            ))}
-                          </div>
+                      <div className="text-right">
+                        <p className="text-neutral-300">{edu.start_date} - {edu.end_date}</p>
+                        {edu.current_grade && (
+                          <p className="text-blue-400 mt-2">Grade: {edu.current_grade}</p>
                         )}
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            </TextRevealCard>
-          </motion.section>
+            </div>
+          </TextRevealCard>
+        </motion.section>
 
-          {/* Certificates Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative"
-          >
-            <TextRevealCard>
-              <div>
-                <h2 className="text-3xl font-bold text-neutral-200 mb-8">Certificates</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {portfolioData?.userDetails?.certificate?.map((cert) => (
-                    <motion.div
-                      key={cert.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{ y: -5 }}
-                      className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
-                    >
-                      <h3 className="text-xl font-semibold text-neutral-200">{cert.name}</h3>
-                      <p className="text-blue-400 mt-2">{cert.issuing_organization}</p>
-                      <p className="text-neutral-400 mt-4">Competition Battled: {cert.competition_battled}</p>
-                      <p className="text-neutral-400 mt-4">Competition Won: {cert.competition_won}</p>
-                      
-                      {cert.credential_id && (
-                        <p className="text-blue-400 mt-2">Credential ID: {cert.credential_id}</p>
+        {/* Projects Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative"
+        >
+          <TextRevealCard>
+            <div>
+              <h2 className="text-3xl font-bold text-neutral-200 mb-8">Projects</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {portfolioData?.userDetails?.project?.map((proj) => (
+                  <motion.div
+                    key={proj.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ y: -5 }}
+                    className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
+                  >
+                    <h3 className="text-xl font-semibold text-neutral-200">{proj.name}</h3>
+                    <p className="text-neutral-400 mt-4">{proj.description}</p>
+                    <div className="mt-6">
+                      <p className="text-blue-400">
+                        {proj.start_date} - {proj.end_date || 'Present'}
+                      </p>
+                      {proj.link && proj.link.length > 0 && (
+                        <div className="flex flex-wrap gap-3 mt-4">
+                          {proj.link.map((link) => (
+                            <motion.a
+                              key={link.id}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-300 text-sm"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              {link.name}
+                            </motion.a>
+                          ))}
+                        </div>
                       )}
-                      {cert.credential_url && (
-                        <motion.a
-                          href={cert.credential_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-block px-4 py-2 mt-4 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-300 text-sm"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          View Certificate
-                        </motion.a>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            </TextRevealCard>
-          </motion.section>
-        </div>
-      </SparklesCore>
+            </div>
+          </TextRevealCard>
+        </motion.section>
 
-      {/* Add debug info for development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed top-20 right-4 bg-black/80 p-4 rounded-lg text-xs text-white z-50">
-          <p>Session Email: {session?.user?.email}</p>
-          <p>Auth Email: {authEmail}</p>
-          <p>Profile Email: {decodedEmail}</p>
-          <p>Is Owner: {isOwner.toString()}</p>
-          <p>Can Edit: {canEdit.toString()}</p>
-        </div>
-      )}
+        {/* Certificates Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative"
+        >
+          <TextRevealCard>
+            <div>
+              <h2 className="text-3xl font-bold text-neutral-200 mb-8">Certificates</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {portfolioData?.userDetails?.certificate?.map((cert) => (
+                  <motion.div
+                    key={cert.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ y: -5 }}
+                    className="p-6 rounded-xl border border-neutral-700 hover:border-blue-500/50 transition-all duration-300"
+                  >
+                    <h3 className="text-xl font-semibold text-neutral-200">{cert.name}</h3>
+                    <p className="text-blue-400 mt-2">{cert.issuing_organization}</p>
+                    <p className="text-neutral-400 mt-4">Competition Battled: {cert.competition_battled}</p>
+                    <p className="text-neutral-400 mt-4">Competition Won: {cert.competition_won}</p>
+                    
+                    {cert.credential_id && (
+                      <p className="text-blue-400 mt-2">Credential ID: {cert.credential_id}</p>
+                    )}
+                    {cert.credential_url && (
+                      <motion.a
+                        href={cert.credential_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block px-4 py-2 mt-4 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-300 text-sm"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        View Certificate
+                      </motion.a>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </TextRevealCard>
+        </motion.section>
+      </div>
 
-      {/* Edit Profile Button - Only visible to authenticated owner */}
+      {/* Enhanced edit button */}
       {isOwner && (
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsEditing(true)}
-          className="fixed bottom-8 right-8 px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition-all duration-300"
+          className="fixed bottom-8 right-8 px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-[0_0_15px_rgba(34,211,238,0.5)] hover:shadow-[0_0_25px_rgba(34,211,238,0.5)] transition-all duration-300"
         >
-          Edit Profile
+          <span className="flex items-center">
+            <span className="mr-2">✨</span>
+            Edit Profile
+          </span>
         </motion.button>
       )}
 
