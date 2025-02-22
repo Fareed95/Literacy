@@ -27,6 +27,7 @@ export default function Home() {
   const [isCompleted, setIsCompleted] = useState(null);
   const router = useRouter();
   const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER;
+  const DJANGO_API_SERVER = process.env.NEXT_PUBLIC_DJANGO_API_SERVER;
 
   useEffect(() => {
     if (roadmap?.roadmap_id) {
@@ -80,6 +81,8 @@ export default function Home() {
       setTotal(data.roadmap_json.total_components);
       console.log("Total components:", data.roadmap_json.total_components);
       fetchComponentData(roadmapId, data.is_completed);
+      json = JSON.stringify(componentData);
+      chatBot(componentData.name, json);
       console.log( data.is_completed ,roadmapId );
     } catch (error) {
       console.error("Error fetching roadmap data:", error);
@@ -127,6 +130,27 @@ export default function Home() {
     }
   };
 
+  const chatBot = async (question, component) => {
+    try {
+      const response = await fetch(`${DJANGO_API_SERVER}/ai-mentor`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question, component }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Chatbot response:", data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching chatbot response:", error);
+      return null;
+    }
+  };
+
   const handleQuizAnswer = (questionIndex, selectedAnswer) => {
     setQuizAnswers((prevAnswers) => ({
       ...prevAnswers,
@@ -145,6 +169,9 @@ export default function Home() {
     );
     setQuizCompleted(allQuestionsAnswered);
   };
+
+    
+   
 
   useEffect(() => {
     checkQuizCompletion();
@@ -313,55 +340,7 @@ export default function Home() {
                 <h2 className="text-xl font-semibold text-electric-blue">Knowledge Check</h2>
               </div>
               <div className="glass p-6 rounded-xl border border-soft-purple/20">
-              <div className="glass p-6 rounded-xl border border-soft-purple/20">
-                {componentData.test_series.map((question, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="mb-6"
-                  >
-                    <h3 className="text-lg font-semibold text-electric-blue mb-4">{question.question}</h3>
-                    <div className="space-y-3">
-                      {question.options.map((option, optionIndex) => (
-                        <label
-                          key={optionIndex}
-                          className="flex items-center space-x-3 p-3 glass rounded-lg cursor-pointer transition-all hover:bg-deep-indigo/20"
-                        >
-                          <input
-                            type="radio"
-                            name={`question-${index}`}
-                            value={option}
-                            onChange={() => handleQuizAnswer(index, option)}
-                            className="form-radio text-electric-blue"
-                          />
-                          <span className="text-neon-cyan">{option}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </motion.div>
-                ))}
-  
-                {quizCompleted && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-8 glass p-6 rounded-xl"
-                  >
-                    <h3 className="text-xl font-bold text-electric-blue mb-4">Quiz Results</h3>
-                    {componentData.test_series.map((question, index) => (
-                      <div key={index} className="mb-4">
-                        <p className="font-semibold text-neon-cyan">{question.question}</p>
-                        <p className={`mt-2 ${quizAnswers[index] === question.answer ? 'text-green-500' : 'text-red-500'}`}>
-                          Your answer: {quizAnswers[index]}
-                          {quizAnswers[index] === question.answer ? " ✅" : " ❌"}
-                        </p>
-                      </div>
-                    ))}
-                  </motion.div>
-                )}
-              </div>
+                {/* Quiz content commented out */}
               </div>
             </motion.div>
   
