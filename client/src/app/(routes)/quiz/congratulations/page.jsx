@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Confetti from 'react-confetti';
 import GetUserInfo from '@/components/GetUserInfo';
+
 function CongratulationsPage() {
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
@@ -12,7 +13,8 @@ function CongratulationsPage() {
   });
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { contextId,contextinput,contextemail } = useUserContext(); // Updated hook
+  const [id, setId] = useState(null);
+  const { contextId, contextinput, contextemail, contextsetId } = useUserContext();
   const score = parseInt(searchParams.get('score') || '0');
   const total = parseInt(searchParams.get('total') || '12');
   const theme = searchParams.get('theme') || 'Quiz';
@@ -20,82 +22,66 @@ function CongratulationsPage() {
   const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER;
 
   const getUserInfo = async () => {
-
-
-   
+    try {
       const response = await fetch(`http://localhost:8000/api/userdetails/${contextemail}`, {
         method: 'GET',
         headers: {
-         
-          'Content-Type': "application/json",
+          'Content-Type': 'application/json',
         },
-       
       });
 
-      // Log the response status and status text
-
-
       if (!response.ok) {
-        // Check for specific status codes and handle them accordingly
-       
         throw new Error('Failed to fetch user ID');
-     
       }
-      if (response.ok) {
-        // Check for specific status codes and handle them accordingly
-       
-        const result = await response.json();
-        console.log(result)
-     
-      }
+
+      const result = await response.json();
+      setId(result.id);
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    }
   };
 
   const DownloadCertificate = async () => {
     try {
-      
-        const response = await fetch(`${MODEL_API_SERVER}/api/certificate-generate/${contextId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          
-        });
-  
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-       
+      const response = await fetch(`${MODEL_API_SERVER}/api/certificate-generate/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
     } catch (error) {
-      console.error('Error downloading cert data:', error);
-    } 
+      console.error('Error downloading certificate:', error);
+    }
   };
-
-
 
   const handleDownloadCertificate = async () => {
     try {
-      getUserInfo()
-        const response = await fetch(`${MODEL_API_SERVER}/api/certificate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ "name":contextinput,
-            "competition_battled":12,
-            "competition_won":score,
-            "user": contextId }),
-        });
-  
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-       
+      await getUserInfo();
+
+      const response = await fetch(`${MODEL_API_SERVER}/api/certificate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: contextinput,
+          competition_battled: 12,
+          competition_won: score,
+          user: id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
+
+      await DownloadCertificate();
     } catch (error) {
-      console.error('Error send certificate:', error);
-    } finally {
-      DownloadCertificate();
+      console.error('Error sending certificate:', error);
     }
   };
 
@@ -106,7 +92,7 @@ function CongratulationsPage() {
         height: window.innerHeight,
       });
     };
-console.log(contextinput,contextId);
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -136,8 +122,8 @@ console.log(contextinput,contextId);
           gravity={0.2}
         />
       )}
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -224,7 +210,7 @@ console.log(contextinput,contextId);
             className="glass px-6 py-2 rounded-lg hover:bg-deep-indigo/20"
             onClick={() => router.push('/')}
           >
-           Apply for Internships
+            Apply for Internships
           </motion.button>
         </motion.div>
       </motion.div>
@@ -233,4 +219,4 @@ console.log(contextinput,contextId);
   );
 }
 
-export default CongratulationsPage; 
+export default CongratulationsPage;

@@ -32,48 +32,28 @@ const FriendCard = ({ friend }) => (
       }`} />
   </motion.div>
 );
-
-const InterviewSlot = ({ slot }) => (
-  <motion.div
-    initial={{ opacity: 0, x: 20 }}
-    animate={{ opacity: 1, x: 0 }}
-    className="bg-neutral-900/50 border border-neutral-800 p-4 rounded-xl space-y-3 hover:bg-neutral-800/50 transition-colors backdrop-blur-sm"
-  >
-    <div className="flex items-center justify-between">
-      <h4 className="text-neutral-200 font-medium">{slot.internship_name}</h4>
-      <span className="px-2 py-1 rounded-full text-xs bg-neutral-700 text-neutral-200">
-        {slot.is_selected ? 'Selected' : 'Pending'}
-      </span>
+const InterviewSlot = ({ slot }) => {
+  return (
+    <div className="border border-neutral-700 p-4 rounded-lg bg-neutral-800">
+      <div className='flex'>
+        <h4 className="text-neutral-200 font-semibold">{slot.internship_name}</h4>
+        <p className="text-neutral-400">{slot.company_name}</p>
+        <p className="text-neutral-400">{new Date(slot.interviw_time).toLocaleString()}</p>
+        <p className={`text-${slot.is_selected ? 'green' : 'red'}-500`}>
+          {slot.is_selected ? 'Selected' : 'Not Selected'}
+        </p>
+        {slot.is_selected && (
+          <div>
+            <a href={`/VideoCall/${slot.company_name}`}>
+              <button className='bg-green-900 p-2 m-2'>Join Meet</button>
+            </a>
+          </div>
+        )}
+      </div>
     </div>
-    <div className="flex items-center space-x-2 text-sm text-neutral-400">
-      <Users className="w-4 h-4" />
-      <span>{slot.company_name}</span>
-    </div>
-    <div className="flex items-center space-x-2 text-sm text-neutral-400">
-      <Calendar className="w-4 h-4" />
-      <span>{new Date(slot.interviw_time).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })}</span>
-    </div>
-    <div className="flex items-center space-x-2 text-sm text-neutral-400">
-      <Clock className="w-4 h-4" />
-      <span>{new Date(slot.interviw_time).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })}</span>
-    </div>
-    <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className="w-full px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-lg flex items-center justify-center space-x-2 transition-colors"
-    >
-      <Video className="w-4 h-4" />
-      <span>Join Interview</span>
-    </motion.button>
-  </motion.div>
-);
+  );
+  
+};
 
 const UserInfoPage = () => {
   const { email, name, isLoggedIn } = useAuth();
@@ -93,7 +73,6 @@ const UserInfoPage = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    // Fetch user details and interview slots from your API
     const fetchUserData = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/user`);
@@ -107,7 +86,6 @@ const UserInfoPage = () => {
             joinDate: new Date().toISOString(),
             lastActive: new Date().toISOString(),
           }));
-          setInterviewSlots(data.interview_selected || []);
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -138,7 +116,6 @@ const UserInfoPage = () => {
     });
   };
 
-  // Mock data for friends
   const friends = [
     { id: 1, name: 'Sarah Chen', status: 'Working on Web Development', isOnline: true },
     { id: 2, name: 'Mike Johnson', status: 'Learning React', isOnline: false },
@@ -147,44 +124,46 @@ const UserInfoPage = () => {
     { id: 5, name: 'Jessica Lee', status: 'Taking a break', isOnline: false },
   ];
 
-  // Mock data for interview slots
   const interviewSlotsMock = [
     {
       id: 1,
-      title: 'Frontend Developer Interview',
-      date: 'March 15, 2024',
-      time: '10:00 AM',
-      status: 'upcoming',
+      internship_name: 'Frontend Developer Interview',
+      company_name: 'Tech Innovators',
+      interviw_time: '2024-03-15T10:00:00',
+      is_selected: false,
     },
     {
       id: 2,
-      title: 'System Design Discussion',
-      date: 'March 17, 2024',
-      time: '2:30 PM',
-      status: 'upcoming',
+      internship_name: 'System Design Discussion',
+      company_name: 'Software Solutions',
+      interviw_time: '2024-03-17T14:30:00',
+      is_selected: true,
     },
     {
       id: 3,
-      title: 'Data Structures Practice',
-      date: 'March 10, 2024',
-      time: '11:00 AM',
-      status: 'completed',
+      internship_name: 'Data Structures Practice',
+      company_name: 'Data Masters',
+      interviw_time: '2024-03-10T11:00:00',
+      is_selected: false,
     },
     {
       id: 4,
-      title: 'Mock Interview Session',
-      date: 'March 8, 2024',
-      time: '4:00 PM',
-      status: 'completed',
+      internship_name: 'Mock Interview Session',
+      company_name: 'Interview Prep',
+      interviw_time: '2024-03-08T16:00:00',
+      is_selected: true,
     },
   ];
+
+  useEffect(() => {
+    setInterviewSlots(interviewSlotsMock);
+  }, []);
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 bg-neutral-950">
       <HeroBackground />
 
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -194,7 +173,6 @@ const UserInfoPage = () => {
           <p className="text-neutral-400">Manage your account settings and preferences</p>
         </motion.div>
 
-        {/* Profile Overview */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -212,15 +190,13 @@ const UserInfoPage = () => {
                 <p className="text-neutral-500 mt-1">Role: {userDetails.role}</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">      
+            <div className="flex items-center space-x-4">
               <h1 className="text-neutral-200">Points: 100</h1>
             </div>
           </div>
         </motion.div>
 
-        {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Friends List */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -244,7 +220,6 @@ const UserInfoPage = () => {
             </div>
           </motion.div>
 
-          {/* Interview Slots */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -272,7 +247,6 @@ const UserInfoPage = () => {
           </motion.div>
         </div>
 
-        {/* Keep PrevCources at the bottom */}
         <PrevCources />
       </div>
     </div>
