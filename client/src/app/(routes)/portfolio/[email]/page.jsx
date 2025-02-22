@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import { usePortfolio } from '@/hooks/usePortfolio';
 import { useAuth } from '@/app/context/AuthContext';
 import SplashCursor from '@/components/SplashCursor';
@@ -106,9 +106,12 @@ const TextRevealCard = ({ children }) => {
 };
 
 const Page = ({ params }) => {
+  // Unwrap params using React.use()
+  const unwrappedParams = use(params);
+  const decodedEmail = decodeURIComponent(unwrappedParams.email);
+  
   const { data: session } = useSession();
   const { email: authEmail } = useAuth();
-  const decodedEmail = decodeURIComponent(params.email);
   
   // Update the ownership check to compare both session email and auth context email
   const isOwner = (session?.user?.email === decodedEmail) || (authEmail === decodedEmail);
@@ -134,19 +137,23 @@ const Page = ({ params }) => {
     }],
     certificate: [{
       name: '',
-      started_at: '',
-      ended_at: '',
-      additionol_testseries_attempted: 0,
       competition_battled: 0,
       competition_won: 0
     }],
     project: [{
       name: '',
       description: '',
-      link: []
+      link: [
+        {
+          name: '',
+          url: '',
+          project: '',
+        }
+      ]
     }],
     toolname: [{
       name: '',
+      user: '',
       tools: []
     }]
   });
@@ -154,6 +161,7 @@ const Page = ({ params }) => {
   useEffect(() => {
     if (portfolioData?.userDetails) {
       setUserDetails({
+        id: portfolioData.userDetails.id,
         name: portfolioData.userDetails.name || '',
         email: portfolioData.userDetails.email || '',
         phone_number: portfolioData.userDetails.phone_number || '',
@@ -162,10 +170,135 @@ const Page = ({ params }) => {
         certificate: portfolioData.userDetails.certificate || [],
         project: portfolioData.userDetails.project || [],
         toolname: portfolioData.userDetails.toolname || []
+
+
       });
     }
   }, [portfolioData]);
 
+  // Add debug logging
+  useEffect(() => {
+    console.log('Auth Debug:', {
+      sessionEmail: session?.user?.email,
+      authEmail,
+      paramsEmail: decodedEmail,
+      isOwner,
+      canEdit,
+      hasToken: !!session?.user?.accessToken
+    });
+  }, [session, authEmail, decodedEmail, isOwner, canEdit]);
+
+  // Add these handler functions
+  const handleUpdateUserDetails = async (e) => {
+    e.preventDefault();
+    
+    try {
+      // 1. Update user details
+      const userResponse = await fetch(`http://localhost:8000/api/userdetails/${decodedEmail}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: userDetails.name,
+          phone_number: userDetails.phone_number,
+          about: userDetails.about,
+        }),
+      });
+
+      if (!userResponse.ok) throw new Error('Failed to update user details');
+
+      // 2. Add toolnames
+      if (userDetails.toolname.length > 0) {
+        for (const tool of userDetails.toolname) {
+          await fetch('http://localhost:8000/api/toolnames/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name: tool.name,
+              user: userDetails.id,
+            }),
+          });
+        }
+      }
+
+      // 3. Add education
+      if (userDetails.education.length > 0) {
+        for (const edu of userDetails.education) {
+          await fetch('http://localhost:8000/api/education/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              degree: edu.degree,
+              field_of_study: edu.field_of_study,
+              University: edu.University,
+              location: edu.location,
+              start_date: edu.start_date,
+              end_date: edu.end_date,
+              current_grade: edu.current_grade,
+              user: userDetails?.id,
+            }),
+          });
+        }
+      }
+
+      // 4. Add projects and their links
+      if (userDetails.project.length > 0) {
+        for (const proj of userDetails.project) {
+          // Create project
+          const projectResponse = await fetch('http://localhost:8000/api/projects/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name: proj.name,
+              description: proj.description,
+              user: userDetails?.id,
+            }),
+          });
+
+          if (!projectResponse.ok) throw new Error('Failed to create project');
+          
+          const projectData = await projectResponse.json();
+
+          // Add links for the project
+          if (proj.link && proj.link.length > 0) {
+            for (const link of proj.link) {
+              await fetch('http://localhost:8000/api/links/', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  name: link.name,
+                  url: link.url,
+                  project: projectData.id, // Use the ID from the created project
+                }),
+              });
+            }
+          }
+        }
+      }
+
+      // Close modal and refresh data
+      setIsEditing(false);
+      // Refresh the portfolio data
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
+
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      // Add error handling UI feedback here
+    }
+  };
+
+  // Add these helper functions for form arrays
   const handleAddEducation = () => {
     setUserDetails(prev => ({
       ...prev,
@@ -206,134 +339,27 @@ const Page = ({ params }) => {
     }));
   };
 
-  const handleAddCertificate = () => {
-    setUserDetails(prev => ({
-      ...prev,
-      certificate: [...prev.certificate, {
-        name: '',
-        started_at: new Date().toISOString(),
-        ended_at: new Date().toISOString(),
-        additionol_testseries_attempted: 0,
-        competition_battled: 0,
-        competition_won: 0
-      }]
-    }));
-  };
-
-  const handleRemoveCertificate = (index) => {
-    setUserDetails(prev => ({
-      ...prev,
-      certificate: prev.certificate.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleUpdateUserDetails = async (e) => {
-    e.preventDefault();
-    try {
-      // Show loading state
-      setIsEditing(false);
-      
-      // Format the data according to the API requirements
-      const formattedData = {
-        userdetails: [{
-          id: portfolioData?.userDetails?.id,
-          name: userDetails.name,
-          email: userDetails.email,
-          phone_number: userDetails.phone_number,
-          about: userDetails.about,
-          education: userDetails.education.map(edu => ({
-            ...edu,
-            user: portfolioData?.userDetails?.id,
-            start_date: edu.start_date ? new Date(edu.start_date).toISOString().split('T')[0] : null,
-            end_date: edu.end_date ? new Date(edu.end_date).toISOString().split('T')[0] : null
-          })),
-          certificate: userDetails.certificate.map(cert => ({
-            ...cert,
-            user: portfolioData?.userDetails?.id,
-            started_at: cert.started_at ? new Date(cert.started_at).toISOString() : null,
-            ended_at: cert.ended_at ? new Date(cert.ended_at).toISOString() : null,
-            additionol_testseries_attempted: Number(cert.additionol_testseries_attempted) || 0,
-            competition_battled: Number(cert.competition_battled) || 0,
-            competition_won: Number(cert.competition_won) || 0
-          })),
-          project: userDetails.project.map(proj => ({
-            ...proj,
-            user: portfolioData?.userDetails?.id,
-            link: Array.isArray(proj.link) ? proj.link : []
-          })),
-          toolname: userDetails.toolname.map(tool => ({
-            ...tool,
-            user: portfolioData?.userDetails?.id,
-            tools: Array.isArray(tool.tools) ? tool.tools : []
-          }))
-        }]
+  const handleAddProjectLink = (projectIndex) => {
+    setUserDetails(prev => {
+      const newProjects = [...prev.project];
+      newProjects[projectIndex] = {
+        ...newProjects[projectIndex],
+        link: [...newProjects[projectIndex].link, { name: '', url: '' }]
       };
-
-      // Get the token from the session
-      if (!session?.user?.accessToken) {
-        throw new Error('You must be logged in to update your profile');
-      }
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/update/${params.email}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.user.accessToken}`
-        },
-        body: JSON.stringify(formattedData)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update profile');
-      }
-
-      const data = await response.json();
-      
-      // Update the local state with the new data
-      if (data.userdetails && data.userdetails[0]) {
-        setUserDetails({
-          name: data.userdetails[0].name || '',
-          email: data.userdetails[0].email || '',
-          phone_number: data.userdetails[0].phone_number || '',
-          about: data.userdetails[0].about || '',
-          education: data.userdetails[0].education || [],
-          certificate: data.userdetails[0].certificate || [],
-          project: data.userdetails[0].project || [],
-          toolname: data.userdetails[0].toolname || []
-        });
-
-        // Show success message
-        alert('Profile updated successfully');
-
-        // Force a refetch of the portfolio data to update the UI
-        if (typeof window !== 'undefined') {
-          window.location.reload();
-        }
-      }
-
-      // Show success message (you can implement a toast notification here)
-      console.log('Profile updated successfully');
-      
-    } catch (error) {
-      console.error('Error updating user details:', error);
-      // Show error message to user
-      alert(error.message || 'Failed to update profile');
-      setIsEditing(true); // Keep the form open if there's an error
-    }
+      return { ...prev, project: newProjects };
+    });
   };
 
-  // Add debug logging
-  useEffect(() => {
-    console.log('Auth Debug:', {
-      sessionEmail: session?.user?.email,
-      authEmail,
-      paramsEmail: decodedEmail,
-      isOwner,
-      canEdit,
-      hasToken: !!session?.user?.accessToken
+  const handleRemoveProjectLink = (projectIndex, linkIndex) => {
+    setUserDetails(prev => {
+      const newProjects = [...prev.project];
+      newProjects[projectIndex] = {
+        ...newProjects[projectIndex],
+        link: newProjects[projectIndex].link.filter((_, i) => i !== linkIndex)
+      };
+      return { ...prev, project: newProjects };
     });
-  }, [session, authEmail, decodedEmail, isOwner, canEdit]);
+  };
 
   if (loading) {
     return (
@@ -381,6 +407,9 @@ const Page = ({ params }) => {
                   className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 mb-4"
                 >
                   {userDetails.name || 'Portfolio'}
+                  <p className="text-neutral-400 mt-4"> {userDetails.email}</p>
+                  <p className="text-neutral-400 mt-4"> {userDetails.phone_number}</p>
+                  <p className="text-neutral-400 mt-4"> {userDetails.about}</p>
                 </motion.h1>
                 <motion.p 
                   initial={{ opacity: 0, y: 20 }}
@@ -406,11 +435,13 @@ const Page = ({ params }) => {
                   transition={{ delay: 0.3 }}
                   className="flex items-center justify-center space-x-6"
                 >
+
                   {userDetails.location && (
                     <span className="text-neutral-400 flex items-center">
                       <Globe className="w-4 h-4 mr-2" /> {userDetails.location}
                     </span>
                   )}
+
                   {userDetails.website && (
                     <a
                       href={userDetails.website}
@@ -428,7 +459,8 @@ const Page = ({ params }) => {
         </div>
         </WavyBackground>
 
-                  
+
+
         <div className="max-w-7xl mx-auto px-4 space-y-24 pb-32">
           {/* Skills Section */}
           <motion.section
@@ -468,7 +500,6 @@ const Page = ({ params }) => {
             </TextRevealCard>
           </motion.section>
 
-          <InfiniteMovingText />
 
           {/* Education Section */}
           <motion.section
@@ -577,10 +608,9 @@ const Page = ({ params }) => {
                     >
                       <h3 className="text-xl font-semibold text-neutral-200">{cert.name}</h3>
                       <p className="text-blue-400 mt-2">{cert.issuing_organization}</p>
-                      <p className="text-neutral-400 mt-4">Issued: {cert.issue_date}</p>
-                      {cert.expiry_date && (
-                        <p className="text-neutral-400">Expires: {cert.expiry_date}</p>
-                      )}
+                      <p className="text-neutral-400 mt-4">Competition Battled: {cert.competition_battled}</p>
+                      <p className="text-neutral-400 mt-4">Competition Won: {cert.competition_won}</p>
+                      
                       {cert.credential_id && (
                         <p className="text-blue-400 mt-2">Credential ID: {cert.credential_id}</p>
                       )}
@@ -864,7 +894,6 @@ const Page = ({ params }) => {
                   <h3 className="text-lg font-semibold text-neutral-300">Certificates</h3>
                   <motion.button
                     type="button"
-                    onClick={handleAddCertificate}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg hover:bg-blue-500/20 transition-colors"
