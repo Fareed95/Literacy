@@ -133,9 +133,9 @@ function CongratulationsPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="neon-btn"
-            onClick={() => router.push('/quiz')}
+            onClick={() => router.push('/')}
           >
-            Try Another Quiz
+            Download Certificate
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -143,7 +143,7 @@ function CongratulationsPage() {
             className="glass px-6 py-2 rounded-lg hover:bg-deep-indigo/20"
             onClick={() => router.push('/')}
           >
-            Back to Home
+           Apply for Internships
           </motion.button>
         </motion.div>
       </motion.div>
