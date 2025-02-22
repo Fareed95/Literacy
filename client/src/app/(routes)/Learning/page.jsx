@@ -81,8 +81,8 @@ export default function Home() {
       setTotal(data.roadmap_json.total_components);
       console.log("Total components:", data.roadmap_json.total_components);
       fetchComponentData(roadmapId, data.is_completed);
-      json = JSON.stringify(componentData);
-      chatBot(componentData.name, json);
+      // json = JSON.stringify(componentData);
+      // chatBot(componentData.name, json);
       console.log( data.is_completed ,roadmapId );
     } catch (error) {
       console.error("Error fetching roadmap data:", error);
