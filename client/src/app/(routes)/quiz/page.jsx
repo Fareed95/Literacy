@@ -15,7 +15,7 @@ const HeroBackground = () => (
 );
 
 function QuizPage() {
-  const {contextsetinput,contextinput} = useUserContext();
+  const {contextinput} = useUserContext();
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);

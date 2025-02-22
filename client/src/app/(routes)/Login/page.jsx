@@ -75,6 +75,7 @@ function Login() {
 
       // Parse the JSON response if the request was successful
       const result = await response.json();
+      
       console.log('User Info:', result);
 
       // Proceed with handling the successful response

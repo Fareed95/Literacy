@@ -1,10 +1,10 @@
 'use client';
-
+import { useUserContext } from '@/app/context/Userinfo';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Confetti from 'react-confetti';
-
+import GetUserInfo from '@/components/GetUserInfo';
 function CongratulationsPage() {
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
@@ -12,11 +12,63 @@ function CongratulationsPage() {
   });
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+  const { contextId,contextinput } = useUserContext(); // Updated hook
   const score = parseInt(searchParams.get('score') || '0');
   const total = parseInt(searchParams.get('total') || '12');
   const theme = searchParams.get('theme') || 'Quiz';
   const percentage = Math.round((score / total) * 100);
+  const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER;
+
+
+
+  const DownloadCertificate = async () => {
+    try {
+      
+        const response = await fetch(`${MODEL_API_SERVER}/api/certificate-generate/${contextId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          
+        });
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+       
+      }
+      
+    } catch (error) {
+      console.error('Error downloading cert data:', error);
+    } 
+  };
+
+
+
+  const handleDownloadCertificate = async () => {
+    try {
+      
+        const response = await fetch(`${MODEL_API_SERVER}/api/certificate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ "name":contextinput,
+            "competition_battled":12,
+            "competition_won":score,
+            "user": contextId }),
+        });
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+       
+      }
+      
+    } catch (error) {
+      console.error('Error send certificate:', error);
+    } finally {
+      DownloadCertificate();
+    }
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -25,7 +77,7 @@ function CongratulationsPage() {
         height: window.innerHeight,
       });
     };
-
+console.log(contextinput,contextId);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -133,7 +185,7 @@ function CongratulationsPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="neon-btn"
-            onClick={() => router.push('/')}
+            onClick={handleDownloadCertificate}
           >
             Download Certificate
           </motion.button>
@@ -147,6 +199,7 @@ function CongratulationsPage() {
           </motion.button>
         </motion.div>
       </motion.div>
+      <GetUserInfo />
     </div>
   );
 }
