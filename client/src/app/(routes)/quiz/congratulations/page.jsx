@@ -12,14 +12,43 @@ function CongratulationsPage() {
   });
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { contextId,contextinput } = useUserContext(); // Updated hook
+  const { contextId,contextinput,contextemail } = useUserContext(); // Updated hook
   const score = parseInt(searchParams.get('score') || '0');
   const total = parseInt(searchParams.get('total') || '12');
   const theme = searchParams.get('theme') || 'Quiz';
   const percentage = Math.round((score / total) * 100);
   const MODEL_API_SERVER = process.env.NEXT_PUBLIC_MODEL_API_SERVER;
 
+  const getUserInfo = async () => {
 
+
+   
+      const response = await fetch(`http://localhost:8000/api/userdetails/${contextemail}`, {
+        method: 'GET',
+        headers: {
+         
+          'Content-Type': "application/json",
+        },
+       
+      });
+
+      // Log the response status and status text
+
+
+      if (!response.ok) {
+        // Check for specific status codes and handle them accordingly
+       
+        throw new Error('Failed to fetch user ID');
+     
+      }
+      if (response.ok) {
+        // Check for specific status codes and handle them accordingly
+       
+        const result = await response.json();
+        console.log(result)
+     
+      }
+  };
 
   const DownloadCertificate = async () => {
     try {
@@ -46,7 +75,7 @@ function CongratulationsPage() {
 
   const handleDownloadCertificate = async () => {
     try {
-      
+      getUserInfo()
         const response = await fetch(`${MODEL_API_SERVER}/api/certificate`, {
           method: 'POST',
           headers: {
