@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect, useRef, use } from 'react';
 import { usePortfolio } from '@/hooks/usePortfolio';
 import { useAuth } from '@/app/context/AuthContext';
-import SplashCursor from '@/components/SplashCursor';
+import SplashCursor from '@/components/SplashCursor'; 
 import { ExternalLink, Globe } from "lucide-react";
 // import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
 // import { Vortex } from '@/components/ui/vortex';
@@ -504,6 +504,7 @@ const Page = ({ params }) => {
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full"
         />
+        <SplashCursor />
       </div>
     );
   }
