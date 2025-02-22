@@ -7,14 +7,9 @@ import { useAuth } from '@/app/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import SplashCursor from '@/components/SplashCursor'
 import { 
-  Briefcase, 
-  Award, 
-  Star, 
-  ArrowRight, 
   ExternalLink,
   Github,
   Code,
-  Globe
 } from "lucide-react";
 
 const InfiniteMovingCards = ({ items, direction = "left", speed = "fast" }) => {
@@ -132,22 +127,22 @@ const ProjectCard = ({ project }) => (
   </motion.div>
 );
 
-const StatsCard = ({ icon: Icon, label, value }) => (
-  <motion.div
-    whileHover={{ scale: 1.05 }}
-    className="bg-neutral-900/50 rounded-xl border border-neutral-800 p-6 backdrop-blur-sm"
-  >
-    <div className="flex items-center gap-4">
-      <div className="p-3 rounded-lg bg-cyan-500/10">
-        <Icon className="w-6 h-6 text-cyan-500" />
-      </div>
-      <div>
-        <p className="text-neutral-400 text-sm">{label}</p>
-        <h4 className="text-2xl font-bold text-neutral-200">{value}</h4>
-      </div>
-    </div>
-  </motion.div>
-);
+// const StatsCard = ({ icon: Icon, label, value }) => (
+//   <motion.div
+//     whileHover={{ scale: 1.05 }}
+//     className="bg-neutral-900/50 rounded-xl border border-neutral-800 p-6 backdrop-blur-sm"
+//   >
+//     <div className="flex items-center gap-4">
+//       <div className="p-3 rounded-lg bg-cyan-500/10">
+//         <Icon className="w-6 h-6 text-cyan-500" />
+//       </div>
+//       <div>
+//         <p className="text-neutral-400 text-sm">{label}</p>
+//         <h4 className="text-2xl font-bold text-neutral-200">{value}</h4>
+//       </div>
+//     </div>
+//   </motion.div>
+// );
 
 const ContainerScroll = ({ children }) => {
   const containerRef = useRef(null);
