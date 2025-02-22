@@ -26,6 +26,7 @@ function Navbar() {
     { label: "Gallery", href: "/Gallery" },
     { label: "About", href: "/About" },
     { label: "Lobby", href: "/Lobby" },
+    
   ];
 
   const Logout = () => {
