@@ -532,7 +532,7 @@ const Page = ({ params }) => {
       <AIHero userDetails={userDetails} />
 
       {/* Update the skills section */}
-      <div className="max-w-7xl mx-auto px-4 space-y-24 pb-32">
+      <div className="max-w-7xl mx-auto px-4 space-y-24 pb-32 ">
         <motion.section
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -708,8 +708,9 @@ const Page = ({ params }) => {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-neutral-900/80 p-8 rounded-2xl max-w-4xl w-full mx-4 border border-neutral-800 backdrop-blur-md max-h-[90vh] overflow-y-auto"
           >
+
             <h2 className="text-2xl font-bold text-neutral-200 mb-6">Edit Profile</h2>
-            <form onSubmit={handleUpdateUserDetails} className="space-y-6">
+            <form onSubmit={handleUpdateUserDetails} className="space-y-6 mt-[18%]">
               {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-neutral-300">Basic Information</h3>
