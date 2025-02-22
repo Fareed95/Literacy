@@ -46,7 +46,7 @@ function GetUserInfo() {
 
       const result = await response.json();
       console.log('ID', result.userdetails[0].id);
-      contextsetId(result.userdetails[0].id);
+      // contextsetId(result.userdetails[0].id);
       // Update context with user information
       contextsetIsLoggedIn(true);
       contextsetEmail(result.email);
