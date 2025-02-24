@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import AvatarComponent from '@/components/avatar/AvatarComponent';
 import VoiceControls from '@/components/avatar/VoiceControls';
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
-    <div className="absolute inset-0 bg-gradient-to-b from-deep-indigo/20 via-soft-purple/10 to-electric-blue/5" />
-    <div className="absolute inset-0 bg-grid-small-white/[0.2] -z-10" />
-    <div className="absolute inset-0 bg-dot-white/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
-    <div className="absolute inset-0 bg-gradient-radial from-soft-purple/20 via-transparent to-transparent" />
+    <div className="absolute inset-0 bg-neutral-950" />
+    <div className="absolute inset-0 bg-grid-small-white/[0.05] -z-10" />
+    <div className="absolute inset-0 bg-dot-white/[0.05] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
+    <div className="absolute inset-0 bg-gradient-radial from-white/10 via-transparent to-transparent" />
   </div>
 );
 
@@ -21,6 +20,57 @@ const AvatarPage = () => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState('');
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const videoRef = useRef(null);
+  const [selectedVoice, setSelectedVoice] = useState(null);
+
+  useEffect(() => {
+    // Get available voices and select a default one
+    const setVoice = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+      setSelectedVoice(englishVoice || voices[0]);
+    };
+
+    // Set voice when voices are loaded
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = setVoice;
+    }
+    setVoice();
+  }, []);
+
+  const speak = (text) => {
+    if (!selectedVoice) return;
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.voice = selectedVoice;
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    // Start video when speaking starts
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+      if (videoRef.current) {
+        videoRef.current.play();
+      }
+    };
+
+    // Stop video when speaking ends
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      if (videoRef.current) {
+        videoRef.current.pause();
+        // Reset video to start
+        videoRef.current.currentTime = 0;
+      }
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
 
   // Handle user input (both voice and text)
   const handleUserInput = async (text) => {
@@ -30,7 +80,6 @@ const AvatarPage = () => {
     setMessages(prev => [...prev, { type: 'user', content: text }]);
 
     try {
-      // TODO: Replace with your AI API endpoint
       const aiResponse = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -43,10 +92,13 @@ const AvatarPage = () => {
       });
 
       const data = await aiResponse.json();
-      const responseText = data.message;
+      const responseText = data.message || text; // Fallback to input text for testing
 
       setResponse(responseText);
       setMessages(prev => [...prev, { type: 'ai', content: responseText }]);
+      
+      // Speak the response
+      speak(responseText);
     } catch (error) {
       console.error('Error getting AI response:', error);
       setMessages(prev => [...prev, {
@@ -57,14 +109,9 @@ const AvatarPage = () => {
       setIsLoading(false);
     }
   };
-
-  // Handle language change
-  const toggleLanguage = () => {
-    setCurrentLanguage(prev => prev === 'en' ? 'es' : 'en');
-  };
-
+  
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden pt-24">
+    <div className="min-h-screen bg-neutral-950 text-white relative overflow-hidden pt-24">
       <HeroBackground />
 
       <div className="relative z-10 container mx-auto px-4">
@@ -74,10 +121,10 @@ const AvatarPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-electric-blue to-neon-cyan bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold text-neutral-100">
             AI Learning Assistant
           </h1>
-          <p className="mt-4 text-lg text-gray-300">
+          <p className="mt-4 text-lg text-neutral-400">
             Your personal mentor for interactive learning
           </p>
         </motion.div>
@@ -88,35 +135,31 @@ const AvatarPage = () => {
             {/* Controls */}
             <div className="flex justify-end mb-4 space-x-4">
               <motion.button
-                onClick={toggleLanguage}
-                className="glass px-4 py-2 rounded-full text-sm hover:bg-electric-blue/20 transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {currentLanguage === 'en' ? '🇺🇸 English' : '🌐 Español'}
-              </motion.button>
-              <motion.button
                 onClick={() => setIsExpanded(prev => !prev)}
-                className="glass px-4 py-2 rounded-full text-sm hover:bg-electric-blue/20 transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                className="bg-neutral-800/50 px-4 py-2 rounded-xl text-sm hover:bg-neutral-700/50 transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 {isExpanded ? 'Minimize' : 'Expand'} Avatar
               </motion.button>
             </div>
 
-            {/* Avatar */}
+            {/* Avatar Video */}
             <motion.div
               layout
-              className="glass p-4 rounded-2xl"
+              className="bg-neutral-900/30 border border-neutral-800/50 p-4 rounded-2xl backdrop-blur-sm"
               style={{ height: isExpanded ? '80vh' : '50vh' }}
             >
-              <AvatarComponent
-                isExpanded={isExpanded}
-                isListening={isListening}
-                currentLanguage={currentLanguage}
-                response={response}
-              />
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover rounded-xl"
+                src="/avatar.mp4"
+                playsInline
+                muted={false}
+                loop
+              >
+                Your browser does not support the video tag.
+              </video>
             </motion.div>
           </div>
 
@@ -124,12 +167,12 @@ const AvatarPage = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Chat history */}
             <motion.div
-              className="glass p-6 rounded-2xl"
+              className="bg-neutral-900/30 border border-neutral-800/50 p-6 rounded-2xl backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <h2 className="text-xl font-semibold text-electric-blue mb-4">Chat History</h2>
-              <div className="h-[50vh] overflow-y-auto hide-scrollbar space-y-4">
+              <h2 className="text-xl font-semibold text-neutral-200 mb-4">Chat History</h2>
+              <div className="h-[50vh] overflow-y-auto space-y-4 pr-4 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-neutral-900">
                 {messages.map((message, index) => (
                   <motion.div
                     key={index}
@@ -140,12 +183,12 @@ const AvatarPage = () => {
                     }`}
                   >
                     <div
-                      className={`max-w-[80%] p-3 rounded-lg ${
+                      className={`max-w-[80%] p-4 rounded-xl ${
                         message.type === 'user'
-                          ? 'bg-electric-blue/20 ml-auto'
+                          ? 'bg-blue-500/20 ml-auto'
                           : message.type === 'error'
                           ? 'bg-red-500/20'
-                          : 'bg-neon-cyan/20'
+                          : 'bg-neutral-800/50'
                       }`}
                     >
                       <p className="text-sm md:text-base">{message.content}</p>
@@ -158,11 +201,11 @@ const AvatarPage = () => {
                     animate={{ opacity: 1 }}
                     className="flex justify-start"
                   >
-                    <div className="bg-neon-cyan/20 p-3 rounded-lg">
+                    <div className="bg-neutral-800/50 p-4 rounded-xl">
                       <div className="flex space-x-2">
-                        <div className="w-2 h-2 bg-neon-cyan rounded-full animate-bounce" />
-                        <div className="w-2 h-2 bg-neon-cyan rounded-full animate-bounce delay-75" />
-                        <div className="w-2 h-2 bg-neon-cyan rounded-full animate-bounce delay-150" />
+                        <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" />
+                        <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce delay-75" />
+                        <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce delay-150" />
                       </div>
                     </div>
                   </motion.div>
@@ -171,14 +214,14 @@ const AvatarPage = () => {
             </motion.div>
 
             {/* Voice controls */}
-            <div className="glass p-6 rounded-2xl">
+            <div className="bg-neutral-900/30 border border-neutral-800/50 p-6 rounded-2xl backdrop-blur-sm">
               <VoiceControls
                 onSpeechStart={() => setIsListening(true)}
                 onSpeechEnd={() => setIsListening(false)}
                 onTextInput={handleUserInput}
                 isListening={isListening}
                 currentLanguage={currentLanguage}
-                disabled={isLoading}
+                disabled={isLoading || isSpeaking}
               />
             </div>
           </div>

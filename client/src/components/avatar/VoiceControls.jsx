@@ -109,7 +109,7 @@ const VoiceControls = ({
             type="button"
             onClick={isListening ? stopListening : startListening}
             className={`absolute right-4 bottom-4 p-2 rounded-full ${
-              isListening ? 'bg-red-500' : 'bg-electric-blue'
+              isListening ? 'bg-red-500' : 'bg-blue-500'
             } hover:opacity-80 transition-opacity disabled:opacity-50`}
             disabled={disabled}
             whileTap={{ scale: 0.95 }}
@@ -141,7 +141,7 @@ const VoiceControls = ({
 
         <motion.button
           type="submit"
-          className="w-full py-3 bg-gradient-to-r from-electric-blue to-neon-cyan text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+          className="w-full py-3 bg-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
           disabled={disabled || !text.trim() || isListening}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -152,9 +152,9 @@ const VoiceControls = ({
 
       {isSpeaking && (
         <div className="mt-4 flex items-center justify-center space-x-2">
-          <div className="w-2 h-2 bg-electric-blue rounded-full animate-bounce" />
-          <div className="w-2 h-2 bg-electric-blue rounded-full animate-bounce delay-75" />
-          <div className="w-2 h-2 bg-electric-blue rounded-full animate-bounce delay-150" />
+          <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" />
+          <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-75" />
+          <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-150" />
         </div>
       )}
     </div>
