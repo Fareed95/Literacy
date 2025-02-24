@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import VoiceControls from '@/components/avatar/VoiceControls';
+import { Volume2, VolumeX, Settings } from 'lucide-react';
 
 const HeroBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -23,13 +24,22 @@ const AvatarPage = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const videoRef = useRef(null);
   const [selectedVoice, setSelectedVoice] = useState(null);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showVoiceSettings, setShowVoiceSettings] = useState(false);
+  const [speechRate, setSpeechRate] = useState(1);
+  const [speechPitch, setSpeechPitch] = useState(1);
 
   useEffect(() => {
-    // Get available voices and select a default one
+    // Get available voices and select a default female voice
     const setVoice = () => {
       const voices = window.speechSynthesis.getVoices();
-      const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
-      setSelectedVoice(englishVoice || voices[0]);
+      // Try to find a female English voice
+      const femaleVoice = voices.find(voice => 
+        voice.lang.startsWith('en') && 
+        (voice.name.includes('female') || voice.name.includes('Female') || voice.name.includes('Samantha'))
+      );
+      setSelectedVoice(femaleVoice || voices[0]);
     };
 
     // Set voice when voices are loaded
@@ -39,6 +49,21 @@ const AvatarPage = () => {
     setVoice();
   }, []);
 
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (videoRef.current) {
+      videoRef.current.volume = newVolume;
+    }
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+    }
+  };
+
   const speak = (text) => {
     if (!selectedVoice) return;
 
@@ -47,9 +72,9 @@ const AvatarPage = () => {
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.voice = selectedVoice;
-    utterance.rate = 1;
-    utterance.pitch = 1;
-    utterance.volume = 1;
+    utterance.rate = speechRate;
+    utterance.pitch = speechPitch;
+    utterance.volume = volume;
 
     // Start video when speaking starts
     utterance.onstart = () => {
@@ -64,7 +89,6 @@ const AvatarPage = () => {
       setIsSpeaking(false);
       if (videoRef.current) {
         videoRef.current.pause();
-        // Reset video to start
         videoRef.current.currentTime = 0;
       }
     };
@@ -133,7 +157,32 @@ const AvatarPage = () => {
           {/* Avatar Section - 3 columns */}
           <div className="lg:col-span-3">
             {/* Controls */}
-            <div className="flex justify-end mb-4 space-x-4">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={toggleMute}
+                  className="bg-neutral-800/50 p-2 rounded-xl hover:bg-neutral-700/50 transition-colors"
+                >
+                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                </button>
+                <div className="w-32">
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={volume}
+                    onChange={handleVolumeChange}
+                    className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
+                  />
+                </div>
+                <button
+                  onClick={() => setShowVoiceSettings(!showVoiceSettings)}
+                  className="bg-neutral-800/50 p-2 rounded-xl hover:bg-neutral-700/50 transition-colors"
+                >
+                  <Settings className="w-5 h-5" />
+                </button>
+              </div>
               <motion.button
                 onClick={() => setIsExpanded(prev => !prev)}
                 className="bg-neutral-800/50 px-4 py-2 rounded-xl text-sm hover:bg-neutral-700/50 transition-colors"
@@ -144,22 +193,71 @@ const AvatarPage = () => {
               </motion.button>
             </div>
 
+            {/* Voice Settings Panel */}
+            {showVoiceSettings && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-neutral-800/90 p-4 rounded-xl mb-4 backdrop-blur-sm"
+              >
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-neutral-400 mb-2">Speech Rate</label>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="2"
+                      step="0.1"
+                      value={speechRate}
+                      onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
+                      className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="text-xs text-neutral-500 mt-1">{speechRate}x</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-neutral-400 mb-2">Pitch</label>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="2"
+                      step="0.1"
+                      value={speechPitch}
+                      onChange={(e) => setSpeechPitch(parseFloat(e.target.value))}
+                      className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="text-xs text-neutral-500 mt-1">{speechPitch}x</div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             {/* Avatar Video */}
             <motion.div
               layout
-              className="bg-neutral-900/30 border border-neutral-800/50 p-4 rounded-2xl backdrop-blur-sm"
+              className="relative bg-neutral-900/30 border border-neutral-800/50 rounded-2xl backdrop-blur-sm overflow-hidden"
               style={{ height: isExpanded ? '80vh' : '50vh' }}
             >
+              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent" />
               <video
                 ref={videoRef}
-                className="w-full h-full object-cover rounded-xl"
+                className="w-full h-full object-cover"
                 src="/avatar.mp4"
                 playsInline
-                muted={false}
+                muted={isMuted}
                 loop
+                style={{ objectPosition: '50% 15%' }} // Position focus on face
               >
                 Your browser does not support the video tag.
               </video>
+              {isSpeaking && (
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                  <div className="flex space-x-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-75" />
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-150" />
+                  </div>
+                </div>
+              )}
             </motion.div>
           </div>
 
