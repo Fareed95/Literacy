@@ -114,7 +114,7 @@ function QuizPage() {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <div className="min-h-screen bg-neutral-950 p-4 relative mt-18">
+    <div className="min-h-screen bg-neutral-950 pt-20 pb-8 px-4 relative">
       <HeroBackground />
       
       <div className="max-w-3xl mx-auto">
@@ -124,11 +124,11 @@ function QuizPage() {
             <span>Question {currentQuestionIndex + 1} of {questions.length}</span>
             <span>Score: {score}</span>
           </div>
-          <div className="w-full h-2 bg-neutral-800 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-neutral-800/50 rounded-full overflow-hidden backdrop-blur-sm">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
-              className="h-full bg-neutral-600 rounded-full"
+              className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
             />
           </div>
         </div>
@@ -138,33 +138,33 @@ function QuizPage() {
           key={currentQuestionIndex}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-neutral-900/50 border border-neutral-800 p-6 rounded-xl backdrop-blur-sm mb-6"
+          className="bg-neutral-900/30 border border-neutral-800/50 p-8 rounded-2xl backdrop-blur-sm mb-6 shadow-xl"
         >
-          <h2 className="text-xl text-neutral-200 mb-4">{currentQuestion.question}</h2>
+          <h2 className="text-2xl text-neutral-200 font-semibold mb-6">{currentQuestion.question}</h2>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
             {currentQuestion.options.map((option, index) => (
               <motion.button
                 key={index}
                 onClick={() => handleAnswer(option)}
                 disabled={isAnswered}
-                className={`w-full p-4 rounded-lg text-left transition-all ${
+                className={`w-full p-5 rounded-xl text-left transition-all ${
                   isAnswered
                     ? option === currentQuestion.answer
-                      ? 'bg-green-500/20 text-green-300 border-green-500/50'
+                      ? 'bg-green-500/10 text-green-300 border-green-500/30'
                       : option === selectedAnswer
-                      ? 'bg-red-500/20 text-red-300 border-red-500/50'
-                      : 'bg-neutral-800/50 text-neutral-400'
-                    : 'bg-neutral-800/50 text-neutral-200 hover:bg-neutral-700/50'
-                } border border-neutral-700`}
-                whileHover={!isAnswered ? { scale: 1.02 } : {}}
+                      ? 'bg-red-500/10 text-red-300 border-red-500/30'
+                      : 'bg-neutral-800/30 text-neutral-400'
+                    : 'bg-neutral-800/30 text-neutral-200 hover:bg-neutral-700/30 hover:border-neutral-700'
+                } border border-neutral-800/50 backdrop-blur-sm`}
+                whileHover={!isAnswered ? { scale: 1.02, transition: { duration: 0.2 } } : {}}
                 whileTap={!isAnswered ? { scale: 0.98 } : {}}
               >
                 <div className="flex items-center">
-                  <span className="w-6 h-6 rounded-full border border-current flex items-center justify-center mr-3 text-sm">
+                  <span className="w-8 h-8 rounded-lg border border-current flex items-center justify-center mr-4 text-sm">
                     {String.fromCharCode(65 + index)}
                   </span>
-                  {option}
+                  <span className="text-lg">{option}</span>
                 </div>
               </motion.button>
             ))}

@@ -23,7 +23,6 @@ function Navbar() {
 
   const menuItems = [
     { label: "Home", href: "/" },
-    { label: "Gallery", href: "/Gallery" },
     { label: "About", href: "/About" },
     { label: "Lobby", href: "/Lobby" },
     
