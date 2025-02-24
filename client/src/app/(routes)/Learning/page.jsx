@@ -182,7 +182,7 @@ export default function Home() {
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-        className="w-16 h-16 border-4 border-electric-blue border-t-transparent rounded-full"
+        className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full"
       />
     </div>
   );
@@ -191,14 +191,14 @@ export default function Home() {
     <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
       <motion.div
         {...fadeIn}
-        className="glass p-8 rounded-2xl text-center max-w-md mx-4"
+        className="bg-neutral-900/30 border border-neutral-800/50 p-8 rounded-2xl backdrop-blur-sm text-center max-w-md mx-4"
       >
-        <div className="text-red-500 text-6xl mb-4">⚠️</div>
-        <h2 className="text-2xl font-bold text-electric-blue mb-4">Error</h2>
-        <p className="text-neon-cyan mb-6">{error}</p>
+        <div className="text-red-400 text-6xl mb-4">⚠️</div>
+        <h2 className="text-2xl font-bold text-neutral-200 mb-4">Error</h2>
+        <p className="text-neutral-400 mb-6">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="neon-btn"
+          className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200"
         >
           Try Again
         </button>
@@ -210,14 +210,14 @@ export default function Home() {
     <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
       <motion.div
         {...fadeIn}
-        className="glass p-8 rounded-2xl text-center max-w-md mx-4"
+        className="bg-neutral-900/30 border border-neutral-800/50 p-8 rounded-2xl backdrop-blur-sm text-center max-w-md mx-4"
       >
-        <BookOpen className="w-16 h-16 text-electric-blue mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-electric-blue mb-4">No Content Available</h2>
-        <p className="text-neon-cyan mb-6">Please select a learning path to begin.</p>
+        <BookOpen className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-neutral-200 mb-4">No Content Available</h2>
+        <p className="text-neutral-400 mb-6">Please select a learning path to begin.</p>
         <button
           onClick={() => router.push('/')}
-          className="neon-btn"
+          className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200"
         >
           Go to Dashboard
         </button>
@@ -228,31 +228,37 @@ export default function Home() {
   return (
     <>
       {isCompleted === 0 ? (
-        <div className="bg-neutral-950 text-white min-h-screen flex flex-col items-center p-4 overflow-hidden">
+        <div className="bg-neutral-950 text-white min-h-screen pt-20 pb-8 px-4 overflow-hidden">
           <Head>
             <title>{componentData.name}</title>
           </Head>
   
-          <motion.div {...fadeIn} className="w-full max-w-7xl glass border border-soft-purple/20 rounded-2xl shadow-2xl p-6 space-y-6">
+          <motion.div {...fadeIn} className="w-full max-w-7xl mx-auto bg-neutral-900/30 border border-neutral-800/50 rounded-2xl shadow-2xl p-8 backdrop-blur-sm">
             {/* Progress Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-10">
               <div>
-                <h1 className="text-2xl font-bold text-electric-blue">{componentData.name}</h1>
-                <div className="flex items-center space-x-2 mt-2">
-                  <BarChart className="w-4 h-4 text-neon-cyan" />
-                  <span className="text-neon-cyan">
-                    Progress: {Math.round((currentComponentIndex+1 / total) * 100)}%
+                <h1 className="text-3xl font-bold text-neutral-100 mb-2">{componentData.name}</h1>
+                <div className="flex items-center space-x-3 mt-2">
+                  <BarChart className="w-5 h-5 text-neutral-400" />
+                  <div className="w-full bg-neutral-800/50 h-2 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.round(((currentComponentIndex+1) / total) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-neutral-400 text-sm">
+                    {Math.round(((currentComponentIndex+1) / total) * 100)}%
                   </span>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="text-right">
-                  <p className="text-sm text-neon-cyan">Component</p>
-                  <p className="text-lg font-bold text-electric-blue">
-                    {currentComponentIndex + 1} / {total}
+                  <p className="text-sm text-neutral-400">Component</p>
+                  <p className="text-xl font-bold text-neutral-200">
+                    {currentComponentIndex + 1} <span className="text-neutral-500">/</span> {total}
                   </p>
                 </div>
-                <Award className="w-8 h-8 text-electric-blue" />
+                <Award className="w-8 h-8 text-blue-500" />
               </div>
             </div>
   
@@ -261,7 +267,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
             >
               {componentData.videos.map((video, index) => (
                 <motion.div
@@ -269,7 +275,7 @@ export default function Home() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className="glass rounded-xl overflow-hidden hover-glow"
+                  className="bg-neutral-800/30 rounded-xl overflow-hidden border border-neutral-700/50 hover:border-neutral-600/50 transition-all duration-200"
                 >
                   <iframe
                     width="100%"
@@ -290,10 +296,10 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="glass p-6 rounded-xl border border-soft-purple/20"
+              className="bg-neutral-800/30 p-6 rounded-xl border border-neutral-700/50 mb-8"
             >
-              <h2 className="text-xl font-bold text-electric-blue mb-4">Overview</h2>
-              <p className="text-neon-cyan">{componentData.description}</p>
+              <h2 className="text-xl font-bold text-neutral-200 mb-4">Overview</h2>
+              <p className="text-neutral-300">{componentData.description}</p>
             </motion.div>
   
             {/* Supplementary Materials Section */}
@@ -301,84 +307,74 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="space-y-4"
+              className="space-y-6 mb-8"
             >
-              <div className="flex items-center space-x-3 mb-4">
-                <FileText className="text-electric-blue" />
-                <h3 className="text-lg font-semibold text-electric-blue">Learning Materials</h3>
+              <div className="flex items-center space-x-3">
+                <FileText className="text-blue-500" />
+                <h3 className="text-xl font-semibold text-neutral-200">Learning Materials</h3>
               </div>
-              <div className="glass p-6 rounded-xl border border-soft-purple/20">
+              <div className="bg-neutral-800/30 border border-neutral-700/50 p-6 rounded-xl backdrop-blur-sm">
                 <iframe
-                  src={componentData.document}
+                  src={componentData.component.document}
                   width="100%"
                   height="600px"
-                  className="rounded-lg mb-4"
+                  className="rounded-lg mb-6 bg-neutral-900"
                   title="PDF Viewer"
                 />
                 <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  href={componentData.document}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  href={componentData.component.document}
                   download
-                  className="neon-btn inline-flex items-center space-x-2"
+                  className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200"
                 >
-                  <FileText size={20} />
+                  <FileText size={20} className="mr-2" />
                   <span>Download PDF</span>
                 </motion.a>
               </div>
             </motion.div>
   
-            {/* Quiz Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="space-y-4"
-            >
-              <div className="flex items-center space-x-3 mb-4">
-                <Clock className="text-electric-blue" />
-                <h2 className="text-xl font-semibold text-electric-blue">Knowledge Check</h2>
-              </div>
-              <div className="glass p-6 rounded-xl border border-soft-purple/20">
-                {/* Quiz content commented out */}
-              </div>
-            </motion.div>
-  
             {/* Next Component Button */}
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleNextComponent}
-              className="neon-btn w-full flex items-center justify-center space-x-2"
+              className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl flex items-center justify-center space-x-2 transition-all duration-200 font-semibold"
             >
-              <span>Next Component</span>
+              <span>Continue to Next Component</span>
               <ArrowRight />
             </motion.button>
           </motion.div>
         </div>
       ) : (
-        <div className="bg-neutral-950 text-white min-h-screen flex flex-col items-center p-4 overflow-hidden">
+        <div className="bg-neutral-950 text-white min-h-screen pt-20 pb-8 px-4 overflow-hidden">
           <Head>
-            <title>{componentData.component.id}</title>
+            <title>{componentData.component.name}</title>
           </Head>
   
-          <motion.div {...fadeIn} className="w-full max-w-7xl glass border border-soft-purple/20 rounded-2xl shadow-2xl p-6 space-y-6">
+          <motion.div {...fadeIn} className="w-full max-w-7xl mx-auto bg-neutral-900/30 border border-neutral-800/50 rounded-2xl shadow-2xl p-8 backdrop-blur-sm">
             {/* Progress Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-10">
               <div>
-                <h1 className="text-2xl font-bold text-electric-blue">{componentData.component.name}</h1>
-                <div className="flex items-center space-x-2 mt-2">
-                  <BarChart className="w-4 h-4 text-neon-cyan" />
-                  <span className="text-neon-cyan">
-                    Progress: {Math.round((currentComponentIndex+1 / total) * 100)}%
+                <h1 className="text-3xl font-bold text-neutral-100 mb-2">{componentData.component.name}</h1>
+                <div className="flex items-center space-x-3 mt-2">
+                  <BarChart className="w-5 h-5 text-neutral-400" />
+                  <div className="w-full bg-neutral-800/50 h-2 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.round(((currentComponentIndex+1) / total) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-neutral-400 text-sm">
+                    {Math.round(((currentComponentIndex+1) / total) * 100)}%
                   </span>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="text-right">
-                  <p className="text-sm text-neon-cyan">Component</p>
-                  <p className="text-lg font-bold text-electric-blue">
-                    {currentComponentIndex + 1} / {total}
+                  <p className="text-sm text-neutral-400">Component</p>
+                  <p className="text-xl font-bold text-neutral-200">
+                    {currentComponentIndex + 1} <span className="text-neutral-500">/</span> {total}
                   </p>
                 </div>
                 <Award className="w-8 h-8 text-electric-blue" />
@@ -390,7 +386,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
             >
               {componentData.component.videos.map((video, index) => (
                 <motion.div
@@ -398,7 +394,7 @@ export default function Home() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className="glass rounded-xl overflow-hidden hover-glow"
+                  className="bg-neutral-800/30 rounded-xl overflow-hidden border border-neutral-700/50 hover:border-neutral-600/50 transition-all duration-200"
                 >
                   <iframe
                     width="100%"
@@ -419,10 +415,10 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="glass p-6 rounded-xl border border-soft-purple/20"
+              className="bg-neutral-800/30 p-6 rounded-xl border border-neutral-700/50 mb-8"
             >
-              <h2 className="text-xl font-bold text-electric-blue mb-4">Overview</h2>
-              <p className="text-neon-cyan">{componentData.component.description}</p>
+              <h2 className="text-xl font-bold text-neutral-200 mb-4">Overview</h2>
+              <p className="text-neutral-300">{componentData.component.description}</p>
             </motion.div>
   
             {/* Supplementary Materials Section */}
@@ -430,28 +426,28 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="space-y-4"
+              className="space-y-6 mb-8"
             >
-              <div className="flex items-center space-x-3 mb-4">
-                <FileText className="text-electric-blue" />
-                <h3 className="text-lg font-semibold text-electric-blue">Learning Materials</h3>
+              <div className="flex items-center space-x-3">
+                <FileText className="text-blue-500" />
+                <h3 className="text-xl font-semibold text-neutral-200">Learning Materials</h3>
               </div>
-              <div className="glass p-6 rounded-xl border border-soft-purple/20">
+              <div className="bg-neutral-800/30 border border-neutral-700/50 p-6 rounded-xl backdrop-blur-sm">
                 <iframe
                   src={componentData.component.document}
                   width="100%"
                   height="600px"
-                  className="rounded-lg mb-4"
+                  className="rounded-lg mb-6 bg-neutral-700"
                   title="PDF Viewer"
                 />
                 <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   href={componentData.component.document}
                   download
-                  className="neon-btn inline-flex items-center space-x-2"
+                  className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200"
                 >
-                  <FileText size={20} />
+                  <FileText size={20} className="mr-2" />
                   <span>Download PDF</span>
                 </motion.a>
               </div>
@@ -462,55 +458,59 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="space-y-4"
+              className="space-y-6"
             >
-              <div className="flex items-center space-x-3 mb-4">
-                <Clock className="text-electric-blue" />
-                <h2 className="text-xl font-semibold text-electric-blue">Knowledge Check</h2>
+              <div className="flex items-center space-x-3 mb-6">
+                <Clock className="text-blue-500" />
+                <h2 className="text-xl font-semibold text-neutral-200">Knowledge Check</h2>
               </div>
-              <div className="glass p-6 rounded-xl border border-soft-purple/20">
+              <div className="bg-neutral-900/30 border border-neutral-800/50 p-6 rounded-xl backdrop-blur-sm">
                 {componentData.component.test_series.map((question, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="mb-6"
+                    className="mb-8 last:mb-0"
                   >
-                    <h3 className="text-lg font-semibold text-electric-blue mb-4">{question.question}</h3>
+                    <h3 className="text-lg font-semibold text-neutral-200 mb-4">{question.question}</h3>
                     <div className="space-y-3">
                       {question.options.map((option, optionIndex) => (
                         <label
                           key={optionIndex}
-                          className="flex items-center space-x-3 p-3 glass rounded-lg cursor-pointer transition-all hover:bg-deep-indigo/20"
+                          className="flex items-center space-x-3 p-4 bg-neutral-800/30 hover:bg-neutral-700/30 border border-neutral-800/50 rounded-xl cursor-pointer transition-all duration-200"
                         >
                           <input
                             type="radio"
                             name={`question-${index}`}
                             value={option}
                             onChange={() => handleQuizAnswer(index, option)}
-                            className="form-radio text-electric-blue"
+                            className="form-radio text-blue-500 border-neutral-600 focus:ring-blue-500"
                           />
-                          <span className="text-neon-cyan">{option}</span>
+                          <span className="text-neutral-200">{option}</span>
                         </label>
                       ))}
                     </div>
                   </motion.div>
                 ))}
-  
+
                 {quizCompleted && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mt-8 glass p-6 rounded-xl"
+                    className="mt-8 bg-neutral-900/50 border border-neutral-800/50 p-6 rounded-xl"
                   >
-                    <h3 className="text-xl font-bold text-electric-blue mb-4">Quiz Results</h3>
+                    <h3 className="text-xl font-bold text-neutral-200 mb-4">Quiz Results</h3>
                     {componentData.component.test_series.map((question, index) => (
-                      <div key={index} className="mb-4">
-                        <p className="font-semibold text-neon-cyan">{question.question}</p>
-                        <p className={`mt-2 ${quizAnswers[index] === question.answer ? 'text-green-500' : 'text-red-500'}`}>
+                      <div key={index} className="mb-4 last:mb-0">
+                        <p className="font-semibold text-neutral-300">{question.question}</p>
+                        <p className={`mt-2 ${
+                          quizAnswers[index] === question.answer 
+                            ? 'text-green-400' 
+                            : 'text-red-400'
+                        }`}>
                           Your answer: {quizAnswers[index]}
-                          {quizAnswers[index] === question.answer ? " ✅" : " ❌"}
+                          {quizAnswers[index] === question.answer ? " ✓" : " ✗"}
                         </p>
                       </div>
                     ))}
@@ -518,15 +518,15 @@ export default function Home() {
                 )}
               </div>
             </motion.div>
-  
+
             {/* Next Component Button */}
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleNextComponent}
-              className="neon-btn w-full flex items-center justify-center space-x-2"
+              className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl flex items-center justify-center space-x-2 transition-all duration-200 font-semibold"
             >
-              <span>Next Component</span>
+              <span>Continue to Next Component</span>
               <ArrowRight />
             </motion.button>
           </motion.div>
